@@ -9,14 +9,15 @@ Created on Mon Jan  6 16:55:24 2020
 # the "input"-function prevents exception throw
 # found out by using the eggclock-helper
 
-def askandreturn(question="Question", validresults=["yes","no"]):
+def askandreturn(question="Question", validresults=["yes","no"]): # THIS REQUIRES STRINGS AS INPUT for validresults!!
+    #validresults = [str(x) for x in validresults] # typecast internal isse: other datatype returned
     while 1:
         text = input(question+str(validresults))
         if text in validresults:
             return text # exit
+
         
-        
-def askandreturnindex(question="Question", validresults=["yes","no"]):
+def askandreturnindex(question="Question", validresults=["yes","no"]): # THIS REQUIRES STRINGS AS INPUT for validresults!!
     return(validresults.index(askandreturn(question,validresults)))
             
         
