@@ -15,7 +15,13 @@ from matplotlib.patches import Arc, Circle
 
 
 # my modules
-import myfolderparser as mfp
+#-#-# module test #-#-#
+if __name__ == '__main__': # test if called as executable, not as library
+    import myfolderparser as mfp
+    tester()
+else:
+    from vigilant_tribbles import myfolderparser as mfp
+
 
 from PIL import Image # pillow library
 #import cv2 # python-opencv library
@@ -598,25 +604,24 @@ class myinkc(mfp.myfolderparserc):
 
                 
         
-        
-#-#-# module test #-#-#
-if __name__ == '__main__': # test if called as executable, not as library
+    
+def tester():
 
-       
-       ele = myinkc()
-       print(ele.defaultcolorlist())
-       
-       x = np.array([0, 1, 2, 5])
-       y = np.array([-1, 0.2, 0.9, 2.1])
-       
-       k, d = ele.LSQ(x,y)
-       
-       #ele.subplots()
-       #ele.plot()#this is in thvsia
-       plt.plot(x, y, 'o', label='Original data', markersize=10)
-       #plt.plot(x, k*x + d, 'r', label='Fitted line', c=ele.defaultcolorlist())#this did not fucking work wtf why didn't i check or uncomment
-       plt.legend()
-       plt.show()
-       
-       ele.modlegend("hellO") # take some ax function to test ax property
+   
+   ele = myinkc()
+   print(ele.defaultcolorlist())
+   
+   x = np.array([0, 1, 2, 5])
+   y = np.array([-1, 0.2, 0.9, 2.1])
+   
+   k, d = ele.LSQ(x,y)
+   
+   #ele.subplots()
+   #ele.plot()#this is in thvsia
+   plt.plot(x, y, 'o', label='Original data', markersize=10)
+   #plt.plot(x, k*x + d, 'r', label='Fitted line', c=ele.defaultcolorlist())#this did not fucking work wtf why didn't i check or uncomment
+   plt.legend()
+   plt.show()
+   
+   ele.modlegend("hellO") # take some ax function to test ax property
        
