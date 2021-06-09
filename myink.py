@@ -96,6 +96,7 @@ class myinkc(mfp.myfolderparserc):
     
     
     #function, since pos in axs will change during plotting
+    #!! generates figure if none (no plt.figure() or self.subplots() etc. called beforehand)!! ergo be inside doplot()-if-context
     def get_ax(self, ax=None): # get class' ax or check if ax is passed and route through
         if ax is None: # no axis given
             if type(self.ax) is type(None): # is axis not a property already - robust
