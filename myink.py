@@ -66,6 +66,9 @@ class myinkc(mfp.myfolderparserc):
     def close(self, st):
         plt.close("all")
     
+    # show last plots - for non-spyder IDEs which need manual trigger
+    def show(self):
+        plt.show()
 
     def ax_onward(self):
         self.ax_move(1)
