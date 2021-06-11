@@ -13,6 +13,30 @@ import matplotlib.pyplot as plt
 from matplotlib.ticker import EngFormatter
 from matplotlib.patches import Arc, Circle
 
+from PIL import Image # pillow library
+import cv2 # python-opencv library - linux:pip install opencv-python
+#from skimage import idata, icolor
+#from skimage.transform import rescale, resize, downscale_local_mean
+
+
+def tester(): # module test, superseeds ifdef-main (since used here for import shenanigans) #
+   ele = myinkc()
+   print(ele.defaultcolorlist())
+   
+   x = np.array([0, 1, 2, 5])
+   y = np.array([-1, 0.2, 0.9, 2.1])
+   
+   k, d = ele.LSQ(x,y)
+   
+   #ele.subplots()
+   #ele.plot()#this is in thvsia
+   plt.plot(x, y, 'o', label='Original data', markersize=10)
+   #plt.plot(x, k*x + d, 'r', label='Fitted line', c=ele.defaultcolorlist())#this did not fucking work wtf why didn't i check or uncomment
+   plt.legend()
+   plt.show()
+   
+   ele.modlegend("hellO") # take some ax function to test ax property
+
 
 # my modules
 #-#-# module test #-#-#
@@ -22,11 +46,6 @@ if __name__ == '__main__': # test if called as executable, not as library
 else:
     from vigilant_tribbles import myfolderparser as mfp
 
-
-from PIL import Image # pillow library
-#import cv2 # python-opencv library
-#from skimage import idata, icolor
-#from skimage.transform import rescale, resize, downscale_local_mean
 
 ## thing to make matplotlib access easier ###
 class myinkc(mfp.myfolderparserc): 
@@ -605,27 +624,3 @@ class myinkc(mfp.myfolderparserc):
         plt.ylabel(ylabel)#("common Y")
            
         
-
-                
-        
-    
-def tester():
-
-   
-   ele = myinkc()
-   print(ele.defaultcolorlist())
-   
-   x = np.array([0, 1, 2, 5])
-   y = np.array([-1, 0.2, 0.9, 2.1])
-   
-   k, d = ele.LSQ(x,y)
-   
-   #ele.subplots()
-   #ele.plot()#this is in thvsia
-   plt.plot(x, y, 'o', label='Original data', markersize=10)
-   #plt.plot(x, k*x + d, 'r', label='Fitted line', c=ele.defaultcolorlist())#this did not fucking work wtf why didn't i check or uncomment
-   plt.legend()
-   plt.show()
-   
-   ele.modlegend("hellO") # take some ax function to test ax property
-       
