@@ -156,7 +156,7 @@ class myinkc(mfp.myfolderparserc):
 
     def twinx(self, ax=None, yleft=None, yright=None, yleftadd=None, yrightadd=None):#make right axis #$todo:insert into axs maybe?
         ax = self.get_ax(ax)#save old left
-        self.pacman_worker(ax)#on left
+        #self.pacman_worker(ax)#on left
         
         self.ax = ax.twinx()#make right
         self.axdir="r"#next pacman_worker would be right
