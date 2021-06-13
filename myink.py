@@ -41,10 +41,10 @@ class myinkc(mfp.myfolderparserc):
         self.ax = None
         self.fig = None
         
-
+        
         self.printimg=True#shall images be printed
         self.yright=None#var to be inspected on plot cleanup and reset
-
+        
         
         super().__init__(*args, **kwargs) # superclass init, in case there is any
         
@@ -63,8 +63,8 @@ class myinkc(mfp.myfolderparserc):
             self.ax=self.axs[0]
             
         return self.fig, self.axs
-
-
+    
+    
     # close old plots    
     def close(self, st):
         plt.close("all")
@@ -72,15 +72,15 @@ class myinkc(mfp.myfolderparserc):
     # show last plots - for non-spyder IDEs which need manual trigger
     def show(self):
         plt.show()
-
-
+    
+    
     def rcparams_update(self,dict):
         plt.rcParams.update(dict)
         #e.g. this as
         #plt.rcParams.update({'font.size': 22})
         #self.rcparams_update({'font.size': 22})
-
-
+    
+    
     def ax_onward(self):
         self.ax_move(1)
         return self.ax
@@ -90,7 +90,7 @@ class myinkc(mfp.myfolderparserc):
         self.ax_move(-1)
         return self.ax
     
-
+    
     def roadkill(self, thing): # flaten if possible - remove any dimensions and make a list
         if (hasattr(thing, "__iter__")):
             return(thing.flatten()) # even more powerful: thing = np.concatenate(thing).ravel()
@@ -102,7 +102,7 @@ class myinkc(mfp.myfolderparserc):
         self.ax_i = self.ax_i + where
         
         self.axs = self.roadkill(self.axs)
-
+        
         if np.size(self.axs)==0:
             raise Exception("only one axis - can't iterate")
         self.ax = self.axs[self.ax_i]
@@ -128,7 +128,7 @@ class myinkc(mfp.myfolderparserc):
         else:
             self.ax=ax
     
-
+    
     # made for comradelegend only, right now
     def get_fig(self, fig=None): # get class' fig or check if fig is passed and route through
         if fig is None: # no axis given
@@ -138,14 +138,14 @@ class myinkc(mfp.myfolderparserc):
                 fig=self.fig # if its a property take that
         return fig
     
-
+    
     def set_fig(self, fig=None): # set class' fig via parameter or matplotlib poll
         if fig is None: # no figis given
             self.fig=plt.gcf() #  get current whatever
         else:
             self.fig=fig
     
-
+    
     def twinx(self, ax=None, yleft=None, yright=None, yleftadd=None, yrightadd=None):#make right axis #$todo:insert into axs maybe?
         ax = self.get_ax(ax)#save old left
         #self.pacman_worker(ax)#on left
@@ -171,32 +171,32 @@ class myinkc(mfp.myfolderparserc):
             ax.set_ylabel(yleft)#set left axis
             #self.ax.set_ylabel(yright)#set right axis#do later, after plotting in resetplot          
             
-
+    
     def twiny(self, ax=None):#make top axis
         ax = self.get_ax(ax)
         self.ax = ax.twiny()
-
-
+    
+    
     def suptitle(self, title=""):# major title/label for figure == "supertitle", to be fig.suptitle compatible
         fig = self.get_fig()
         fig.suptitle(title)
         
-
+    
     def figlabel(self, title=None):#alias for what it actually does, avoids confusion
         if title!=None:    
             self.suptitle(title)
             
-
+    
     def title(self, title=None): # minor title of individual axis
         ax = self.get_ax()    
         if title!=None:    
                 ax.set_title(title)
         
-
+    
     def set_figlabel(self, *args, **kwargs):
         self.figlabel(self, *args, **kwargs)
     
-
+    
     def get_figlabel(self):
         fig = self.get_fig()
         if type(fig._suptitle) == type(None):#if it doesn't exist
@@ -245,7 +245,7 @@ class myinkc(mfp.myfolderparserc):
     def killlegend(self,ax=None):
         ax = self.get_ax(ax)
         #for stuff in [ax.get_legend()]:
-         #   stuff.remove()
+        #   stuff.remove()
         oh_my = ax.get_legend() # alt
         if oh_my:
             oh_my.remove()
@@ -299,11 +299,11 @@ class myinkc(mfp.myfolderparserc):
             ll=list(ax.get_legend().get_texts()) # fetch what is there
             texts = [item._text for item in ll ]
             mylegendtext=texts
-
+            
             extra = Rectangle((0, 0), 1, 1, fc="w", fill=False, edgecolor='none', linewidth=0) # dummy rect
             
             mytext=mylegendtext
-     
+            
             ## todo: outsource it into  "turn into list" function
             if type(mytext)==list:
                 pass # we're good
@@ -322,14 +322,14 @@ class myinkc(mfp.myfolderparserc):
             mytext.insert(0,title) # insert as first ele into list
             legendlines=ax.get_lines()[:] # decompose simple_list object, or sth.
             legendlines.insert(0,extra) # insert into regular list
-           
-                
+            
+            
             #print(mytext)
             #print()
             
             ax.legend(legendlines, mytext)   
-            
-   
+    
+    
     def comradelegend(self, fig=None, **kwargs): # collect all labels of one figure and collate to one master legend
         fig=self.get_fig(fig)#fetch
         
@@ -514,7 +514,7 @@ class myinkc(mfp.myfolderparserc):
         #left, right = ax.get_xlim() 
         #left, right = self.include_me(left, right)
         #ax.set_xlim(left, right) e
-       
+        
         if me < left:
             left=me*1.1
         elif me > right:
@@ -557,7 +557,7 @@ class myinkc(mfp.myfolderparserc):
     def picshow_manual(self, imgs=[], engine="cv", *args, **kwargs): # give img list and fig size - get gallery, recommended max. 2x2
         self.picframe(*args, **kwargs)
         self.axs = self.roadkill(self.axs) # remove higher dimensions of nxm array, put all into list
-       
+        
         for ax in self.axs:
             ax.axis("off")
             
@@ -571,7 +571,7 @@ class myinkc(mfp.myfolderparserc):
             if engine=="PIL":
                 ax.imshow(Image.open(img)) # no rotation, theoretically slower
             elif engine=="cv":
-                 ax.imshow(cv2.cvtColor(cv2.imread(img), cv2.COLOR_BGR2RGB)) # auto-rotation, slower on older machine i think
+                ax.imshow(cv2.cvtColor(cv2.imread(img), cv2.COLOR_BGR2RGB)) # auto-rotation, slower on older machine i think
             else:
                 print("programmer you fucked up imshow")
             #imgs.pop(0)
@@ -581,7 +581,7 @@ class myinkc(mfp.myfolderparserc):
         self.listfiles()#list and store images in self
         self.gallery(imgs=self.images)
         
-         
+        
     def rotate_xticks(self, rotation, fix=1):
         ax=self.get_ax()
         for tick in ax.get_xticklabels():
@@ -614,7 +614,7 @@ class myinkc(mfp.myfolderparserc):
         plt.tick_params(labelcolor='none', which='both', top=False, bottom=False, left=False, right=False)
         plt.xlabel(xlabel)#("common X")
         plt.ylabel(ylabel)#("common Y")
-           
+        
         
 def tester(): # module test, superseeds ifdef-main (since used here for import shenanigans) #
     #oldtest()
