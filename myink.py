@@ -67,8 +67,8 @@ class myinkc(mfp.myfolderparserc):
     
     
     # close old plots    
-    def close(self, st):
-        plt.close("all")
+    def close(self, st="all"):
+        plt.close(st)
     
     # show last plots - for non-spyder IDEs which need manual trigger
     def show(self):
