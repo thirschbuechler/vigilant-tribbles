@@ -590,7 +590,6 @@ class myinkc(mfp.myfolderparserc):
         #"empty" but sets rotation (_str of this obj returns "Text(0, 0, '')")
         for tick in ax.get_xticklabels():
             tick.set_rotation(rotation)
-            print(tick)
         
         # then check if longer
         if long:#longer ones might appear shifted to right - compensate!
