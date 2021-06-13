@@ -82,6 +82,10 @@ class myinkc(mfp.myfolderparserc):
         #self.rcparams_update({'font.size': 22})
     
     
+    def savefig(self,*args, **kwargs):
+        plt.savefig(*args, **kwargs)
+
+
     def ax_onward(self):
         self.ax_move(1)
         return self.ax
