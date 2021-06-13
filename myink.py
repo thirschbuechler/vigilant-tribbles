@@ -583,24 +583,57 @@ class myinkc(mfp.myfolderparserc):
         self.gallery(imgs=self.images)
         
         
-    def rotate_xticks(self, rotation, fix=1):
+    def rotate_xticks(self, rotation, long=0, ha="right", autoscale=1):#ha and autoscale only get done if long is True
         ax=self.get_ax()
-        l=1
+    
+        #"empty" but sets rotation (_str of this obj returns "Text(0, 0, '')")
         for tick in ax.get_xticklabels():
             tick.set_rotation(rotation)
-            l=np.size(tick)
-            
-        if fix:#longer ones appear shifted to right
+            print(tick)
+            #print(xticklabels)#not defined per default - WTF - list of "Text(0, 0, '')" elements !!
+            #l=np.size(tick)
+        
+        if long:#longer ones appear shifted to right
             #ax.tick_params(direction='inout')
             #ax.set_xticklabels(ax.get_xticklabels(), rotation=rotation, ha='right') # doesn't work in 3.3.0 anymore
             
+
+            #plt.xticks(rotation=rotation, ha=ha)#updateing matplotlib 3.3. (turbo cmap) required this#ha doesnt work anymore
+            #ax.set_yticklabels(ax.get_yticklabels(), rotation=rotation, va='top')
+            
+            
+            xticks=ax.get_xticks()
+            #xticklabels=ax.get_xticklabels()
+            #print(xticks)
+            #print(xticklabels)#not defined per default - WTF - list of "Text(0, 0, '')" elements !!
+            
+            ax.set_xticks(xticks)#works but does ugly autoscaling
+            # re-autoscale
+            if autoscale: # UNLESS you have an imshow then probably not
+                usedxticks=list(xticks.copy())
+                usedxticks.pop(0)
+                usedxticks.pop(len(usedxticks)-1)
+                ax.set_xlim(min(usedxticks),max(usedxticks))
+            #print(min(xticks))
             # set ha (horizontal alignment) dependent on tick len
+            """
+            #l=max([print(str(xtick) for xtick in list(xticks))]) # get generator - wtf!?
+            #l=max([len(str(xtick) for xtick in list(xticks.ticks))]) # get longest schlong - no worky
+            l=0
+            for xtick in list(xticks):
+                print(xtick)#wtf - 0.6000000000000001 - how to catch one of these
+                l=max(l,len(str(xtick)))
+            print(l)
             if l<5:
                 ha="left"
             else:
                 ha="right"
-            plt.xticks(rotation=rotation, ha=ha)#updateing matplotlib 3.3. (turbo cmap) required this
-            #ax.set_yticklabels(ax.get_yticklabels(), rotation=rotation, va='top')
+            """
+            
+            fontdict={'horizontalalignment':ha}
+            
+            ax.set_xticklabels(xticks,fontdict=fontdict)#Warning AFTER Axes.set_xticks - mandatory set_xticks!. Otherwise, the labels may end up in unexpected positions.
+            
 
 
     def subplots_adjust(self, *args, **kwargs):
@@ -678,43 +711,28 @@ def large_alltext():
 
 
 def tickrot():
+    # testdata and root obj
     x1=np.arange(1,20)
     x2=np.arange(1,20000)
-
     ele=myinkc()
+
+    # regular graph
     ele.subplots(nrows=2)
-    
     plt.plot(x1,x1)
     ele.ax_onward()
     plt.plot(x2,x2)
     ele.suptitle("normal labels")
     ele.show()
 
+    # modified graphs
     ele.subplots(nrows=2)
-    
     plt.plot(x1,x1)
-    ele.rotate_xticks(rotation=45,fix=1)
+    ele.rotate_xticks(rotation=45)
     ele.ax_onward()
     plt.plot(x2,x2)
-    #ele.rotate_xticks(rotation=45,fix=1)
+    
+    ele.rotate_xticks(rotation=45,long=1)
     ele.suptitle("rot labels")
-    ax=ele.get_ax()
-    #ax.set_xticklabels(ax.get_xticklabels(), rotation=45, ha='right') # doesn't work in 3.3.0 anymore
-    fontdict={'horizontalalignment':"right"}
-    xticks=ax.get_xticks()
-    xticklabels=ax.get_xticklabels()
-    
-    print(xticks)
-    print(xticklabels)#not defined per default - WTF - list of "Text(0, 0, '')" elements !!
-    
-    ax.set_xticks(xticks)#works but does ugly autoscaling
-    usedxticks=list(xticks.copy())
-    usedxticks.pop(0)
-    usedxticks.pop(len(usedxticks)-1)
-    ax.set_xlim(min(usedxticks),max(usedxticks))
-    print(min(xticks))
-    
-    ax.set_xticklabels(xticks,fontdict=fontdict)#Warning AFTER Axes.set_xticks - mandatory set_xticks!. Otherwise, the labels may end up in unexpected positions.
     ele.show()
 
 
