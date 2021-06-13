@@ -586,27 +586,16 @@ class myinkc(mfp.myfolderparserc):
     def rotate_xticks(self, rotation, long=0, ha="right", autoscale=1):#ha and autoscale only get done if long is True
         ax=self.get_ax()
     
+        # first, rotate 
         #"empty" but sets rotation (_str of this obj returns "Text(0, 0, '')")
         for tick in ax.get_xticklabels():
             tick.set_rotation(rotation)
             print(tick)
-            #print(xticklabels)#not defined per default - WTF - list of "Text(0, 0, '')" elements !!
-            #l=np.size(tick)
         
-        if long:#longer ones appear shifted to right
-            #ax.tick_params(direction='inout')
-            #ax.set_xticklabels(ax.get_xticklabels(), rotation=rotation, ha='right') # doesn't work in 3.3.0 anymore
-            
-
-            #plt.xticks(rotation=rotation, ha=ha)#updateing matplotlib 3.3. (turbo cmap) required this#ha doesnt work anymore
-            #ax.set_yticklabels(ax.get_yticklabels(), rotation=rotation, va='top')
-            
+        # then check if longer
+        if long:#longer ones might appear shifted to right - compensate!
             
             xticks=ax.get_xticks()
-            #xticklabels=ax.get_xticklabels()
-            #print(xticks)
-            #print(xticklabels)#not defined per default - WTF - list of "Text(0, 0, '')" elements !!
-            
             ax.set_xticks(xticks)#works but does ugly autoscaling
             # re-autoscale
             if autoscale: # UNLESS you have an imshow then probably not
@@ -614,9 +603,9 @@ class myinkc(mfp.myfolderparserc):
                 usedxticks.pop(0)
                 usedxticks.pop(len(usedxticks)-1)
                 ax.set_xlim(min(usedxticks),max(usedxticks))
-            #print(min(xticks))
-            # set ha (horizontal alignment) dependent on tick len
+            
             """
+            # set ha (horizontal alignment) dependent on tick len - DOES NOT WORK
             #l=max([print(str(xtick) for xtick in list(xticks))]) # get generator - wtf!?
             #l=max([len(str(xtick) for xtick in list(xticks.ticks))]) # get longest schlong - no worky
             l=0
@@ -630,9 +619,9 @@ class myinkc(mfp.myfolderparserc):
                 ha="right"
             """
             
-            fontdict={'horizontalalignment':ha}
-            
-            ax.set_xticklabels(xticks,fontdict=fontdict)#Warning AFTER Axes.set_xticks - mandatory set_xticks!. Otherwise, the labels may end up in unexpected positions.
+            fontdict={'horizontalalignment':ha}#put in here to pass along
+            ax.set_xticklabels(xticks,fontdict=fontdict)#Warning mandatory Axes.set_xticks beforehand!. 
+                                                            #Otherwise, the labels may end up in unexpected positions. (mpl >3.3.0, web-doc 3.4.1)
             
 
 
