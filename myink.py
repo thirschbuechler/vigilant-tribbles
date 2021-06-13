@@ -21,6 +21,7 @@ import cv2 # python-opencv library - linux:pip install opencv-python
 
 # my modules
 #-#-# module test #-#-#
+testing=False # imports don't seem to traverse this before reaching EOF and complaining about undef_bool !?
 if __name__ == '__main__': # test if called as executable, not as library
     import myfolderparser as mfp
     testing=True
