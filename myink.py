@@ -641,6 +641,11 @@ def oldtest():
 
 
 def test_fontsize():
+    large_title2()
+    large_alltext()
+
+
+def large_title2():
     ele = myinkc()
     #plt.subplots(nrows=2)
     ele.subplots(nrows=2) # why roadkill not defined? is a self-method of myinkc !? no forward-decl possible in py.. - because rcparams-update was at wrong indent level..
@@ -650,5 +655,17 @@ def test_fontsize():
     ele.title("biig")
     ele.show()
 
-if testing:
+
+def large_alltext():
+    ele = myinkc()
+    ele.rcparams_update({'font.size': 22})
+    ele.subplots(nrows=2)
+    ele.title("regular size")
+    ele.ax_onward()
+    
+    ele.title("biig")
+    ele.show()
+
+
+if testing:#call if selected, after defined, explanation see above
     tester()
