@@ -11,7 +11,7 @@ import os
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.ticker import EngFormatter
-from matplotlib.patches import Arc, Circle
+#from matplotlib.patches import Arc, Circle
 
 from PIL import Image # pillow library
 import cv2 # python-opencv library - linux:pip install opencv-python
