@@ -19,32 +19,15 @@ import cv2 # python-opencv library - linux:pip install opencv-python
 #from skimage.transform import rescale, resize, downscale_local_mean
 
 
-def tester(): # module test, superseeds ifdef-main (since used here for import shenanigans) #
-   ele = myinkc()
-   print(ele.defaultcolorlist())
-   
-   x = np.array([0, 1, 2, 5])
-   y = np.array([-1, 0.2, 0.9, 2.1])
-   
-   k, d = ele.LSQ(x,y)
-   
-   #ele.subplots()
-   #ele.plot()#this is in thvsia
-   plt.plot(x, y, 'o', label='Original data', markersize=10)
-   #plt.plot(x, k*x + d, 'r', label='Fitted line', c=ele.defaultcolorlist())#this did not fucking work wtf why didn't i check or uncomment
-   plt.legend()
-   plt.show()
-   
-   ele.modlegend("hellO") # take some ax function to test ax property
-
-
 # my modules
 #-#-# module test #-#-#
 if __name__ == '__main__': # test if called as executable, not as library
     import myfolderparser as mfp
-    tester()
+    testing=True
+    #tester()#since this is no fct definition, can't call this, also py has no forward-declaration option
 else:
     from vigilant_tribbles import myfolderparser as mfp
+    #testing=False
 
 
 ## thing to make matplotlib access easier ###
@@ -80,14 +63,23 @@ class myinkc(mfp.myfolderparserc):
             self.ax=self.axs[0]
             
         return self.fig, self.axs
-    
-    
+
+
+    # close old plots    
     def close(self, st):
         plt.close("all")
     
     # show last plots - for non-spyder IDEs which need manual trigger
     def show(self):
         plt.show()
+
+
+    def rcparams_update(self,dict):
+        plt.rcParams.update(dict)
+        #e.g. this as
+        #plt.rcParams.update({'font.size': 22})
+        #self.rcparams_update({'font.size': 22})
+
 
     def ax_onward(self):
         self.ax_move(1)
@@ -624,3 +616,39 @@ class myinkc(mfp.myfolderparserc):
         plt.ylabel(ylabel)#("common Y")
            
         
+def tester(): # module test, superseeds ifdef-main (since used here for import shenanigans) #
+    #oldtest()
+    test_fontsize()
+
+
+def oldtest():    
+    ele = myinkc()
+    print(ele.defaultcolorlist())
+    
+    x = np.array([0, 1, 2, 5])
+    y = np.array([-1, 0.2, 0.9, 2.1])
+    
+    k, d = ele.LSQ(x,y)
+    
+    #ele.subplots()
+    #ele.plot()#this is in thvsia
+    plt.plot(x, y, 'o', label='Original data', markersize=10)
+    #plt.plot(x, k*x + d, 'r', label='Fitted line', c=ele.defaultcolorlist())#this did not fucking work wtf why didn't i check or uncomment
+    plt.legend()
+    plt.show()
+    
+    ele.modlegend("hellO") # take some ax function to test ax property
+
+
+def test_fontsize():
+    ele = myinkc()
+    #plt.subplots(nrows=2)
+    ele.subplots(nrows=2) # why roadkill not defined? is a self-method of myinkc !? no forward-decl possible in py.. - because rcparams-update was at wrong indent level..
+    ele.title("regular size")
+    ele.ax_onward()
+    ele.rcparams_update({'font.size': 22})
+    ele.title("biig")
+    ele.show()
+
+if testing:
+    tester()
