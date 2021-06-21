@@ -12,7 +12,7 @@ from mystring import * # legacy compatibility for every external call to mfp
 # ToDo - with-context stuff like __enter__ and __exit__,
 # - getpath() in enter to set "scriptdir" to current scope's dir
 # - cleanup() to release it back where it is expected to be!
-
+# - bump issue
 
 # doctest
 def integritycheck():
