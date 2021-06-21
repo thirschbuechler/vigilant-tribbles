@@ -5,14 +5,10 @@ Created on Mon May 18 21:06:39 2020
 
 @author: thirschbuechler
 """
-
-        #cleanup to avoid traverse issue - this should be integrated into mfp!!
-        #self.setinitdir(myinitcd) 
-        #self.cd(myinitcd)
-        
-        
 import os
 
+
+# some random helper functions first, probably put somewhere else $ToDo
 def integritycheck():
     import doctest
     print("performing doctest test..")
@@ -56,7 +52,10 @@ def removestringparts(matchers, listt):
     return listt
 
 
-## thing to parse directorys 
+## thing to traverse directorys ##
+# - go there (cd functions)
+# - list files and classify them
+# - if an file-open called by any function, the path can be omitted there
 class myfolderparserc(object):
         
     ## housekeeping
@@ -66,23 +65,30 @@ class myfolderparserc(object):
         else:
             defaultpath=self.getpath() # py-file folder if not declared
             
-        self.initdir=defaultpath 
-        self.myfprint=dummy        
-        super().__init__(*args, **kwargs) # superclass init, in case there is any
+        self.scriptdir=defaultpath #NEVER EVER CHANGE - neaded foor cleanup!
+        self.rootdir=defaultpath # change as you please
         
+        self.myfprint=dummy   
+        
+        super().__init__(*args, **kwargs) # superclass init, in case there is any
+    
+    
     def set_myfprint(self,handle):
         self.myfprint=handle
-        
+    
+
     # helper fcts  #
     def getpath(self):
-        return os.getcwd() # get current shell path
+        return os.getcwd() # get current shell path (working directory location)
     
-    def setinitdir(self, newpath): # change reset target of cdres
-        self.initdir = newpath
-        self.myfprint("from {} to {}".format(self.getpath(),newpath))
-        
+
+    def setrootdir(self, newpath): # change reset target of cdres, cdleap, .. root of folders to traverse
+        self.rootdir = newpath
+        self.myfprint("rootdir from {} to {}".format(self.rootdir,newpath))
+    
+
     def cd(self,newpath): 
-        self.myfprint("from {} to {}".format(self.getpath(),newpath))
+        self.myfprint("cd from {} to {}".format(self.getpath(),newpath))
         try:
             #if(os.path.isdir(newpath)):
             #print("going to {}".format(newpath))
@@ -93,22 +99,26 @@ class myfolderparserc(object):
             os.chdir((newpath)) # change current shell path                
         except Exception as e:
             pnow=self.getpath()
-            raise Exception("folder {} not found, currently in {}  (os.path isdir true on second, tip: set initdir and jumpdirs & don't traverse zigzag in different levels, cleanup after blocks'), ".format(e, pnow))
-        
+            raise Exception("folder {} not found, currently in {}  (os.path isdir true on second, tip: set rootdir and jumpdirs & don't traverse zigzag in different levels, cleanup after blocks'), ".format(e, pnow))
+    
     def cdup(self):
         self.cd('../')
         
     def cdres(self): # reset
-        self.cd(self.initdir)
-        
+        self.cd(self.rootdir)
+    
     def cdleap(self, newpath): # leap-jump over to other dir after topdir
         self.cdres()
         self.cd(newpath)
-        
-        
+    
+    def cleanup(self): # reset current-path to scriptdir after doing some traversing
+        self.setrootdir(self.scriptdir) 
+        self.cd(self.scriptdir)
+    
+
     def listfiles(self,myprint=dummy): # list files and save imgs in new
     #https://stackoverflow.com/questions/18262293/how-to-open-every-file-in-a-folder
-        location = os.getcwd() # get present working directory location here
+        location = self.getpath()
         counter = 0 #keep a count of all files found
         otherfiles = [] #list to keep any other file that do not match the criteria
         
@@ -135,12 +145,11 @@ class myfolderparserc(object):
                 raise e
                 print("No files found here!")
         myprint("found {} files in total".format(counter))
- 
 
-      
+
 #-#-# module test #-#-#
 if __name__ == '__main__': # test if called as executable, not as library
-    integritycheck()    
+    integritycheck() #doctest   
     
     print("todo: test cd functions - like playing fetch with a dog")
     
