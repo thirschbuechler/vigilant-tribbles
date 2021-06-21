@@ -14,8 +14,8 @@ from mystring import * # legacy compatibility for every external call to mfp
 # - cleanup() to release it back where it is expected to be!
 
 
-# doctest
 def integritycheck():
+    """ better call doctest """
     import doctest
     print("performing doctest test..")
     res=doctest.testmod() # process doctest methods
@@ -23,13 +23,15 @@ def integritycheck():
     print("attempted==succeeded, if no fails\n")
 
 
-## thing to traverse directorys ##
-# - go there (cd functions)
-# - list files and classify them
-# - if an file-open called by any function, the path can be omitted there
 class myfolderparserc(object):
-        
-    ## housekeeping
+    """
+    thing to traverse directorys
+    - go there (cd functions)
+    - list files and classify them
+    - if an file-open called by any function, the path can be omitted there
+    """
+    
+    # class init
     def __init__(self, *args, **kwargs):  
         if "defaultpath" in kwargs:
             defaultpath = kwargs["defaultpath"]
@@ -50,10 +52,12 @@ class myfolderparserc(object):
 
     # helper fcts  #
     def getpath(self):
-        return os.getcwd() # get current shell path (working directory location)
+        """get current shell path (working directory location)"""
+        return os.getcwd()
     
 
-    def setrootdir(self, newpath): # change reset target of cdres, cdleap, .. root of folders to traverse
+    def setrootdir(self, newpath):
+        """ change reset target of cdres, cdleap, .. root of folders to traverse"""
         self.rootdir = newpath
         self.myfprint("rootdir from {} to {}".format(self.rootdir,newpath))
     
@@ -75,7 +79,8 @@ class myfolderparserc(object):
     def cdup(self):
         self.cd('../')
         
-    def cdres(self): # reset
+    def cdres(self):
+        """ reset to rootdir for further folder traversing"""
         self.cd(self.rootdir)
     
     def cdleap(self, newpath): # leap-jump over to other dir after topdir
@@ -87,14 +92,15 @@ class myfolderparserc(object):
         self.cd(self.scriptdir)
     
 
-    def listfiles(self,myprint=dummy): # list files and save imgs in new
-    #https://stackoverflow.com/questions/18262293/how-to-open-every-file-in-a-folder
+    def listfiles(self,myprint=dummy): 
+        """ list files and classify them """
+        #https://stackoverflow.com/questions/18262293/how-to-open-every-file-in-a-folder
         location = self.getpath()
         counter = 0 #keep a count of all files found
         otherfiles = [] #list to keep any other file that do not match the criteria
         
         self.images=[]
-        self.layouts=[]#pmd layout files
+        self.layouts=[] # pyweave pmd layout files
         self.touchstone=[]
         
         for file in os.listdir(location):
@@ -113,8 +119,9 @@ class myfolderparserc(object):
                     myprint("not classified: "+file)
                     counter +=1
             except Exception as e:
-                raise e
                 print("No files found here!")
+                raise e
+        
         myprint("found {} files in total".format(counter))
 
 
