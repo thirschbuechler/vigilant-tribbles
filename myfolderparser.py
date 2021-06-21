@@ -1,55 +1,26 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Mon May 18 21:06:39 2020
+Myfolderparser - traverse folders and ease file operations
 
+Created on Mon May 18 21:06:39 2020
 @author: thirschbuechler
 """
 import os
+from mystring import * # legacy compatibility for every external call to mfp
+
+# ToDo - with-context stuff like __enter__ and __exit__,
+# - getpath() in enter to set "scriptdir" to current scope's dir
+# - cleanup() to release it back where it is expected to be!
 
 
-# some random helper functions first, probably put somewhere else $ToDo
+# doctest
 def integritycheck():
     import doctest
     print("performing doctest test..")
     res=doctest.testmod() # process doctest methods
     print(res)
     print("attempted==succeeded, if no fails\n")
-    
-def dummy(*args, **kwargs):
-    pass
-
-def iscontainedin(matchers, listt): # returns matches by modding listt
-    return [s for s in listt if any(xs in s for xs in matchers)]
-
-
-def removecontainingof(tobe_del,listt, sure=0): # removes stuff from listt
-    if type(listt)!=list and sure==0:
-        print("are you sure to hand over a non-list?")
-        print("nothing happened")
-    else:
-        matches=iscontainedin(tobe_del,listt)
-        for s in matches:
-            listt.pop(listt.index(s))
-
-
-def removestringparts(matchers, listt): 
-    """returns cleaned list of input listt (list) and to-be-removed matchers (list)
-    
-    >>> removestringparts("QQ",["QQasdf","asdfQQasdf"])
-    ['asdf', 'asdfasdf']
-    
-    >>> removestringparts(["QQ","s"],["QQasdf","asdfQQasdf"])
-    ['adf', 'adfadf']
-    """
-    #print("hi")
-    if type(matchers)==str:
-        matchers=[matchers]#assume if a string given to only replace the whole thing
-    
-    for matcher in matchers:
-        listt = [line.replace(matcher,"") for line in listt]  # replace with nothing
-        #print(line)
-    return listt
 
 
 ## thing to traverse directorys ##
@@ -153,8 +124,11 @@ if __name__ == '__main__': # test if called as executable, not as library
     
     print("todo: test cd functions - like playing fetch with a dog")
     
-    
     a = myfolderparserc()
     a.cd("myfigures")
     a.listfiles(myprint=print)
     print(a.images)
+
+    # testing legacy mystring include
+    print("\nnow, without extensions:")
+    print(removestringparts([".jpg",".png"],a.images ))
