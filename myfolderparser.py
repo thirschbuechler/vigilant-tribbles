@@ -7,7 +7,19 @@ Created on Mon May 18 21:06:39 2020
 @author: thirschbuechler
 """
 import os
-from mystring import * # legacy compatibility for every external call to mfp
+
+#-#-# module test #-#-#
+testing=False # imports don't seem to traverse this before reaching EOF and complaining about undef_bool !?
+if __name__ == '__main__': # test if called as executable, not as library
+    from mystring import * # legacy compatibility for every external call to mfp
+    testing=True
+    #tester()#since this is no fct definition, can't call this, also py has no forward-declaration option
+else:
+    from vigilant_tribbles.mystring import * # legacy compatibility for every external call to mfp
+    #testing=False
+
+
+
 
 # ToDo - with-context stuff like __enter__ and __exit__,
 # - getpath() in enter to set "scriptdir" to current scope's dir
@@ -56,9 +68,12 @@ class myfolderparserc(object):
         return os.getcwd()
     
 
-    def setrootdir(self, newpath):
+    def setrootdir(self, newpath=""):
         """ change reset target of cdres, cdleap, .. root of folders to traverse"""
-        self.rootdir = newpath
+        if newpath!="":
+            self.rootdir = newpath
+        else:
+            self.rootdir = self.getpath()
         self.myfprint("rootdir from {} to {}".format(self.rootdir,newpath))
     
 
@@ -126,7 +141,7 @@ class myfolderparserc(object):
 
 
 #-#-# module test #-#-#
-if __name__ == '__main__': # test if called as executable, not as library
+if testing:#call if selected, after defined, explanation see above
     integritycheck() #doctest   
     
     print("todo: test cd functions - like playing fetch with a dog")
