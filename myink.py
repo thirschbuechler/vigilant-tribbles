@@ -11,16 +11,25 @@ import os
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.ticker import EngFormatter
-from matplotlib.patches import Arc, Circle
+#from matplotlib.patches import Arc, Circle
+
+from PIL import Image # pillow library
+import cv2 # python-opencv library - linux:pip install opencv-python
+#from skimage import idata, icolor
+#from skimage.transform import rescale, resize, downscale_local_mean
 
 
 # my modules
-import myfolderparser as mfp
+#-#-# module test #-#-#
+testing=False # imports don't seem to traverse this before reaching EOF and complaining about undef_bool !?
+if __name__ == '__main__': # test if called as executable, not as library
+    import myfolderparser as mfp
+    testing=True
+    #tester()#since this is no fct definition, can't call this, also py has no forward-declaration option
+else:
+    from vigilant_tribbles import myfolderparser as mfp
+    #testing=False
 
-from PIL import Image # pillow library
-#import cv2 # python-opencv library
-#from skimage import idata, icolor
-#from skimage.transform import rescale, resize, downscale_local_mean
 
 ## thing to make matplotlib access easier ###
 class myinkc(mfp.myfolderparserc): 
@@ -33,10 +42,10 @@ class myinkc(mfp.myfolderparserc):
         self.ax = None
         self.fig = None
         
-
+        
         self.printimg=True#shall images be printed
         self.yright=None#var to be inspected on plot cleanup and reset
-
+        
         
         super().__init__(*args, **kwargs) # superclass init, in case there is any
         
@@ -57,9 +66,25 @@ class myinkc(mfp.myfolderparserc):
         return self.fig, self.axs
     
     
-    def close(self, st):
-        plt.close("all")
+    # close old plots    
+    def close(self, st="all"):
+        plt.close(st)
     
+    # show last plots - for non-spyder IDEs which need manual trigger
+    def show(self):
+        plt.show()
+    
+    
+    def rcparams_update(self,dict):
+        plt.rcParams.update(dict)
+        #e.g. this as
+        #plt.rcParams.update({'font.size': 22})
+        #self.rcparams_update({'font.size': 22})
+    
+    
+    def savefig(self,*args, **kwargs):
+        plt.savefig(*args, **kwargs)
+
 
     def ax_onward(self):
         self.ax_move(1)
@@ -70,7 +95,7 @@ class myinkc(mfp.myfolderparserc):
         self.ax_move(-1)
         return self.ax
     
-
+    
     def roadkill(self, thing): # flaten if possible - remove any dimensions and make a list
         if (hasattr(thing, "__iter__")):
             return(thing.flatten()) # even more powerful: thing = np.concatenate(thing).ravel()
@@ -82,7 +107,7 @@ class myinkc(mfp.myfolderparserc):
         self.ax_i = self.ax_i + where
         
         self.axs = self.roadkill(self.axs)
-
+        
         if np.size(self.axs)==0:
             raise Exception("only one axis - can't iterate")
         self.ax = self.axs[self.ax_i]
@@ -90,6 +115,7 @@ class myinkc(mfp.myfolderparserc):
     
     
     #function, since pos in axs will change during plotting
+    #!! generates figure if none (no plt.figure() or self.subplots() etc. called beforehand)!! ergo be inside doplot()-if-context
     def get_ax(self, ax=None): # get class' ax or check if ax is passed and route through
         if ax is None: # no axis given
             if type(self.ax) is type(None): # is axis not a property already - robust
@@ -107,7 +133,7 @@ class myinkc(mfp.myfolderparserc):
         else:
             self.ax=ax
     
-
+    
     # made for comradelegend only, right now
     def get_fig(self, fig=None): # get class' fig or check if fig is passed and route through
         if fig is None: # no axis given
@@ -117,17 +143,17 @@ class myinkc(mfp.myfolderparserc):
                 fig=self.fig # if its a property take that
         return fig
     
-
+    
     def set_fig(self, fig=None): # set class' fig via parameter or matplotlib poll
         if fig is None: # no figis given
             self.fig=plt.gcf() #  get current whatever
         else:
             self.fig=fig
     
-
+    
     def twinx(self, ax=None, yleft=None, yright=None, yleftadd=None, yrightadd=None):#make right axis #$todo:insert into axs maybe?
         ax = self.get_ax(ax)#save old left
-        self.pacman_worker(ax)#on left
+        #self.pacman_worker(ax)#on left
         
         self.ax = ax.twinx()#make right
         self.axdir="r"#next pacman_worker would be right
@@ -150,32 +176,32 @@ class myinkc(mfp.myfolderparserc):
             ax.set_ylabel(yleft)#set left axis
             #self.ax.set_ylabel(yright)#set right axis#do later, after plotting in resetplot          
             
-
+    
     def twiny(self, ax=None):#make top axis
         ax = self.get_ax(ax)
         self.ax = ax.twiny()
-
-
+    
+    
     def suptitle(self, title=""):# major title/label for figure == "supertitle", to be fig.suptitle compatible
         fig = self.get_fig()
         fig.suptitle(title)
         
-
+    
     def figlabel(self, title=None):#alias for what it actually does, avoids confusion
         if title!=None:    
             self.suptitle(title)
             
-
+    
     def title(self, title=None): # minor title of individual axis
         ax = self.get_ax()    
         if title!=None:    
                 ax.set_title(title)
         
-
+    
     def set_figlabel(self, *args, **kwargs):
         self.figlabel(self, *args, **kwargs)
     
-
+    
     def get_figlabel(self):
         fig = self.get_fig()
         if type(fig._suptitle) == type(None):#if it doesn't exist
@@ -224,7 +250,7 @@ class myinkc(mfp.myfolderparserc):
     def killlegend(self,ax=None):
         ax = self.get_ax(ax)
         #for stuff in [ax.get_legend()]:
-         #   stuff.remove()
+        #   stuff.remove()
         oh_my = ax.get_legend() # alt
         if oh_my:
             oh_my.remove()
@@ -278,11 +304,11 @@ class myinkc(mfp.myfolderparserc):
             ll=list(ax.get_legend().get_texts()) # fetch what is there
             texts = [item._text for item in ll ]
             mylegendtext=texts
-
+            
             extra = Rectangle((0, 0), 1, 1, fc="w", fill=False, edgecolor='none', linewidth=0) # dummy rect
             
             mytext=mylegendtext
-     
+            
             ## todo: outsource it into  "turn into list" function
             if type(mytext)==list:
                 pass # we're good
@@ -301,14 +327,14 @@ class myinkc(mfp.myfolderparserc):
             mytext.insert(0,title) # insert as first ele into list
             legendlines=ax.get_lines()[:] # decompose simple_list object, or sth.
             legendlines.insert(0,extra) # insert into regular list
-           
-                
+            
+            
             #print(mytext)
             #print()
             
             ax.legend(legendlines, mytext)   
-            
-   
+    
+    
     def comradelegend(self, fig=None, **kwargs): # collect all labels of one figure and collate to one master legend
         fig=self.get_fig(fig)#fetch
         
@@ -493,7 +519,7 @@ class myinkc(mfp.myfolderparserc):
         #left, right = ax.get_xlim() 
         #left, right = self.include_me(left, right)
         #ax.set_xlim(left, right) e
-       
+        
         if me < left:
             left=me*1.1
         elif me > right:
@@ -536,7 +562,7 @@ class myinkc(mfp.myfolderparserc):
     def picshow_manual(self, imgs=[], engine="cv", *args, **kwargs): # give img list and fig size - get gallery, recommended max. 2x2
         self.picframe(*args, **kwargs)
         self.axs = self.roadkill(self.axs) # remove higher dimensions of nxm array, put all into list
-       
+        
         for ax in self.axs:
             ax.axis("off")
             
@@ -550,7 +576,7 @@ class myinkc(mfp.myfolderparserc):
             if engine=="PIL":
                 ax.imshow(Image.open(img)) # no rotation, theoretically slower
             elif engine=="cv":
-                 ax.imshow(cv2.cvtColor(cv2.imread(img), cv2.COLOR_BGR2RGB)) # auto-rotation, slower on older machine i think
+                ax.imshow(cv2.cvtColor(cv2.imread(img), cv2.COLOR_BGR2RGB)) # auto-rotation, slower on older machine i think
             else:
                 print("programmer you fucked up imshow")
             #imgs.pop(0)
@@ -560,17 +586,46 @@ class myinkc(mfp.myfolderparserc):
         self.listfiles()#list and store images in self
         self.gallery(imgs=self.images)
         
-         
-    def rotate_xticks(self, rotation, fix=1):
+        
+    def rotate_xticks(self, rotation, long=0, ha="right", autoscale=1):#ha and autoscale only get done if long is True
         ax=self.get_ax()
+    
+        # first, rotate 
+        #"empty" but sets rotation (_str of this obj returns "Text(0, 0, '')")
         for tick in ax.get_xticklabels():
             tick.set_rotation(rotation)
+        
+        # then check if longer
+        if long:#longer ones might appear shifted to right - compensate!
             
-        if fix:#longer ones appear shifted to right
-            #ax.tick_params(direction='inout')
-            #ax.set_xticklabels(ax.get_xticklabels(), rotation=rotation, ha='right') # doesn't work in 3.3.0 anymore
-            plt.xticks(rotation=rotation)#updateing matplotlib 3.3. (turbo cmap) required this
-            #ax.set_yticklabels(ax.get_yticklabels(), rotation=rotation, va='top')
+            xticks=ax.get_xticks()
+            ax.set_xticks(xticks)#works but does ugly autoscaling
+            # re-autoscale
+            if autoscale: # UNLESS you have an imshow then probably not
+                usedxticks=list(xticks.copy())
+                usedxticks.pop(0)
+                usedxticks.pop(len(usedxticks)-1)
+                ax.set_xlim(min(usedxticks),max(usedxticks))
+            
+            """
+            # set ha (horizontal alignment) dependent on tick len - DOES NOT WORK
+            #l=max([print(str(xtick) for xtick in list(xticks))]) # get generator - wtf!?
+            #l=max([len(str(xtick) for xtick in list(xticks.ticks))]) # get longest schlong - no worky
+            l=0
+            for xtick in list(xticks):
+                print(xtick)#wtf - 0.6000000000000001 - how to catch one of these
+                l=max(l,len(str(xtick)))
+            print(l)
+            if l<5:
+                ha="left"
+            else:
+                ha="right"
+            """
+            
+            fontdict={'horizontalalignment':ha}#put in here to pass along
+            ax.set_xticklabels(xticks,fontdict=fontdict)#Warning mandatory Axes.set_xticks beforehand!. 
+                                                            #Otherwise, the labels may end up in unexpected positions. (mpl >3.3.0, web-doc 3.4.1)
+            
 
 
     def subplots_adjust(self, *args, **kwargs):
@@ -593,30 +648,86 @@ class myinkc(mfp.myfolderparserc):
         plt.tick_params(labelcolor='none', which='both', top=False, bottom=False, left=False, right=False)
         plt.xlabel(xlabel)#("common X")
         plt.ylabel(ylabel)#("common Y")
-           
         
+        
+def tester(): # module test, superseeds ifdef-main (since used here for import shenanigans) #
+    #oldtest()
+    #test_fontsize()
+    tickrot()
 
-                
-        
-        
+
+def oldtest():    
+    ele = myinkc()
+    print(ele.defaultcolorlist())
+    
+    x = np.array([0, 1, 2, 5])
+    y = np.array([-1, 0.2, 0.9, 2.1])
+    
+    k, d = ele.LSQ(x,y)
+    
+    #ele.subplots()
+    #ele.plot()#this is in thvsia
+    plt.plot(x, y, 'o', label='Original data', markersize=10)
+    #plt.plot(x, k*x + d, 'r', label='Fitted line', c=ele.defaultcolorlist())#this did not fucking work wtf why didn't i check or uncomment
+    plt.legend()
+    plt.show()
+    
+    ele.modlegend("hellO") # take some ax function to test ax property
+
+
+def test_fontsize():
+    large_title2()
+    large_alltext()
+
+
+def large_title2():
+    ele = myinkc()
+    #plt.subplots(nrows=2)
+    ele.subplots(nrows=2) # why roadkill not defined? is a self-method of myinkc !? no forward-decl possible in py.. - because rcparams-update was at wrong indent level..
+    ele.title("regular size")
+    ele.ax_onward()
+    ele.rcparams_update({'font.size': 22})
+    ele.title("biig")
+    ele.show()
+
+
+def large_alltext():
+    ele = myinkc()
+    ele.rcparams_update({'font.size': 22})
+    ele.subplots(nrows=2)
+    ele.title("regular size")
+    ele.ax_onward()
+    
+    ele.title("biig")
+    ele.show()
+
+
+def tickrot():
+    # testdata and root obj
+    x1=np.arange(1,20)
+    x2=np.arange(1,20000)
+    ele=myinkc()
+
+    # regular graph
+    ele.subplots(nrows=2)
+    plt.plot(x1,x1)
+    ele.ax_onward()
+    plt.plot(x2,x2)
+    ele.suptitle("normal labels")
+    ele.show()
+
+    # modified graphs
+    ele.subplots(nrows=2)
+    plt.plot(x1,x1)
+    ele.rotate_xticks(rotation=45)
+    ele.ax_onward()
+    plt.plot(x2,x2)
+    
+    ele.rotate_xticks(rotation=45,long=1)
+    ele.suptitle("rot labels")
+    ele.show()
+
+
 #-#-# module test #-#-#
-if __name__ == '__main__': # test if called as executable, not as library
-
-       
-       ele = myinkc()
-       print(ele.defaultcolorlist())
-       
-       x = np.array([0, 1, 2, 5])
-       y = np.array([-1, 0.2, 0.9, 2.1])
-       
-       k, d = ele.LSQ(x,y)
-       
-       #ele.subplots()
-       #ele.plot()#this is in thvsia
-       plt.plot(x, y, 'o', label='Original data', markersize=10)
-       #plt.plot(x, k*x + d, 'r', label='Fitted line', c=ele.defaultcolorlist())#this did not fucking work wtf why didn't i check or uncomment
-       plt.legend()
-       plt.show()
-       
-       ele.modlegend("hellO") # take some ax function to test ax property
-       
+if testing:#call if selected, after defined, explanation see above
+    tester()
