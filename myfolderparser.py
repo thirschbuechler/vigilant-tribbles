@@ -7,6 +7,7 @@ Created on Mon May 18 21:06:39 2020
 @author: thirschbuechler
 """
 import os
+from pathvalidate import sanitize_filepath
 
 #-#-# module test #-#-#
 testing=False # imports don't seem to traverse this before reaching EOF and complaining about undef_bool !?
@@ -53,13 +54,13 @@ class myfolderparserc(object):
         self.scriptdir=defaultpath #NEVER EVER CHANGE - neaded foor cleanup!
         self.rootdir=defaultpath # change as you please
         
-        self.myfprint=dummy   
+        self.myprint=dummy   
         
         super().__init__(*args, **kwargs) # superclass init, in case there is any
     
     
-    def set_myfprint(self,handle):
-        self.myfprint=handle
+    def set_myprint(self,handle):
+        self.myprint=handle
     
 
     # helper fcts  #
@@ -74,11 +75,11 @@ class myfolderparserc(object):
             self.rootdir = newpath
         else:
             self.rootdir = self.getpath()
-        self.myfprint("rootdir from {} to {}".format(self.rootdir,newpath))
+        self.myprint("rootdir from {} to {}".format(self.rootdir,newpath))
     
 
     def cd(self,newpath): 
-        self.myfprint("cd from {} to {}".format(self.getpath(),newpath))
+        self.myprint("cd from {} to {}".format(self.getpath(),newpath))
         try:
             #if(os.path.isdir(newpath)):
             #print("going to {}".format(newpath))
@@ -98,14 +99,21 @@ class myfolderparserc(object):
         """ reset to rootdir for further folder traversing"""
         self.cd(self.rootdir)
     
-    def cdleap(self, newpath): # leap-jump over to other dir after topdir
+    def cdleap(self, newpath):
+        """ leap-jump over to other dir after cdres to rootdir"""
         self.cdres()
         self.cd(newpath)
+
+    def mkdir(self, path):
+        path = self.sanitize(path)#make windows compatible
+        os.mkdir(path)     
     
     def cleanup(self): # reset current-path to scriptdir after doing some traversing
         self.setrootdir(self.scriptdir) 
         self.cd(self.scriptdir)
     
+    def sanitize(self, s):
+        return sanitize_filepath(s)
 
     def listfiles(self,myprint=dummy): 
         """ list files and classify them """
