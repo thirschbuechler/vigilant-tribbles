@@ -11,13 +11,17 @@ from pathvalidate import sanitize_filepath
 
 #-#-# module test #-#-#
 testing=False # imports don't seem to traverse this before reaching EOF and complaining about undef_bool !?
-if __name__ == '__main__': # test if called as executable, not as library
-    from mystring import * # legacy compatibility for every external call to mfp
+if __name__ == '__main__': # test if called as executable, not as library    
     testing=True
     #tester()#since this is no fct definition, can't call this, also py has no forward-declaration option
-else:
-    from vigilant_tribbles.mystring import * # legacy compatibility for every external call to mfp
-    #testing=False
+
+try:
+    from mystring import * # legacy compatibility for every external call to mfp
+except:
+    try:
+        from vigilant_tribbles.mystring import * # legacy compatibility for every external call to mfp
+    except:
+        print("failed to import module directly or via submodule -  mind adding them with underscores not operators (minuses aka dashes, etc.)")
 
 
 
