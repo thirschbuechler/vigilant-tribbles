@@ -10,7 +10,9 @@ import re
 import os
 import numpy as np
 import matplotlib.pyplot as plt
-from matplotlib.ticker import EngFormatter
+from matplotlib.ticker import EngFormatter #enginerd stuff
+from matplotlib.ticker import (MultipleLocator, FormatStrFormatter) # nicergrid
+
 #from matplotlib.patches import Arc, Circle
 
 #from PIL import Image # pillow library --> MOVED DOWN TO IMPORT SWITCH
@@ -651,8 +653,33 @@ class myinkc(mfp.myfolderparserc):
         plt.tick_params(labelcolor='none', which='both', top=False, bottom=False, left=False, right=False)
         plt.xlabel(xlabel)#("common X")
         plt.ylabel(ylabel)#("common Y")
-        
-        
+
+
+    def nicergrid(self,y_major=20E6, y_minor=2.5E6, x_major=0.5, x_minor=0.1):
+        ax = self.get_ax()
+
+        #axis y         #we have: 20M on left and 2.5*20=50M on right
+        ax.yaxis.set_major_locator(MultipleLocator(y_major))
+        ax.yaxis.set_major_formatter(FormatStrFormatter('%d'))
+        ax.yaxis.set_minor_locator(MultipleLocator(y_minor))
+        self.enginerd_yaxis()
+        #axis x         # 0.1 minor and 0.5 major
+        ax.xaxis.set_major_locator(MultipleLocator(x_major))
+        ax.xaxis.set_major_formatter(FormatStrFormatter('%d'))
+        ax.xaxis.set_minor_locator(MultipleLocator(x_minor))
+        self.enginerd_xaxis()
+        #ax.grid("on")
+        ax.grid(b=True, which='major', color='grey', linestyle='-', alpha=0.5)
+        ax.grid(b=True, which='minor', color='grey', linestyle=':', alpha=0.5)
+
+
+    def hidey(self):
+        #self.get_ax().yaxis.set_visible(False) # hide ylabels and grid
+        self.get_ax().set_yticklabels([]) # hide only values
+        #self.get_ax().grid(True)
+        self.get_ax().set_ylabel("") # and unit label
+
+
 def tester(): # module test, superseeds ifdef-main (since used here for import shenanigans) #
     #oldtest()
     #test_fontsize()
