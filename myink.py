@@ -13,8 +13,9 @@ import matplotlib.pyplot as plt
 from matplotlib.ticker import EngFormatter
 #from matplotlib.patches import Arc, Circle
 
-from PIL import Image # pillow library
-import cv2 # python-opencv library - linux:pip install opencv-python
+#from PIL import Image # pillow library --> MOVED DOWN TO IMPORT SWITCH
+#import cv2 # python-opencv library - linux:pip install opencv-python --> MOVED DOWN TO IMPORT SWITCH
+
 #from skimage import idata, icolor
 #from skimage.transform import rescale, resize, downscale_local_mean
 
@@ -574,8 +575,10 @@ class myinkc(mfp.myfolderparserc):
             # matplotlib imshow params, if needed
             # https://matplotlib.org/api/_as_gen/matplotlib.pyplot.imshow.html
             if engine=="PIL":
+                from PIL import Image # pillow library --> MOVED DOWN TO IMPORT SWITCH
                 ax.imshow(Image.open(img)) # no rotation, theoretically slower
             elif engine=="cv":
+                import cv2 # python-opencv library - linux:pip install opencv-python --> MOVED DOWN TO IMPORT SWITCH
                 ax.imshow(cv2.cvtColor(cv2.imread(img), cv2.COLOR_BGR2RGB)) # auto-rotation, slower on older machine i think
             else:
                 print("programmer you fucked up imshow")
