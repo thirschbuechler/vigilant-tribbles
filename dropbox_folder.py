@@ -1,7 +1,13 @@
-#
-#from vigilant_tribbles import myfolderparser as mfp
-import myfolderparser as mfp
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 import os
+try:
+    import myfolderparser as mfp
+except:
+    try:
+        from vigilant_tribbles import myfolderparser as mfp
+    except:
+        print("failed to import module directly or via submodule -  mind adding them with underscores not operators (minuses aka dashes, etc.)")
 
 
 def get_dropbox(subfolder=""):
@@ -41,7 +47,7 @@ def get_dropbox(subfolder=""):
         return path
 
 
-def goto_subfolder(subfoolders=[], show=False):
+def goto_subfolder(subfolders=[], show=False):
     """dropbox importer over home dir and going places (there)"""
     dp_f = get_dropbox()
     print(dp_f)
@@ -54,7 +60,7 @@ def goto_subfolder(subfoolders=[], show=False):
     pe.cd(dp_f)
 
     # set working dir to..
-    for sub in subfoolders:
+    for sub in subfolders:
         pe.cd(sub)
 
     if show:
