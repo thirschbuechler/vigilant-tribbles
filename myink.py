@@ -99,7 +99,8 @@ class myinkc(mfp.myfolderparserc):
         return self.ax
     
     
-    def roadkill(self, thing): # flaten if possible - remove any dimensions and make a list
+    def roadkill(self, thing):
+        """ flaten if possible - remove any dimensions and make a list """
         if (hasattr(thing, "__iter__")):
             return(thing.flatten()) # even more powerful: thing = np.concatenate(thing).ravel()
         else:
@@ -338,7 +339,8 @@ class myinkc(mfp.myfolderparserc):
             ax.legend(legendlines, mytext)   
     
     
-    def comradelegend(self, fig=None, **kwargs): # collect all labels of one figure and collate to one master legend
+    def comradelegend(self, fig=None, **kwargs): 
+        """ collect all labels of one figure and collate to one master legend """
         fig=self.get_fig(fig)#fetch
         
         # fuckin' babysit legend placing...
@@ -383,7 +385,8 @@ class myinkc(mfp.myfolderparserc):
         fig.legend(lines, labels, **kwargs)
         
         
-    def comradeaxlegend(self, ax=None, **kwargs): # collect all labels of one figure and collate to one master legend
+    def comradeaxlegend(self, ax=None, **kwargs):
+        """ collect all labels of one axis and collate to one master legend """
         ax = self.get_ax(ax)
 
         # fuckin' babysit legend placing...
@@ -431,16 +434,16 @@ class myinkc(mfp.myfolderparserc):
 
     
     # oszi-like markers, buy one get two! limited offer!!
-    # vertical lines #
     def vmarkers(self, start, stop, col, ax=None):
+        """ oszi like vertical cursors """
         ax = self.get_ax(ax)
         ylims=ax.get_ylim()
         ax.vlines(start,  ylims[0], ylims[1], colors=col)
         ax.vlines(stop,  ylims[0], ylims[1], colors=col)
         
 
-    # horz lines #        
     def hmarkers(self, start, stop, col, ax=None):
+        """ oszi like horizontal cursors"""
         ax = self.get_ax(ax)
         xlims=ax.get_xlim()
         ax.hlines(start,  xlims[0], xlims[1], colors=col)
@@ -472,6 +475,7 @@ class myinkc(mfp.myfolderparserc):
                     
     
     def LSQ(self, x, y):
+        """ THE OLD FASHIONED MOORE PENROSE WAY"""
         # make pinv basis
         A = np.vstack([x, np.ones(len(x))]).T
         # make pinv and unpack
@@ -592,7 +596,21 @@ class myinkc(mfp.myfolderparserc):
         self.gallery(imgs=self.images)
         
         
-    def rotate_xticks(self, rotation, long=0, ha="right", autoscale=1):#ha and autoscale only get done if long is True
+    def rotate_xticks(self, rotation, long=0, ha="right", autoscale=1):
+        """ rotate ticks and fix visual offset if long i guess
+            - ha and autoscale only get done if long is True
+
+            application example from plot_mse_mx after imshow:
+                
+            # show all ticks
+            ax.set_xticks(np.arange(len(xlabels)))
+            ax.set_yticks(np.arange(len(ylabels)))
+            # ... and label them with the respective list entries
+            ax.set_xticklabels(xlabels, ha="right")#horizontal alignment
+            ax.set_yticklabels(ylabels)
+            
+            self.rotate_xticks(45)
+        """
         ax=self.get_ax()
     
         # first, rotate 
