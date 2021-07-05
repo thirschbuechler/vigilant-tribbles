@@ -119,6 +119,51 @@ class myfolderparserc(object):
     def sanitize(self, s):
         return sanitize_filepath(s)
 
+
+    def get_dp(self, subfolder=""):
+        """dropbox importer over home dir"""
+        # prep vars
+        dp_f=os.path.join("~","Dropbox")
+        dp_f = (os.path.expanduser(dp_f))# C:\Users\hirschbuechler\Dropbox # however IS Dropbox.lnk
+        #print(os.path.exists(dp_f)) # False, is Dropbox.lnk not folder!
+
+        if os.path.exists(dp_f):
+            path=dp_f
+        else:
+            file="Dropbox.txt"
+            file=os.path.expanduser(os.path.join("~",file))
+            #path=file
+            if not os.path.exists(file):
+                raise Exception("no file {}".format(file))
+            try:
+                with open(file,"r") as f:
+                    path = f.read()
+            except Exception as e:
+                print("reading {} failed, dueto {}".format(file,str(e)))
+
+        if not os.path.exists(path):
+            raise Exception("The folder read from {} is not existant (on this computer)".format(str(path)))
+        else:
+            return path
+
+
+    def goto_dp(self, subfolders=[], show=False):
+        """dropbox importer over home dir and going places (there)"""
+        dp_f = self.get_dp()
+        #print(dp_f)
+
+        # goto dropbox
+        self.cd(dp_f)
+
+        # set working dir to..
+        for sub in subfolders:
+            self.cd(sub)
+
+        if show:
+            # what's here?
+            self.listfiles(myprint=print)
+
+
     def listfiles(self,myprint=dummy): 
         """ list files and classify them """
         #https://stackoverflow.com/questions/18262293/how-to-open-every-file-in-a-folder
