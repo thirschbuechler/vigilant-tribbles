@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+# %%
 """
 Myfolderparser - traverse folders and ease file operations
 
@@ -211,3 +212,5 @@ if testing:#call if selected, after defined, explanation see above
     # testing legacy mystring include
     print("\nnow, without extensions:")
     print(removestringparts([".jpg",".png"],a.images ))
+
+# %%
