@@ -186,22 +186,33 @@ class myinkc(mfp.myfolderparserc):
         self.ax = ax.twiny()
     
     
-    def suptitle(self, title=""):# major title/label for figure == "supertitle", to be fig.suptitle compatible
+    def suptitle(self, title=""):
+        """ major title/label for figure == "supertitle", to be fig.suptitle compatible 
+            alias figlabel
+            """
         fig = self.get_fig()
         fig.suptitle(title)
         
     
-    def figlabel(self, title=None):#alias for what it actually does, avoids confusion
+    def figlabel(self, title=None):
+        """ alias suptitle """ 
         if title!=None:    
             self.suptitle(title)
             
     
-    def title(self, title=None): # minor title of individual axis
+    def title(self, title=None): 
+        """ minor title of individual axis
+            
+            (major one - figlabel)
+            """
         ax = self.get_ax()    
         if title!=None:    
                 ax.set_title(title)
         
-    
+    def axlabel(self, title=None): 
+        """  alias title """
+        self.title(title)
+
     def set_figlabel(self, *args, **kwargs):
         self.figlabel(self, *args, **kwargs)
     
