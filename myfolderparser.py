@@ -113,7 +113,11 @@ class myfolderparserc(object):
         path = self.sanitize(path)#make windows compatible
         os.mkdir(path)     
     
-    def cleanup(self): # reset current-path to scriptdir after doing some traversing
+    def cleanup(self): # 
+        """ reset current-path after doing traversing 
+            - setrootdir to scriptdir
+            - cd there
+        """
         self.setrootdir(self.scriptdir) 
         self.cd(self.scriptdir)
     
