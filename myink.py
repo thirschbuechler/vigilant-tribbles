@@ -35,7 +35,8 @@ else:
 
 
 ## thing to make matplotlib access easier ###
-class myinkc(mfp.myfolderparserc): 
+class myinkc(mfp.hopper): 
+    
     
     ## housekeeping
     def __init__(self, *args, **kwargs):

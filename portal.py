@@ -19,7 +19,8 @@ class portal(object):
 
     def __init__(self, folder, myprint=dummy):
         self.myprint = myprint
-        self.__enterdir=self.getpath() # neaded for cleanup!
+        self.__enterdir=self.getpath() # needed for cleanup!
+        self.cd(self.__enterdir) # for some reason, a cd of a sub-loop with a portal would fail (it assumes start from scriptdir)
         self.folder = folder
 
 
@@ -31,12 +32,12 @@ class portal(object):
 
     def __enter__(self):
         self.myprint("with-context entered")
-        os.chdir(self.folder) # goto folder
+        self.cd(self.folder) # goto folder
         return self # unless this happens, object dies before reporting
     
     def __exit__(self, exc_type, exc_value, tb):
         self.myprint("with-context exited")
-        os.chdir(self.__enterdir)
+        self.cd(self.__enterdir)
         self.__del__() # unless this happens, session doesn't get exited
         #return
 
@@ -47,11 +48,26 @@ class portal(object):
         """get current shell path (working directory location)"""
         return os.getcwd()
 
+    def cd(self, newpath):
+        """ wrap chdir with slightly more readable exceptions"""
+        now=self.getpath()
+        newpath_abs=os.path.join(now,newpath)
+
+        if os.path.exists(newpath):
+            os.chdir(newpath)
+        elif os.path.exists(newpath_abs):
+            os.chdir(newpath_abs)
+        elif (newpath in now):
+            raise Exception("dude you are already there")
+        else:
+            raise Exception("neither abs nor relative {} exists, now: {}".format(newpath,now))
+        # note: a "\\ error" (\\ occouring in path not found) usually means the path is invalid (not escape issue or sth)
+
 
     def cleanup(self): # 
         """ reset current-path after doing traversing 
         """
-        os.chdir(self.__enterdir)
+        self.cd(self.__enterdir)
 
 
 #### testing stuff ####

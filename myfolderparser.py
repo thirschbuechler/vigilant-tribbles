@@ -18,9 +18,12 @@ if __name__ == '__main__': # test if called as executable, not as library
 
 try:
     from mystring import * # legacy compatibility for every external call to mfp
+    from portal import portal
 except:
     try:
         from vigilant_tribbles.mystring import * # legacy compatibility for every external call to mfp
+        from vigilant_tribbles.portal import portal
+
     except:
         print("failed to import module directly or via submodule -  mind adding them with underscores not operators (minuses aka dashes, etc.)")
 
@@ -41,7 +44,7 @@ def integritycheck():
     print("attempted==succeeded, if no fails\n")
 
 
-class myfolderparserc(object):
+class hopper(portal):
     """
     thing to traverse directorys
     - go there (cd functions)
@@ -56,11 +59,16 @@ class myfolderparserc(object):
         else:
             defaultpath=self.getpath() # py-file folder if not declared
             
-        self.scriptdir=defaultpath #NEVER EVER CHANGE - neaded foor cleanup!
+        self.scriptdir=defaultpath #NEVER EVER CHANGE - needed foor cleanup!
         self.rootdir=defaultpath # change as you please
         
         self.myprint=dummy   
         
+
+        if "folder" not in kwargs:
+
+            kwargs["folder"]=defaultpath
+
         super().__init__(*args, **kwargs) # superclass init, in case there is any
     
     
@@ -69,9 +77,6 @@ class myfolderparserc(object):
     
 
     # helper fcts  #
-    def getpath(self):
-        """get current shell path (working directory location)"""
-        return os.getcwd()
     
 
     def setrootdir(self, newpath=""):
@@ -83,20 +88,6 @@ class myfolderparserc(object):
         self.myprint("rootdir from {} to {}".format(self.rootdir,newpath))
     
 
-    def cd(self,newpath): 
-        self.myprint("cd from {} to {}".format(self.getpath(),newpath))
-        try:
-            #if(os.path.isdir(newpath)):
-            #print("going to {}".format(newpath))
-            #os.chdir(os.path.dirname(newpath)) # change current shell path             
-            #newpath=os.path.join(self.getpath(),newpath)
-            if "//" in newpath:
-                raise Exception("don't escape windows style, use os.path.join pls!!")
-            os.chdir((newpath)) # change current shell path                
-        except Exception as e:
-            pnow=self.getpath()
-            raise Exception("folder {} not found, currently in {}  (os.path isdir true on second, tip: set rootdir and jumpdirs & don't traverse zigzag in different levels, cleanup after blocks'), ".format(e, pnow))
-    
     def cdup(self):
         self.cd('../')
         
@@ -208,7 +199,7 @@ if testing:#call if selected, after defined, explanation see above
     
     print("todo: test cd functions - like playing fetch with a dog")
     
-    a = myfolderparserc()
+    a = hopper()
     a.cd("myfigures")
     a.listfiles(myprint=print)
     print(a.images)
