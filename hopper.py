@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 # %%
 """
-Myfolderparser - traverse folders and ease file operations
+hopper - traverse folders and ease file operations
 
 Created on Mon May 18 21:06:39 2020
 @author: thirschbuechler
@@ -17,11 +17,11 @@ if __name__ == '__main__': # test if called as executable, not as library
     #tester()#since this is no fct definition, can't call this, also py has no forward-declaration option
 
 try:
-    from mystring import * # legacy compatibility for every external call to mfp
+    from mystring import * # legacy compatibility for every external call to hoppy
     from portal import portal
 except:
     try:
-        from vigilant_tribbles.mystring import * # legacy compatibility for every external call to mfp
+        from vigilant_tribbles.mystring import * # legacy compatibility for every external call to hoppy
         from vigilant_tribbles.portal import portal
 
     except:

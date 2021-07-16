@@ -26,16 +26,17 @@ from matplotlib.ticker import (MultipleLocator, FormatStrFormatter) # nicergrid
 #-#-# module test #-#-#
 testing=False # imports don't seem to traverse this before reaching EOF and complaining about undef_bool !?
 if __name__ == '__main__': # test if called as executable, not as library
-    import myfolderparser as mfp
+    import hopper as hoppy
     testing=True
     #tester()#since this is no fct definition, can't call this, also py has no forward-declaration option
 else:
-    from vigilant_tribbles import myfolderparser as mfp
+    from vigilant_tribbles import hopper as hoppy
+
     #testing=False
 
 
 ## thing to make matplotlib access easier ###
-class myinkc(mfp.hopper): 
+class myinkc(hoppy.hopper): 
     
     
     ## housekeeping
@@ -337,7 +338,7 @@ class myinkc(mfp.hopper):
             
             
             if rmsubstr!=None:
-                mytext=mfp.removestringparts(rmsubstr,mytext)
+                mytext=hoppy.removestringparts(rmsubstr,mytext)
                 print(mytext)
                 
             mytext.insert(0,title) # insert as first ele into list

@@ -2,7 +2,7 @@
 # hopper class module
 ## be a minimal-example
 
-# ToDo - import mfp functions and make mfp inherit hopper
+# ToDo - import hoppy functions and make hoppy inherit hopper
 
 import os
 
