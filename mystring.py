@@ -54,7 +54,8 @@ def groupByPrefix(strings,delimiter="_"):
     return stringsByPrefix
 
 
-def removecontainingof(tobe_del,listt, sure=0): # removes stuff from listt
+def removecontainingof(tobe_del,listt, sure=0):
+    """ removes stuff from original list, no return val """
     if type(listt)!=list and sure==0:
         print("are you sure to hand over a non-list?")
         print("nothing happened")

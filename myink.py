@@ -12,6 +12,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.ticker import EngFormatter #enginerd stuff
 from matplotlib.ticker import (MultipleLocator, FormatStrFormatter) # nicergrid
+from vigilant_tribbles import mystring as ms
 
 #from matplotlib.patches import Arc, Circle
 
@@ -338,7 +339,7 @@ class myinkc(hoppy.hopper):
             
             
             if rmsubstr!=None:
-                mytext=hoppy.removestringparts(rmsubstr,mytext)
+                mytext=ms.removestringparts(rmsubstr,mytext)
                 print(mytext)
                 
             mytext.insert(0,title) # insert as first ele into list

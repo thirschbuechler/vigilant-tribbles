@@ -17,11 +17,11 @@ if __name__ == '__main__': # test if called as executable, not as library
     #tester()#since this is no fct definition, can't call this, also py has no forward-declaration option
 
 try:
-    from mystring import * # legacy compatibility for every external call to hoppy
+    import mystring as ms
     from portal import portal
 except:
     try:
-        from vigilant_tribbles.mystring import * # legacy compatibility for every external call to hoppy
+        import vigilant_tribbles.mystring as ms
         from vigilant_tribbles.portal import portal
 
     except:
@@ -101,6 +101,7 @@ class hopper(portal):
         self.cd(newpath)
 
     def mkdir(self, path):
+        """ input path to make dir """
         path = self.sanitize(path)#make windows compatible
         os.mkdir(path)     
     
@@ -206,6 +207,6 @@ if testing:#call if selected, after defined, explanation see above
 
     # testing legacy mystring include
     print("\nnow, without extensions:")
-    print(removestringparts([".jpg",".png"],a.images ))
+    print(ms.removestringparts([".jpg",".png"],a.images ))
 
 # %%
