@@ -62,13 +62,13 @@ class hopper(portal):
         self.scriptdir=defaultpath #NEVER EVER CHANGE - needed foor cleanup!
         self.rootdir=defaultpath # change as you please
         
-        self.myprint=dummy   
+        self.myprint=ms.dummy   
         
+        
+        #if not ("folder" in kwargs): #$$ dunno why but this didn'work - instead multiple folder-keys were created or sth - made defaultparam for "folder" in portal init
+            #kwargs["folder"]=defaultpath
 
-        if "folder" not in kwargs:
-
-            kwargs["folder"]=defaultpath
-
+        #print("hopper folder is {}".format(kwargs["folder"]))
         super().__init__(*args, **kwargs) # superclass init, in case there is any
     
     
@@ -161,7 +161,7 @@ class hopper(portal):
             self.listfiles(myprint=print)
 
 
-    def listfiles(self,myprint=dummy): 
+    def listfiles(self,myprint=ms.dummy): 
         """ list files and classify them """
         #https://stackoverflow.com/questions/18262293/how-to-open-every-file-in-a-folder
         location = self.getpath()

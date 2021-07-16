@@ -17,10 +17,10 @@ class portal(object):
         - no hopping
         """
 
-    def __init__(self, folder, myprint=dummy):
+    def __init__(self, folder="", myprint=dummy):
         self.myprint = myprint
         self.__enterdir=self.getpath() # needed for cleanup!
-        self.cd(self.__enterdir) # for some reason, a cd of a sub-loop with a portal would fail (it assumes start from scriptdir)
+        #self.cd(self.__enterdir) # for some reason, a cd of a sub-loop with a portal would fail (it assumes start from scriptdir) - nope was different rooted obj i think
         self.folder = folder
 
 
@@ -32,7 +32,8 @@ class portal(object):
 
     def __enter__(self):
         self.myprint("with-context entered")
-        self.cd(self.folder) # goto folder
+        if self.folder!="":
+            self.cd(self.folder) # goto folder
         return self # unless this happens, object dies before reporting
     
     def __exit__(self, exc_type, exc_value, tb):
