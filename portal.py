@@ -59,7 +59,9 @@ class portal(object):
         elif os.path.exists(newpath_abs):
             os.chdir(newpath_abs)
         elif (newpath in now):
-            raise Exception("dude you are already there")
+            #raise Exception("dude you are already there")
+            myprint("dude you are already there")
+            #pass
         else:
             raise Exception("neither abs nor relative {} exists, now: {}".format(newpath,now))
         # note: a "\\ error" (\\ occouring in path not found) usually means the path is invalid (not escape issue or sth)
