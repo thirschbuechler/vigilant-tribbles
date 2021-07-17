@@ -11,6 +11,7 @@ import re #sorting
 
 
 def dummy(*args, **kwargs):
+    """ function pointer to nowhere (and eat any arguments)"""
     pass
 
 
