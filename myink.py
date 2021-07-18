@@ -711,6 +711,10 @@ class myinkc(hoppy.hopper):
         #self.get_ax().grid(True)
         self.get_ax().set_ylabel("") # and unit label
 
+    def hist(self,*args,**kwargs):
+        """ forward to mpl hist"""
+        self.get_ax().hist(*args,**kwargs)
+
 
 def tester(): # module test, superseeds ifdef-main (since used here for import shenanigans) #
     #oldtest()
