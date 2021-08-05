@@ -171,6 +171,7 @@ class hopper(portal):
         self.images=[]
         self.layouts=[] # pyweave pmd layout files
         self.touchstone=[]
+        self.csv=[]
         
         for file in os.listdir(location):
             try:
@@ -183,9 +184,12 @@ class hopper(portal):
                 elif file.endswith(".s2p") or file.endswith(".s1p"):
                     self.touchstone.append(file)
                     counter +=1
+                elif file.endswith(".csv"):
+                    self.csv.append(file)
+                    counter +=1
                 else:
                     otherfiles.append(file)
-                    myprint("not classified: "+file)
+                    myprint("not classified: {}".format(file))
                     counter +=1
             except Exception as e:
                 print("No files found here!")
