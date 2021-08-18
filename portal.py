@@ -60,7 +60,7 @@ class portal(object):
             os.chdir(newpath_abs)
         elif (newpath in now):
             #raise Exception("dude you are already there")
-            myprint("dude you are already there")
+            self.myprint("dude you are already there")
             #pass
         else:
             raise Exception("neither abs nor relative {} exists, now: {}".format(newpath,now))
