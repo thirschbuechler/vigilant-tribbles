@@ -39,24 +39,25 @@ else:
 ## thing to make matplotlib access easier ###
 class myinkc(hoppy.hopper): 
     
-    
-    ## housekeeping
     def __init__(self, *args, **kwargs):
-        #plt.close("all")
+        """ init some vars, mostly passing args to superclass """
         # note: matplotlib may need to be reloaded to quit xkcd mode
-        #importlib.reload(plt) # not required anymore (using with-context)
+        # importlib.reload(plt) # not required anymore (using with-context)
         self.ax = None
         self.fig = None
         
-        
-        self.printimg=True#shall images be printed
-        self.yright=None#var to be inspected on plot cleanup and reset
-        
+        self.printimg=True # shall images be printed
+        self.yright=None # var to be inspected on plot cleanup and reset
         
         super().__init__(*args, **kwargs) # superclass init, in case there is any
         
         
     def subplots(self, *args, **kwargs):
+        """ make subplot axes (plt.subplots(..)) and save axs for iterating via fct
+            - ax_onward
+            - ax_backtrack
+            - ax_move(int) #relative
+            """
         self.fig, self.axs = plt.subplots(*args, **kwargs)
         self.ax_i = 0
         
@@ -72,12 +73,14 @@ class myinkc(hoppy.hopper):
         return self.fig, self.axs
     
     
-    # close old plots    
     def close(self, st="all"):
+        """close old plots
+        CAVEAT: unless new console for each call (i.e. in vscode)
+        """
         plt.close(st)
     
-    # show last plots - for non-spyder IDEs which need manual trigger
     def show(self):
+        """ show last plots - for non-spyder IDEs which need manual trigger """
         plt.show()
     
     
@@ -93,17 +96,19 @@ class myinkc(hoppy.hopper):
 
 
     def ax_onward(self):
+        """ move to next subplot axis """
         self.ax_move(1)
         return self.ax
         
     
     def ax_backtrack(self):
+        """ move to prev subplot axis """
         self.ax_move(-1)
         return self.ax
     
     
     def roadkill(self, thing):
-        """ flaten if possible - remove any dimensions and make a list """
+        """ flatten if possible - remove any dimensions and make a list """
         if (hasattr(thing, "__iter__")):
             return(thing.flatten()) # even more powerful: thing = np.concatenate(thing).ravel()
         else:
@@ -111,6 +116,7 @@ class myinkc(hoppy.hopper):
     
             
     def ax_move(self, where):
+        """ move relative up/down to another subplot axis """
         self.ax_i = self.ax_i + where
         
         self.axs = self.roadkill(self.axs)
