@@ -3,7 +3,6 @@
 # -*- coding: utf-8 -*-
 """
 Created on Mon May 18 21:26:53 2020
-
 @author: thirschbuechler
 """
 import re
@@ -21,6 +20,10 @@ from vigilant_tribbles import mystring as ms
 
 #from skimage import idata, icolor
 #from skimage.transform import rescale, resize, downscale_local_mean
+
+# ToDos myink general
+# - stem with turnoff options
+# - plot as mplot
 
 
 # my modules
@@ -244,7 +247,7 @@ class myinkc(hoppy.hopper):
         self.enginerd_axis(ax.yaxis, unit=unit, **kwargs)        
         
 
-    def enginerd(self, value, unit='Hz', **kwargs):####todo: enginerd object instead of calling it this badly here and axis wise
+    def enginerd(self, value, unit='Hz', **kwargs):#todo: enginerd object instead of calling it this badly here and axis wise
         # load defaults if necessary
         if not "places" in kwargs:
             kwargs["places"]=2 # decimal acc
