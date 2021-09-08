@@ -11,7 +11,18 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.ticker import EngFormatter #enginerd stuff
 from matplotlib.ticker import (MultipleLocator, FormatStrFormatter) # nicergrid
-from vigilant_tribbles import mystring as ms
+
+try:
+    import mystring as ms
+    #from portal import portal
+except:
+    try:
+        import vigilant_tribbles.mystring as ms
+        #from vigilant_tribbles.portal import portal
+
+    except:
+        print("failed to import module directly or via submodule -  mind adding them with underscores not operators (minuses aka dashes, etc.)")
+
 
 #from matplotlib.patches import Arc, Circle
 
