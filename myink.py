@@ -33,9 +33,7 @@ except:
 #from skimage.transform import rescale, resize, downscale_local_mean
 
 # ToDos myink general
-# - stem with turnoff options
-# - plot as mplot
-
+# - see littered to-dos / to-do tree
 
 # my modules
 #-#-# module test #-#-#
@@ -258,7 +256,7 @@ class myinkc(hoppy.hopper):
         self.enginerd_axis(ax.yaxis, unit=unit, **kwargs)        
         
 
-    def enginerd(self, value, unit='Hz', **kwargs):#todo: enginerd object instead of calling it this badly here and axis wise
+    def enginerd(self, value, unit='Hz', **kwargs):#todo: enginerd object/mystring-outsourcing instead of calling it this badly here and axis wise
         # load defaults if necessary
         if not "places" in kwargs:
             kwargs["places"]=2 # decimal acc
