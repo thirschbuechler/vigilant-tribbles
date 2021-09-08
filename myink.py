@@ -744,11 +744,29 @@ class myinkc(hoppy.hopper):
         """ forward to mpl scatter"""
         return self.get_ax().scatter(*args,**kwargs)
 
+    def stem(self, *args, hidestems=False, hidedots=False, **kwargs):
+        """ stem, options to hide lines etc. """
+
+        # call mpl stem
+        markerline, stemline, baseline =  self.get_ax().stem(*args,**kwargs)
+
+        # post process
+        # https://stackoverflow.com/questions/60616721/how-to-remove-stemlines-from-a-matplotlib-stem-plot
+        if hidestems:
+            stemline.remove() 
+            baseline.remove()
+        if hidedots:
+            markerline.remove()
+
+        # route through results
+        return markerline, stemline, baseline
+
 
 def tester(): # module test, superseeds ifdef-main (since used here for import shenanigans) #
-    #oldtest()
-    #test_fontsize()
+    oldtest()
+    test_fontsize()
     tickrot()
+    stemmy()
 
 
 def oldtest():    
@@ -823,6 +841,19 @@ def tickrot():
     ele.show()
 
 
+def stemmy():
+    stuff=np.random.random(size=10)
+
+    ele=myinkc()
+    ele.stem(stuff, hidestems=True)
+    ele.title("no stemlines")
+    ele.show()
+
+    ele.stem(stuff)
+    ele.title("stemlines normal")
+    ele.show()
+
 #-#-# module test #-#-#
 if testing:#call if selected, after defined, explanation see above
-    tester()
+    #tester()
+    stemmy()
