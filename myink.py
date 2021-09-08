@@ -731,9 +731,18 @@ class myinkc(hoppy.hopper):
         #self.get_ax().grid(True)
         self.get_ax().set_ylabel("") # and unit label
 
+    ## forwarders ##
     def hist(self,*args,**kwargs):
         """ forward to mpl hist"""
         return self.get_ax().hist(*args,**kwargs)
+
+    def pplot(self,*args,**kwargs):#thsmith already has a "plot"
+        """ forward to mpl plot"""
+        return self.get_ax().plot(*args,**kwargs)
+
+    def scatter(self,*args,**kwargs):
+        """ forward to mpl scatter"""
+        return self.get_ax().scatter(*args,**kwargs)
 
 
 def tester(): # module test, superseeds ifdef-main (since used here for import shenanigans) #
