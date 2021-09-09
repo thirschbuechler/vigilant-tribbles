@@ -10,8 +10,8 @@ import os
 def dummy(*args, **kwargs):
     pass
 
-
-class portal(object):
+# portal is auto child of object in py3, see https://stackoverflow.com/questions/4015417/why-do-python-classes-inherit-object
+class portal():
     """ - enter a subfolder
         - cleanup afterwards
         - no hopping
