@@ -684,19 +684,25 @@ class myinkc(hoppy.hopper):
 
 
     def subplots_adjust(self, *args, **kwargs):
+        """ fiddle with the parameters, for spacing
+        - left right top bot
+        - hspace wspace
+        """
         self.get_fig().subplots_adjust(*args, **kwargs)   
         
         
     def hide_frame(self,ax=None):
+        """ blank out frame aka hide_frame"""
         self.get_fig().patch.set_visible(False)
         self.get_ax(ax).axis('off')
 
     def blank(self,ax=None):
+        """ blank out frame aka hide_frame"""
         self.hide_frame(ax=ax)
         
         
     def common_ax_labels(self,xlabel="",ylabel=""):
-        # add a big axis, hide frame
+        """ add a big axis, hide frame """
         fig = self.get_fig()
         fig.add_subplot(111, frameon=False)
         # hide tick and tick label of the big axis
