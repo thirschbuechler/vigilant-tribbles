@@ -730,10 +730,19 @@ class myinkc(hoppy.hopper):
 
 
     def hidey(self):
+        """ hide current ax' y-axis label and tick-labels """
         #self.get_ax().yaxis.set_visible(False) # hide ylabels and grid
         self.get_ax().set_yticklabels([]) # hide only values
         #self.get_ax().grid(True)
         self.get_ax().set_ylabel("") # and unit label
+
+    def hidex(self):
+        """ hide current ax' x-axis label and tick-labels"""
+        #self.get_ax().xaxis.set_visible(False) # hide xlabels and grid
+        self.get_ax().set_xticklabels([]) # hide only values
+        #self.get_ax().grid(True)
+        self.get_ax().set_xlabel("") # and unit label
+
 
     ## forwarders ##
     def hist(self,*args,**kwargs):
