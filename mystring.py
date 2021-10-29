@@ -36,7 +36,8 @@ def sort_human(stuff):
     return stuff
 
 
-def iscontainedin(matchers, listt): # returns matches by modding listt
+def iscontainedin(matchers, listt):
+    """ returns matches of listt element """
     return [s for s in listt if any(xs in s for xs in matchers)]
 
 
@@ -56,7 +57,7 @@ def groupByPrefix(strings,delimiter="_"):
 
 
 def removecontainingof(tobe_del,listt, sure=0):
-    """ removes stuff from original list, no return val """
+    """ removes stuff from original list, NO return val """
     if type(listt)!=list and sure==0:
         print("are you sure to hand over a non-list?")
         print("nothing happened")
@@ -85,6 +86,9 @@ def removestringparts(matchers, listt):
     return listt
 
 
+# $ToDo - this naming scheme would be way nicer.. 
+def rm_str_parts_list(matchers, listt): 
+    return removestringparts(matchers, listt)
 
 
 ###################### testing #############################
