@@ -299,6 +299,12 @@ class myinkc(hoppy.hopper):
         
         
     def modlegend(self, mylegendtext=None, addtext=None, title=None, rmsubstr=None, ax=None, *args, **kwargs):#, *args, **kwargs for ax.legend only
+        """ legend handler and creator 
+            - create out of self.mylegend if no mylegendtext passed 
+            - use mylegendtext (if passed and same len)
+            - remove shit with rmsubstr
+            - DOES NOT WORK FOR pplot, as it does not save mylegendtext
+            """
         # addtext is a list of same len as legend    
         ax = self.get_ax(ax)
         
@@ -372,7 +378,11 @@ class myinkc(hoppy.hopper):
     
     
     def comradelegend(self, fig=None, **kwargs): 
-        """ collect all labels of one figure and collate to one master legend """
+        """ collect all labels of one figure and collate to one master legend 
+            locations "loc": 
+                - upper/lower left/right
+                - "ul/ll/lr/ur"
+        """
         fig=self.get_fig(fig)#fetch
         
         # fuckin' babysit legend placing...
