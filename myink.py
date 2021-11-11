@@ -500,9 +500,14 @@ class myinkc(hoppy.hopper):
     #       fct(*args, **kwargs)
 
 
-    # marker helper            
     def markernum(self, num):
-        num=num+2 # skip first two horz matplotlib markers unless too many
+        """" marker helper - skip first two horz matplotlib markers unless too many
+        
+            returns: int for marker: 2-11
+
+            can be passed as "marker=self.markernum(i)" to matplotlib fcts
+        """
+        num=num+2 # 
         while(num>11): # ensure matplotlib markers don't overflow
             num=num-12
         return num
@@ -514,7 +519,7 @@ class myinkc(hoppy.hopper):
 
     def killall(self):
         plt.close("all") # fun but not needed
-                    
+    
     
     def LSQ(self, x, y):
         """ THE OLD FASHIONED MOORE PENROSE WAY"""
@@ -528,7 +533,7 @@ class myinkc(hoppy.hopper):
     
     def get_points(self):
         return self.list_to_xy (self.points)
-        
+    
 
     def list_to_xy(self, mylist):
         
@@ -544,11 +549,12 @@ class myinkc(hoppy.hopper):
             return x,y
 
         else:
-            print("something fucked up - points are no list in list_to_xy")
+            raise Exception("something fucked up - points are no list in list_to_xy")
         
 
     def resetcolorwheel(self):
-        self.get_ax().set_prop_cycle(None)#restart auto-"colorwheel" for line-colors
+        """ restart auto-"colorwheel" for line-colors """
+        self.get_ax().set_prop_cycle(None)
         
 
     def defaultcolorlist(self, maxval=""):
@@ -563,11 +569,16 @@ class myinkc(hoppy.hopper):
         return dictlist
     
     
-    def include_me(self, left, right, me): # get two bound and tertiary value, if third out of bounds include the third
+    def include_me(self, left, right, me):
+        """ include a value (me) into a boundary (left, right) by rewriting it (coeff 1.1)
+
+        get two bound and tertiary value, if third out of bounds include the third
+
         # example use
-        #left, right = ax.get_xlim() 
-        #left, right = self.include_me(left, right)
-        #ax.set_xlim(left, right) e
+        left, right = ax.get_xlim() 
+        left, right = self.include_me(left, right, 0)
+        ax.set_xlim(left, right)
+        """
         
         if me < left:
             left=me*1.1
@@ -582,7 +593,8 @@ class myinkc(hoppy.hopper):
         return self.subplots(*args, **kwargs) # a new figure/axis has to be explicitly added; figsize in inches BUT degrades only
     
     
-    def gallery(self, imgs= []): # takes a list (!) of one or more elements and splits it up into 2x2 max.
+    def gallery(self, imgs= []):
+        """ takes a list (!) of one or more elements and splits it up into 2x2 max. """
         if np.size(imgs)==0:
             print("dude, no images in this folder! {}".format(self.getpath()))
         elif not self.printimg:
@@ -605,6 +617,7 @@ class myinkc(hoppy.hopper):
                 
                 
     def pic(self, img):
+        """ show one pic """
         self.gallery(imgs=[img])
                 
     
@@ -634,6 +647,7 @@ class myinkc(hoppy.hopper):
             
             
     def complete_gallery(self):
+        """ gallery of current dir (calls listfiles-self.images) """
         self.listfiles()#list and store images in self
         self.gallery(imgs=self.images)
         
@@ -722,6 +736,13 @@ class myinkc(hoppy.hopper):
 
 
     def nicergrid(self,y_major=20E6, y_minor=2.5E6, x_major=0.5, x_minor=0.1):
+        """ add x,y grid based on spacings
+            - x_minor
+            - y_minor
+            - x_major
+            - y_major
+        
+        """
         ax = self.get_ax()
 
         #axis y         #we have: 20M on left and 2.5*20=50M on right
