@@ -102,7 +102,17 @@ class myinkc(hoppy.hopper):
         #plt.rcParams.update({'font.size': 22})
         #self.rcparams_update({'font.size': 22})
     
-    
+    def canvas_params(self,fontsize=5,figsize=[15,10], dpi=300):
+        """ takes fontsize in pt,  figsize-list in cm, and dpi
+            e.g.
+            - fontsize=5
+            - figsize = [15,10]
+            - dpi = 300
+        """
+        cm = 1/2.54
+        self.rcparams_update({'font.size': fontsize, 'figure.figsize': np.array(figsize)*cm, 'figure.dpi': dpi})
+
+
     def savefig(self,*args, **kwargs):
         plt.savefig(*args, **kwargs)
 
