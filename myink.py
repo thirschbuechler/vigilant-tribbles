@@ -822,6 +822,8 @@ class myinkc(hoppy.hopper):
         # route through results
         return markerline, stemline, baseline
 
+    #</myinkc> - if an indent level is wrong fcts afterwards not defined!
+
 
 def tester(): # module test, superseeds ifdef-main (since used here for import shenanigans) #
     oldtest()
@@ -857,7 +859,7 @@ def test_fontsize():
 def large_title2():
     ele = myinkc()
     #plt.subplots(nrows=2)
-    ele.subplots(nrows=2) # why roadkill not defined? is a self-method of myinkc !? no forward-decl possible in py.. - because rcparams-update was at wrong indent level..
+    ele.subplots(nrows=2)
     ele.title("regular size")
     ele.ax_onward()
     ele.rcparams_update({'font.size': 22})
