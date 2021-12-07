@@ -776,6 +776,11 @@ class myinkc(hoppy.hopper):
         self.get_ax().set_xlabel("") # and unit label
         self.get_ax().xaxis.set_major_locator(plt.NullLocator()) # hide ticks "sticks"
 
+    def hidexy(self):
+        """ hide current ax' xy-axis labels and tick-labels"""
+        self.hidex()
+        self.hidey()
+
 
     ## forwarders ##
     def hist(self,*args,**kwargs):
