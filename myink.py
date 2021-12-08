@@ -390,8 +390,8 @@ class myinkc(hoppy.hopper):
     def comradelegend(self, fig=None, **kwargs): 
         """ collect all labels of one figure and collate to one master legend 
             locations "loc": 
-                - upper/lower left/right
-                - "ul/ll/lr/ur"
+                - upper/lower left/right/center - equals
+                - loc="ul/ll/lr/ur/c"
         """
         fig=self.get_fig(fig)#fetch
         
@@ -406,17 +406,20 @@ class myinkc(hoppy.hopper):
         
         if "loc" in kwargs:
 
-            if kwargs["loc"]=='lr':#lowerright
+            if kwargs["loc"]=='lr': # lowerright
                 kwargs1=dict(bbox_to_anchor=(1-xoff, yoff), loc='lower right', borderaxespad=0.)
             
-            elif kwargs["loc"]=='ll':#lowerleft
+            elif kwargs["loc"]=='ll': # lowerleft
                 kwargs1=dict(bbox_to_anchor=(xoff+0.025, yoff), loc='lower left', borderaxespad=0.)
                 
-            elif kwargs["loc"]=='ul':#upperleft
+            elif kwargs["loc"]=='ul': # upperleft
                 kwargs1=dict(bbox_to_anchor=(xoff+0.025, 1-(yoff+0.01)), loc='upper left', borderaxespad=0.)
                 
-            elif kwargs["loc"]=='ur':#upperright
+            elif kwargs["loc"]=='ur': # upperright
                 kwargs1=dict(bbox_to_anchor=(1-xoff, 1-(yoff+0.01)), loc='upper right', borderaxespad=0.)
+
+            elif kwargs["loc"]=='c': # center - of figure not current ax :(
+                kwargs1=dict(bbox_to_anchor=[0.5, 0.5], loc='center', borderaxespad=0.)
                 
             else:
                 print("programmer, you screwed up.")
