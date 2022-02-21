@@ -43,11 +43,16 @@ def iscontainedin(matchers, listt):
     """ returns matches of listt element 
         - listt can be list
         - listt can also be a str, see 2nd test
+        - for substrings use: "if substring in string", see weird 3rd output
 
         >>> iscontainedin(".",["abc","dev.f"])
         ['dev.f']
         >>> iscontainedin(".","dev.f")
         ['.']
+        >>> iscontainedin(".bin","C:\\bla.bin")
+        ['.', 'b', 'i', 'n']
+        >>> iscontainedin(".bin","C:\\bla")
+        []
     """
     return [s for s in listt if any(xs in s for xs in matchers)]
 

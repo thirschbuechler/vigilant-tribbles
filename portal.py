@@ -50,7 +50,16 @@ class portal():
         return os.getcwd()
 
     def cd(self, newpath):
-        """ wrap chdir with slightly more readable exceptions"""
+        """ wrap chdir 
+        - slightly more readable exceptions
+        - folder:x.bin notation possible
+        """
+
+        # bin override via ":" notation possible
+        if ".bin" in newpath:
+            newpath = newpath.split(":")[0] # eg folder:0.bin
+            #print("bla is ".format(bla))
+
         now=self.getpath()
         newpath_abs=os.path.join(now,newpath)
 
