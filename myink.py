@@ -808,22 +808,28 @@ class myinkc(hoppy.hopper):
         """ forward to mpl scatter"""
         return self.get_ax().scatter(*args,**kwargs)
 
-    def stem(self, *args, hidestems=False, hidedots=False, **kwargs):
+    def stem(self, *args, hidestems=False, hidedots=False, markersize = -1, **kwargs):
         """ stem, options to hide lines etc. """
 
         # call mpl stem
-        markerline, stemline, baseline =  self.get_ax().stem(*args,**kwargs)
+        markers, stemlines, baseline =  self.get_ax().stem(*args,**kwargs)
 
-        # post process
+        ## post process ##
+        
+        # hide stuff if requested
         # https://stackoverflow.com/questions/60616721/how-to-remove-stemlines-from-a-matplotlib-stem-plot
         if hidestems:
-            stemline.remove() 
+            stemlines.remove() 
             baseline.remove()
         if hidedots:
-            markerline.remove()
+            markers.remove()
+
+        # change size if requested
+        if markersize>-1:
+            markers.set_markersize(1)
 
         # route through results
-        return markerline, stemline, baseline
+        return markers, stemlines, baseline
 
     #</myinkc> - if an indent level is wrong fcts afterwards not defined!
 
