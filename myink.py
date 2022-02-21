@@ -808,7 +808,7 @@ class myinkc(hoppy.hopper):
         """ forward to mpl scatter"""
         return self.get_ax().scatter(*args,**kwargs)
 
-    def stem(self, *args, hidestems=False, hidedots=False, markersize = -1, **kwargs):
+    def stem(self, *args, hidestems=False, hidedots=False, markersize = -1, markercolor="", **kwargs):
         """ stem, options to hide lines etc. """
 
         # call mpl stem
@@ -827,6 +827,9 @@ class myinkc(hoppy.hopper):
         # change size if requested
         if markersize>-1:
             markers.set_markersize(1)
+
+        if len(markercolor)>0:
+            markers.set_color(markercolor)
 
         # route through results
         return markers, stemlines, baseline
