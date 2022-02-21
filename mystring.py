@@ -4,6 +4,9 @@
 """
 Mystring - collection of random helper functions, mostly string related
 
+
+note: listt is used to not overwrite builtin list fct
+
 Created on June 21, 2021
 @author: thirschbuechler
 """
@@ -20,11 +23,11 @@ def atoi(text):
     return int(text) if text.isdigit() else text
 
 def natural_keys(text):
-    '''
-    alist.sort(key=natural_keys) sorts in human order
+    """ alist.sort(key=natural_keys) sorts in human order
+
     http://nedbatchelder.com/blog/200712/human_sorting.html
     (See Toothy's implementation in the comments)
-    '''
+    """
     return [ atoi(c) for c in re.split(r'(\d+)', text) ]
 
 def sort_human(stuff):
@@ -37,7 +40,15 @@ def sort_human(stuff):
 
 
 def iscontainedin(matchers, listt):
-    """ returns matches of listt element """
+    """ returns matches of listt element 
+        - listt can be list
+        - listt can also be a str, see 2nd test
+
+        >>> iscontainedin(".",["abc","dev.f"])
+        ['dev.f']
+        >>> iscontainedin(".","dev.f")
+        ['.']
+    """
     return [s for s in listt if any(xs in s for xs in matchers)]
 
 
@@ -58,6 +69,7 @@ def groupByPrefix(strings,delimiter="_"):
 
 def removecontainingof(tobe_del,listt, sure=0):
     """ removes stuff from original list, NO return val """
+    
     if type(listt)!=list and sure==0:
         print("are you sure to hand over a non-list?")
         print("nothing happened")
