@@ -273,6 +273,8 @@ class myinkc(hoppy.hopper):
         if not "sep" in kwargs:
             kwargs["sep"]="\N{THIN SPACE}"
             
+        #print(kwargs["places"])
+        #if kwargs["places"] > 0: # inactive for -1#does not work here, only in waterfall directly!?!?! #HACK
         return(EngFormatter(**kwargs).format_eng(value))
     
         
