@@ -11,6 +11,7 @@ Created on June 21, 2021
 @author: thirschbuechler
 """
 import re #sorting
+#import numpy as np # ndarray for list vecorization in split string index bla
 
 
 def dummy(*args, **kwargs):
@@ -106,6 +107,24 @@ def removestringparts(matchers, listt):
 # $ToDo - this naming scheme would be way nicer.. 
 def rm_str_parts_list(matchers, listt): 
     return removestringparts(matchers, listt)
+
+
+#https://stackoverflow.com/questions/45104747/split-python-string-by-predifned-indices
+def str_split_via_indices(s="",split_points=[]):
+    """
+    split a string via a list of indices
+    - s: inputstring
+    - split_points: indices where to split
+    >>> str_split_via_indices(s="thequickbrownfoxjumpsoverthelazydog",split_points=[3, 8, 13, 16, 21, 25, 28, 32])
+    ['the', 'quick', 'brown', 'fox', 'jumps', 'over', 'the', 'lazy', 'dog']"""
+
+    # insert first and last boundary
+    #split_points=np.array(split_points)#vectorize compatiblity
+    split_points.insert(0,0)
+    split_points.append(len(s))
+    #split_points = [0,*split_points, len(s)]
+    # stackoverflow magic
+    return([s[i: j] for i, j in zip(split_points, split_points[1:])])
 
 
 ###################### testing #############################
