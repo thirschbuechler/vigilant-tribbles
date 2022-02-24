@@ -129,10 +129,17 @@ class myinkc(hoppy.hopper):
         return self.ax
     
     
-    def roadkill(self, thing):
+    def roadkill(self, thing, hard=False):
         """ flatten if possible - remove any dimensions and make a list """
         if (hasattr(thing, "__iter__")):
-            return(thing.flatten()) # even more powerful: thing = np.concatenate(thing).ravel()
+            if not hard:
+                return(thing.flatten()) # please be flat
+            else:
+                # sudo be_flat
+                # - join np.arrays in list via conc
+                # - then join lists via ravel)
+                return(np.concatenate(thing).ravel())
+
         else:
             return thing
     
