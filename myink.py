@@ -847,6 +847,49 @@ class myinkc(hoppy.hopper):
         # route through results
         return markers, stemlines, baseline
 
+    def boxplot(self, data, xlabels="", meanoffset=False, ylabel="", title=""):
+        """
+        creates 2row subplot for a boxplot w many elements (e.g. RSSIs) and labeling
+
+        forked from https://stackoverflow.com/questions/33328774/box-plot-with-min-max-average-and-standard-deviation
+        """
+
+        # # data conditioning # # 
+        statistics = []
+        for item in data:
+            item = np.array(item).astype(np.float)
+            mins = np.min(item)
+            maxes = np.max(item)
+            means = np.mean(item)
+            std = np.std(item)
+            statistics.append([mins, means, maxes, std])
+
+        mins, means, maxes, std  = np.array(statistics).astype("float").T # unpack
+        x=np.arange(len(data))
+        print(len(data),len(statistics))
+
+        if meanoffset:
+            off=means
+            ylabel+=", means subtracted"
+        else:
+            off=0
+
+        # # plotting # #
+        self.subplots(nrows=2)
+        # create stacked errorbars
+        self.errorbar(x, means-off, std, fmt='ok', lw=3) # fat std
+        self.errorbar(x ,means-off, [means - mins, maxes - means], fmt='.k', ecolor='gray', lw=1) # thin min-max
+
+        # xy_labelling
+        ax = self.get_ax()
+        ax.set_ylabel(ylabel)
+        ax.set_xticks(np.arange(len(xlabels)))
+        ax.set_xticklabels(xlabels, ha="right")#horizontal alignment
+        self.rotate_xticks(45)
+        self.title(title)
+        self.ax_onward()
+        self.hide_frame()
+
     #</myinkc> - if an indent level is wrong fcts afterwards not defined!
 
 
