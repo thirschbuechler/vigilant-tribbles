@@ -817,6 +817,10 @@ class myinkc(hoppy.hopper):
         """ forward to mpl scatter"""
         return self.get_ax().scatter(*args,**kwargs)
 
+    def errorbar(self,*args,**kwargs):
+        """ forward to mpl errorbar"""
+        return self.get_ax().errorbar(*args,**kwargs)
+
     def stem(self, *args, hidestems=False, hidedots=False, markersize = -1, markercolor="", **kwargs):
         """ stem, options to hide lines etc. """
 

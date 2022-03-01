@@ -85,6 +85,16 @@ def removecontainingof(tobe_del,listt, sure=0):
             listt.pop(listt.index(s))
 
 
+def replacestringparts(matchers, listt, newstr=""): 
+    """returns list of input listt (list) with replaced matchers (list) by one newstr
+    """
+    if type(matchers)==str:
+        matchers=[matchers] # assume if a string given to only replace the whole thing
+    
+    for matcher in matchers:
+        listt = [line.replace(matcher,newstr) for line in listt]  # replace with newstr
+    return listt
+
 def removestringparts(matchers, listt): 
     """returns cleaned list of input listt (list) and to-be-removed matchers (list)
     
@@ -94,15 +104,7 @@ def removestringparts(matchers, listt):
     >>> removestringparts(["QQ","s"],["QQasdf","asdfQQasdf"])
     ['adf', 'adfadf']
     """
-    #print("hi")
-    if type(matchers)==str:
-        matchers=[matchers]#assume if a string given to only replace the whole thing
-    
-    for matcher in matchers:
-        listt = [line.replace(matcher,"") for line in listt]  # replace with nothing
-        #print(line)
-    return listt
-
+    return replacestringparts(matchers, listt, "")
 
 # $ToDo - this naming scheme would be way nicer.. 
 def rm_str_parts_list(matchers, listt): 
