@@ -111,7 +111,12 @@ class myinkc(hoppy.hopper):
         """
         cm = 1/2.54
         self.rcparams_update({'font.size': fontsize, 'figure.figsize': np.array(figsize)*cm, 'figure.dpi': dpi})
-
+    
+    def canvas_params_reset(self):
+        """ reset canvas_params to what is default, according to internet
+            e.g. for a small plot to not look ugly and stretched
+        """
+        self.rcparams_update({'font.size': 10, 'figure.figsize': [6.4, 4.8], 'figure.dpi': 100})
 
     def savefig(self,*args, **kwargs):
         plt.savefig(*args, **kwargs)
@@ -847,7 +852,17 @@ class myinkc(hoppy.hopper):
         # route through results
         return markers, stemlines, baseline
 
-    def boxplot(self, data, xlabels="", meanoffset=False, ylabel="", title=""):
+
+    def autoscale_fig(self):
+        """
+        try to fit most text of axis ticks, labels, titles w.o. overlapping
+        - usually works, only GUI panel might overlap still
+        - alternatively, use subplots.adjust wspace hspace bottom top
+        """
+        plt.tight_layout()
+
+
+    def boxplot(self, data, xlabels="", meanoffset=False, ylabel="", title="", small=False):
         """
         creates 2row subplot for a boxplot w many elements (e.g. RSSIs) and labeling
 
@@ -875,7 +890,12 @@ class myinkc(hoppy.hopper):
             off=0
 
         # # plotting # #
-        self.subplots(nrows=2)
+        nrows=1
+        #if not small:
+            #nrows=2 # provide extra space for labels
+        #else:
+            #nrows=1
+        self.subplots(nrows=nrows)
         # create stacked errorbars
         self.errorbar(x, means-off, std, fmt='ok', lw=3) # fat std
         self.errorbar(x ,means-off, [means - mins, maxes - means], fmt='.k', ecolor='gray', lw=1) # thin min-max
@@ -885,10 +905,14 @@ class myinkc(hoppy.hopper):
         ax.set_ylabel(ylabel)
         ax.set_xticks(np.arange(len(xlabels)))
         ax.set_xticklabels(xlabels, ha="right")#horizontal alignment
-        self.rotate_xticks(45)
+        self.rotate_xticks(45, autoscale=0)
         self.title(title)
-        self.ax_onward()
-        self.hide_frame()
+        #if not small:
+        #    self.ax_onward()
+        #    self.hide_frame()
+
+        self.autoscale_fig()
+
 
     #</myinkc> - if an indent level is wrong fcts afterwards not defined!
 
