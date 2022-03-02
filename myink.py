@@ -818,9 +818,22 @@ class myinkc(hoppy.hopper):
         """ forward to mpl plot"""
         return self.get_ax().plot(*args,**kwargs)
 
-    def scatter(self,*args,**kwargs):
-        """ forward to mpl scatter"""
+    def scatter(self ,*args , weigh=False, wf=10, **kwargs):
+        """ forward to mpl scatter
+            - extra option: weigh and wf (weighfactor)
+        """
+        
+        if weigh: # multiple occourances cause large dots 
+            #https://stackoverflow.com/questions/46700733/how-to-have-scatter-points-become-larger-for-higher-density-using-matplotlib
+            from collections import Counter
+            x,y = args
+            c = Counter(zip(x,y))
+            # create a list of the sizes, here multiplied by wf for scale
+            s = [wf*c[(xx,yy)] for xx,yy in zip(x,y)]
+            kwargs["s"]=s
+
         return self.get_ax().scatter(*args,**kwargs)
+
 
     def errorbar(self,*args,**kwargs):
         """ forward to mpl errorbar"""
@@ -1008,7 +1021,20 @@ def stemmy():
     ele.title("stemlines normal")
     ele.show()
 
+
+def weigh_scatter():
+    ele=myinkc()
+    x=[0,1,1,2,2,2,2,2]
+    y=[0,1,2,3,3,3,3,5]
+
+    ele.scatter(x,y,weigh=True)
+
+    ele.show()
+
+
 #-#-# module test #-#-#
 if testing:#call if selected, after defined, explanation see above
     #tester()
-    stemmy()
+    #stemmy()
+
+    weigh_scatter()
