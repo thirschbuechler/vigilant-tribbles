@@ -894,7 +894,7 @@ class myinkc(hoppy.hopper):
 
         mins, means, maxes, std  = np.array(statistics).astype("float").T # unpack
         x=np.arange(len(data))
-        print(len(data),len(statistics))
+        #print(len(data),len(statistics))
 
         if meanoffset:
             off=means
