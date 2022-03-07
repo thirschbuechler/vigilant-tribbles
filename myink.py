@@ -814,6 +814,10 @@ class myinkc(hoppy.hopper):
         """ forward to mpl hist"""
         return self.get_ax().hist(*args,**kwargs)
 
+    def imshow(self,*args,**kwargs):
+        """ forward to mpl imshow"""
+        return self.get_ax().imshow(*args,**kwargs)
+
     def pplot(self,*args,**kwargs):#thsmith already has a "plot"
         """ forward to mpl plot"""
         return self.get_ax().plot(*args,**kwargs)
