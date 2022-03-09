@@ -51,7 +51,7 @@ else:
 ## thing to make matplotlib access easier ###
 class myinkc(hoppy.hopper): 
     
-    def __init__(self, *args, **kwargs):
+    def __init__(self, tikz=False, *args, **kwargs):
         """ init some vars, mostly passing args to superclass """
         # note: matplotlib may need to be reloaded to quit xkcd mode
         # importlib.reload(plt) # not required anymore (using with-context)
@@ -62,6 +62,16 @@ class myinkc(hoppy.hopper):
         self.yright=None # var to be inspected on plot cleanup and reset
         
         super().__init__(*args, **kwargs) # superclass init, in case there is any
+
+        if tikz:
+            self.tikz_enable()
+
+    def tikz_enable(self):
+        plt.style.use("ggplot")
+
+    def tikz_save(self, fn="graph.tex"):
+        import tikzplotlib
+        tikzplotlib.save(fn)
         
         
     def subplots(self, *args, **kwargs):
