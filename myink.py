@@ -87,6 +87,8 @@ class myinkc(hoppy.hopper):
         fn = "{}_{}.tex".format(title, self.tikz_counter)
         fn = self.sanitize(fn)
         fn = fn.replace("/", "")# don't get folders by a desanitzed slash-n
+        import os
+        fn = os.path.join("tikz_out",fn)
 
         # save #
         import tikzplotlib
