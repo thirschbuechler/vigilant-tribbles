@@ -57,6 +57,7 @@ class myinkc(hoppy.hopper):
         # importlib.reload(plt) # not required anymore (using with-context)
         self.ax = None
         self.fig = None
+        self.subplot_counter = 0
         self.tikz = 0
 
         self.printimg=True # shall images be printed
@@ -69,7 +70,6 @@ class myinkc(hoppy.hopper):
 
     def tikz_enable(self):
         plt.style.use("ggplot")
-        self.tikz_counter = 0 # init here notin  __init__ to error if forgotten
         self.tikz = 1
 
 
@@ -84,7 +84,7 @@ class myinkc(hoppy.hopper):
             title = self.current_title
         
         # filename #
-        fn = "{}_{}.tex".format(title, self.tikz_counter)
+        fn = "{}_{}.tex".format(title, self.subplot_counter)
         fn = self.sanitize(fn)
         fn = fn.replace("/", "")# don't get folders by a desanitzed slash-n
         import os
@@ -94,7 +94,7 @@ class myinkc(hoppy.hopper):
         import tikzplotlib
         tikzplotlib.save(fn)
         print("tikz saved {} in {}".format(fn, self.getpath() ) )
-        #self.tikz_counter+=1 # nope subplots does that
+        #self.subplot_counter+=1 # nope subplots does that
         
         
     def subplots(self, *args, **kwargs):
@@ -106,10 +106,9 @@ class myinkc(hoppy.hopper):
         # # cleanup last graph  # #
         # save tikz if enabled #
         if self.tikz: # if enabled - save here and with self.show()
-            if self.tikz_counter>0: # not first one and var created by enabling
+            if self.subplot_counter>0: # not first one and var created by enabling
                 self.tikz_save_lastgraph()
         # cleanup tikz vars #
-        self.tikz_counter+=1
         self.current_suptitle = ""
         self.current_title = ""
 
@@ -118,6 +117,7 @@ class myinkc(hoppy.hopper):
         
         # save properties #
         self.ax_i = 0
+        self.subplot_counter+=1
 
         if not (hasattr(self.axs, "__iter__")):#case axs was ax only #np.size didn't work for 2d axs
             self.ax=self.axs#put singular here    
