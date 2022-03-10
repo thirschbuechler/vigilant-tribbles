@@ -62,6 +62,11 @@ class myinkc(hoppy.hopper):
 
         self.printimg=True # shall images be printed
         self.yright=None # var to be inspected on plot cleanup and reset
+
+        if "bigfig" in kwargs: # e.g. for jupyter fullwidth graphs
+            if kwargs["bigfig"]:
+                self.canvas_params(fontsize=5,figsize=[15,10])
+            kwargs.pop("bigfig")
         
         super().__init__(*args, **kwargs) # superclass init, in case there is any
 
