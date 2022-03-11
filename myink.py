@@ -1006,7 +1006,7 @@ class myinkc(hoppy.hopper):
         if hidesmallframes:
             for axsi in axs:
                 for ax in axsi:
-                    self.hideframe(ax)
+                    self.blank(ax)
 
         fig.tight_layout()
 
@@ -1141,14 +1141,21 @@ def ecke_tester():
 
     # images
     ele=myinkc()
-    ele.ecke()
+    ele.ecke(hidesmallframes=True)
     ele.scatter([1,2,3,4],[1,2,1,0])
 
     pics = get_pics()
     for i in range(0,5):
         ele.ax_onward()
         ele.imshow(pics[i])
+        #ele.blank() # hide axes, etc around images
 
+    # todo - arrows pointing
+    # https://stackoverflow.com/questions/44060063/connectionpatch-or-pyplot-arrow-between-subplots-of-pyplot-pie-charts
+    # or annotate each one w emoji and assign this way
+    # https://i.stack.imgur.com/Za66N.png
+
+    # finally, show
     ele.show()
 
 
