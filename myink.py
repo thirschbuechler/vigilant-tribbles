@@ -985,6 +985,44 @@ class myinkc(hoppy.hopper):
 
         self.autoscale_fig()
 
+    def ecke(self, hidesmallframes=False): # inspired by mpl official doc
+        """
+        make a subplot with a corner in left bot, 5 plots around
+        - return
+        """
+        fig, axs = plt.subplots(ncols=3, nrows=3)
+        gs = axs[1, 2].get_gridspec()
+        # remove the underlying axes
+        for axsi in axs[1:, :2]:
+            for ax in axsi:
+                ax.remove()
+
+        # first dim: how much of y-axis: "0:" means everything starting from 0
+        # second dim: how much of x-axis: (starting right)
+        axbig = fig.add_subplot(gs[1:, :2]) 
+        #axbig.annotate('Big Axes \nGridSpec[1:, -1]', (0.1, 0.5),
+        #                xycoords='axes fraction', va='center')
+
+        if hidesmallframes:
+            for axsi in axs:
+                for ax in axsi:
+                    self.hideframe(ax)
+
+        fig.tight_layout()
+
+        # put axs inside
+        #self.axs = np.array([axbig, axs], dtype="object")
+        #self.axs = axbig, axs
+        self.ax = axbig
+        self.axs = axs
+
+        self.axs = np.delete(self.axs, [3,4,6,7])
+
+        self.ecke_axs = axs
+        self.ax_i = -1 # HACK
+
+
+
 
     #</myinkc> - if an indent level is wrong fcts afterwards not defined!
 
@@ -994,7 +1032,7 @@ def tester(): # module test, superseeds ifdef-main (since used here for import s
     test_fontsize()
     tickrot()
     stemmy()
-
+    weigh_scatter()
 
 def oldtest():    
     ele = myinkc()
@@ -1091,9 +1129,51 @@ def weigh_scatter():
     ele.show()
 
 
+def ecke_tester():
+    # basic
+    ele=myinkc()
+    ele.ecke()
+    ele.scatter([1,2,3,4],[1,2,1,0])
+
+    for i in range(0,5):
+        ele.ax_onward()
+        ele.scatter(i,i)
+
+    # images
+    ele=myinkc()
+    ele.ecke()
+    ele.scatter([1,2,3,4],[1,2,1,0])
+
+    pics = get_pics()
+    for i in range(0,5):
+        ele.ax_onward()
+        ele.imshow(pics[i])
+
+    ele.show()
+
+
+def get_pics():
+    from PIL import Image
+    pics = []
+
+    # using PIL
+    pics.append(Image.open("myfigures/stinkbug.webp")) # plt / PIL demo pic
+    pics.append(Image.open("myfigures/pic.png"))
+
+    import matplotlib.image as mpimg
+    import matplotlib.cbook as cbook
+    sample_data = ['grace_hopper.jpg',"logo2.png", "Minduka_Present_Blue_Pack.png"]
+
+    # or mpl
+    for sample in sample_data:
+        with cbook.get_sample_data(sample) as image_file:
+            pics.append(plt.imread(image_file))
+
+    return pics
+
+
 #-#-# module test #-#-#
 if testing:#call if selected, after defined, explanation see above
     #tester()
-    #stemmy()
 
-    weigh_scatter()
+    ecke_tester()
