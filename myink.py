@@ -1167,7 +1167,7 @@ def get_pics():
     pics.append(Image.open("myfigures/stinkbug.webp")) # plt / PIL demo pic
     pics.append(Image.open("myfigures/pic.png"))
 
-    import matplotlib.image as mpimg
+    # import matplotlib.image as mpimg
     import matplotlib.cbook as cbook
     sample_data = ['grace_hopper.jpg',"logo2.png", "Minduka_Present_Blue_Pack.png"]
 
