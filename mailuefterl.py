@@ -13,8 +13,8 @@ def auto_round(x):
     >>> auto_round(153)
     150
     """
-    r = - int (np.log10(x)) + 1 # neg to round left of comma
-    return (round(x, r))
+    r = int (np.log10(x)) - 1
+    return (round(x, -r))
 
 
 def auto_floor(x):
@@ -28,9 +28,8 @@ def auto_floor(x):
     >>> auto_floor(153)
     150
     """
-    r =  int (np.log10(x)) - 1 # neg to round left of comma
+    r =  int (np.log10(x)) - 1
     expo = np.power(10,r)
-    #print(x/expo)
     x = np.floor(x/expo)*expo
     return int(x)
 
