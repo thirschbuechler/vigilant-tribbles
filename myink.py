@@ -67,6 +67,10 @@ class myinkc(hoppy.hopper):
             if kwargs["bigfig"]:
                 self.canvas_params(fontsize=5,figsize=[15,10])
             kwargs.pop("bigfig")
+        if "medfig" in kwargs:
+            if kwargs["medfig"]:
+                self.canvas_params(fontsize=4,figsize=[10,6.6])
+            kwargs.pop("medfig")
         
         super().__init__(*args, **kwargs) # superclass init, in case there is any
 
@@ -806,6 +810,11 @@ class myinkc(hoppy.hopper):
         """ blank out frame aka hide_frame"""
         self.hide_frame(ax=ax)
         
+    def xlabel(self, label=""):
+        self.get_ax().set_xlabel(label)
+
+    def ylabel(self, label=""):
+        self.get_ax().set_ylabel(label)
         
     def common_ax_labels(self,xlabel="",ylabel=""):
         """ add a big axis, hide frame """
