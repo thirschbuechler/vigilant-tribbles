@@ -1,6 +1,7 @@
 # some general computation bla
 
 import numpy as np
+import warnings # numpy nanzero zeroslice stuff
 
 def auto_round(x):
     """
@@ -43,6 +44,24 @@ def integritycheck():
     print("attempted==succeeded, if no fails\n")
 
 
+# HACK all runtime warnings of one fct ignored
+# ToDo only ignore zeromean nan slice ones
+def babysit(eval, *args, **kwargs):
+    # numpy nanzero zeroslice stuff
+    # nan-matrices shall be allowed to have means over nans or zeros without giving a warning
+    # I expect to see RuntimeWarnings in this block - a mean(0) warning
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", category=RuntimeWarning)
+        return eval(*args,**kwargs)
+        
+def nanmean(*args, **kwargs):
+    return babysit(np.nanmean,*args, **kwargs)
+
+def nanmax(*args, **kwargs):
+    return babysit(np.nanmax,*args, **kwargs)
+
+def nanmin(*args, **kwargs):
+    return babysit(np.nanmin,*args, **kwargs)
 
 #-#-# module test #-#-#
 if __name__ == '__main__': # test if called as executable, not as library
