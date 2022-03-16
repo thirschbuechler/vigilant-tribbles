@@ -365,20 +365,26 @@ class myinkc(hoppy.hopper):
         # set
         axissub.set_major_formatter(EngFormatter(**kwargs))
     
-        
+    
     def killlegend(self,ax=None):
         ax = self.get_ax(ax)
-        #for stuff in [ax.get_legend()]:
-        #   stuff.remove()
-        oh_my = ax.get_legend() # alt
+        oh_my = ax.get_legend()
         if oh_my:
             oh_my.remove()
 
 
-    def killxlabel(self, ax=None):
-        ax = self.get_ax(ax)
-        ax.set_xticklabels([]) # remove numbers
-        ax.set_xlabel("") # remove text (unit)
+    def yticklabels(self, stuff, **kwargs):
+        self.get_ax().set_yticks(range(0,len(stuff)))
+        self.get_ax().set_yticklabels(stuff, **kwargs)
+
+    def xticklabels(self, stuff, **kwargs):
+        self.get_ax().set_xticks(range(0,len(stuff)))
+        self.get_ax().set_xticklabels(stuff, **kwargs)
+
+
+    def killxlabel(self):
+        self.xticklabels("") # remove numbers
+        self.xlabel() # remove text (unit)
         
         
     def modlegend(self, mylegendtext=None, addtext=None, title=None, rmsubstr=None, ax=None, *args, **kwargs):#, *args, **kwargs for ax.legend only
