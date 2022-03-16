@@ -20,7 +20,7 @@ def auto_round(x):
 
 def auto_floor(x):
     """
-    round to significance
+    round down to significance
 
     >>> auto_floor(15000)
     15000
@@ -32,6 +32,23 @@ def auto_floor(x):
     r =  int (np.log10(x)) - 1
     expo = np.power(10,r)
     x = np.floor(x/expo)*expo
+    return int(x)
+
+
+def auto_ceil(x):
+    """
+    round up to significance
+
+    >>> auto_ceil(15000)
+    15000
+    >>> auto_ceil(15555)
+    16000
+    >>> auto_ceil(153)
+    160
+    """
+    r =  int (np.log10(x)) - 1
+    expo = np.power(10,r)
+    x = np.ceil(x/expo)*expo
     return int(x)
 
 
