@@ -60,6 +60,8 @@ class myinkc(hoppy.hopper):
         self.fig = None
         self.subplot_counter = 0
         self.tikz = 0
+        
+        self.imims=[] # remember imageshows for rescaling - common_cb_lims
 
         self.printimg=True # shall images be printed
         self.yright=None # var to be inspected on plot cleanup and reset
@@ -887,7 +889,8 @@ class myinkc(hoppy.hopper):
 
     def imshow(self,*args,**kwargs):
         """ forward to mpl imshow"""
-        self.im = self.get_ax().imshow(*args,**kwargs)
+        self.im = self.get_ax().imshow(*args,**kwargs) # for animate
+        self.imims.append(self.im) # for common_cb_lims
         return self.im
 
     def pplot(self,*args,**kwargs):#thsmith already has a "plot"
@@ -1068,9 +1071,25 @@ class myinkc(hoppy.hopper):
         anim.save(fn, fps=fps)
         print("saved {}".format(fn))
 
+    def common_cb_lims(self, data):
+        """ 
+            - finds common min/max of data
+            - iterates over self.imim
+            - sets common colorbar limits
+            - resets self.imim
+        """
+        mymin=np.amin(data)
+        mymax=np.amax(data)
+        #print("{},{}".format(mymin,mymax))
+        for imim in self.imims:
+            imim.set_clim(mymin,mymax)
+            #print(imim)
+            #pe.get_fig().colorbar(imim,ax=pe.get_ax())
+        self.imims=[]#del imshow refs after rescaling
 
     #</myinkc> - if an indent level is wrong fcts afterwards not defined!
 
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 
 def tester(): # module test, superseeds ifdef-main (since used here for import shenanigans) #
     oldtest()
