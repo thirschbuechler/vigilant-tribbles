@@ -1071,6 +1071,16 @@ class myinkc(hoppy.hopper):
         anim.save(fn, fps=fps)
         print("saved {}".format(fn))
 
+    def colorbar(self, label="", **kwargs):
+        """ make a colorbar for the last imshow plot
+            - label
+            - cmap?
+            """
+        cb=self.get_fig().colorbar(self.im,ax=self.get_ax(), **kwargs) # ( ((3.4.2) , 3.5.1 require cb to have correct color with custom cb!?
+        cb.set_label(label)
+
+        return cb
+
     def common_cb_lims(self, data):
         """ 
             - finds common min/max of data
