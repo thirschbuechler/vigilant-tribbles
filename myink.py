@@ -9,6 +9,7 @@ import re
 import os
 import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib.animation as animation
 from matplotlib.ticker import EngFormatter #enginerd stuff
 from matplotlib.ticker import (MultipleLocator, FormatStrFormatter) # nicergrid
 
@@ -886,7 +887,8 @@ class myinkc(hoppy.hopper):
 
     def imshow(self,*args,**kwargs):
         """ forward to mpl imshow"""
-        return self.get_ax().imshow(*args,**kwargs)
+        self.im = self.get_ax().imshow(*args,**kwargs)
+        return self.im
 
     def pplot(self,*args,**kwargs):#thsmith already has a "plot"
         """ forward to mpl plot"""
@@ -1037,6 +1039,34 @@ class myinkc(hoppy.hopper):
         self.ax_i = -1 # HACK
 
 
+# https://stackoverflow.com/questions/17212722/matplotlib-imshow-how-to-animate
+    def make_im_gif(self, data, fn='test_anim.gif', fps=1, sec=4):
+        """ takes last self.imshow handle and makes a gif
+            - data: array of elements to pass to imshow instances
+            - fn: filename
+            - fps
+            - sec
+            CAUTION: last im's axis labeling stays!
+        """
+        im = self.im
+
+        def animate_func(i):
+            if i % fps == 0:
+                print( '.', end ='' )
+
+            im.set_array(data[i])
+            return [im]
+
+        anim = animation.FuncAnimation(
+                                    self.fig, 
+                                    animate_func, 
+                                    frames = sec * fps,
+                                    interval = 1000 / fps, # in ms
+                                    )
+
+        #anim.save('test_anim.mp4', fps=fps)# ffmpeg knows, pillow not, extra_args=['-vcodec', 'libx264'])
+        anim.save(fn, fps=fps)
+        print("saved {}".format(fn))
 
 
     #</myinkc> - if an indent level is wrong fcts afterwards not defined!
@@ -1194,8 +1224,26 @@ def get_pics():
     return pics
 
 
+
+def test_make_im_gif():
+    ele=myinkc()
+    sec = 4
+    fps = 1
+    data = [ np.random.rand(5,5) for _ in range( 4 * 1 ) ]
+
+    # First set up the figure, the axis, and the plot element we want to animate
+    #fig = plt.figure( figsize=(8,8) )
+    ele.subplots()
+
+    a = data[0]
+    im = ele.imshow(a, interpolation='none', aspect='auto', vmin=0, vmax=1)
+
+    ele.make_im_gif(data=data)
+
+
 #-#-# module test #-#-#
 if testing:#call if selected, after defined, explanation see above
     #tester()
 
-    ecke_tester()
+    #ecke_tester()
+    test_make_im_gif()
