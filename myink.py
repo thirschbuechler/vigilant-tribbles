@@ -1102,6 +1102,9 @@ class myinkc(hoppy.hopper):
 
     def cb_remove(self,i=None):
         """ remove one or all colorbars, index i
+
+            NOTE: DOESNT SEEM TO WORK UNLESS common_CB lims called, or sth
+                    maybe needs some plt.update() or sth?
         """
         if i==None:
             for imim in self.imims:
