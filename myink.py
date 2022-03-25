@@ -1100,6 +1100,17 @@ class myinkc(hoppy.hopper):
 
         return cb
 
+    def cb_remove(self,i=None):
+        """ remove one or all colorbars, index i
+        """
+        if i==None:
+            for imim in self.imims:
+                imim.colorbar.remove()
+        else:
+            imim = self.imims[i]
+            imim.colorbar.remove()
+
+
     def common_cb_lims(self, data):
         """ 
             - finds common min/max of data
