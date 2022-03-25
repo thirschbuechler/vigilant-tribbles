@@ -1071,13 +1071,24 @@ class myinkc(hoppy.hopper):
         anim.save(fn, fps=fps)
         print("saved {}".format(fn))
 
-    def colorbar(self, label="", **kwargs):
+    def colorbar(self, label="", ax=None, **kwargs):
         """ make a colorbar for the last imshow plot
             - label
+            - ax: to wich ax (or axs-for-all) to attach to
             - cmap?
             """
-        cb=self.get_fig().colorbar(self.im,ax=self.get_ax(), **kwargs) # ( ((3.4.2) , 3.5.1 require cb to have correct color with custom cb!?
-        cb.set_label(label)
+        ax = self.get_ax(ax)
+
+        # forward certian things to set_label
+        kwargs2 = {}
+        things = ["horizontalalignment"]
+        for thing in things:
+            if thing in kwargs:
+                kwargs2[thing]=kwargs[thing]
+                kwargs.pop(thing)
+
+        cb=self.get_fig().colorbar(self.im,ax=ax, **kwargs) # ( ((3.4.2) , 3.5.1 require cb to have correct color with custom cb!?
+        cb.set_label(label, **kwargs2)
 
         return cb
 
