@@ -221,9 +221,13 @@ class myinkc(hoppy.hopper):
         return self.ax
     
     
-    #function, since pos in axs will change during plotting
-    #!! generates figure if none (no plt.figure() or self.subplots() etc. called beforehand)!! ergo be inside doplot()-if-context
-    def get_ax(self, ax=None): # get class' ax or check if ax is passed and route through
+
+    def get_ax(self, ax=None): 
+        """ get class' ax or check if ax is passed and route through 
+        
+            function, since pos in axs will change during plotting
+            !! generates figure if none (no plt.figure() or self.subplots() etc. called beforehand)!! ergo be inside doplot()-if-context
+        """
         if ax is None: # no axis given
             if type(self.ax) is type(None): # is axis not a property already - robust
                 ax=plt.gca() #  get current axis $$ this might give multiple.. wtf$$ no the error was probably self.ax=self.axs[0] above
@@ -234,15 +238,17 @@ class myinkc(hoppy.hopper):
         return ax
     
     
-    def set_ax(self, ax=None): # set class' ax via parameter or matplotlib poll
+    def set_ax(self, ax=None):
+        """ set class' ax via parameter or matplotlib poll """
         if ax is None: # no axis given
             self.ax=plt.gca() #  get current whatever
         else:
             self.ax=ax
     
     
-    # made for comradelegend only, right now
-    def get_fig(self, fig=None): # get class' fig or check if fig is passed and route through
+    def get_fig(self, fig=None):
+        """ get class' fig or check if fig is passed and route through
+        """
         if fig is None: # no axis given
             if type(self.fig) is type(None): # is axis not a property already - robust with type
                 fig=plt.gcf() #  get current whatever $no setting - does it matter
@@ -251,7 +257,9 @@ class myinkc(hoppy.hopper):
         return fig
     
     
-    def set_fig(self, fig=None): # set class' fig via parameter or matplotlib poll
+    def set_fig(self, fig=None):
+        """ set class' fig via parameter or matplotlib poll
+        """
         if fig is None: # no figis given
             self.fig=plt.gcf() #  get current whatever
         else:
