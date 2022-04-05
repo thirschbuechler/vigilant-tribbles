@@ -892,7 +892,9 @@ class myinkc(hoppy.hopper):
 
     ## forwarders ##
     def hist(self,*args,**kwargs):
-        """ forward to mpl hist"""
+        """ forward to mpl hist
+        note: old patchy-draw stuff at bottom of myink as comment
+        """
         return self.get_ax().hist(*args,**kwargs)
 
     def imshow(self,*args,**kwargs):
@@ -1309,3 +1311,41 @@ if testing:#call if selected, after defined, explanation see above
 
     #ecke_tester()
     test_make_im_gif()
+
+""" 
+plt.hist stuff using bins, copied from metric - unused
+#
+        #do some gradient magic - todo: check for "right axis" 
+        #https://stackoverflow.com/questions/23061657/plot-histogram-with-colors-taken-from-colormap
+        
+        import matplotlib.pyplot as plt
+        #cm = plt.cm.get_cmap('RdYlBu_r')
+        cm = plt.cm.get_cmap('turbo_r')
+        bin_centers = 0.5 * (bins[:-1] + bins[1:])
+
+        # scale values to interval [0,1]
+        col = bin_centers - min(bin_centers)
+        col /= max(col)
+
+        # apply
+        for c, p in zip(col, patches):
+            plt.setp(p, 'facecolor', cm(c))
+
+        draw_colorbar = False # works but manual colorbars mess up last outline plot - $maybe horizontal? below all plots
+        if draw_colorbar:
+            # make colorbar
+            #fig, ax = plt.subplots()
+            #fig.colorbar()
+            #cb=self.get_fig().colorbar(imim,ax=ax)
+            #cb.set_label(cb_label)
+            #plt.colorbar() #noo mapper
+            
+            #https://stackoverflow.com/questions/41661409/how-to-generate-a-colorbar-for-manually-colored-plots-in-matplotlib
+            from mpl_toolkits.axes_grid1 import make_axes_locatable 
+            import matplotlib as mpl
+            divider = make_axes_locatable(plt.gca())
+            ax_cb = divider.new_horizontal(size="5%", pad=0.05)    
+            cb1 = mpl.colorbar.ColorbarBase(ax_cb, cmap=cm, orientation='vertical')
+            plt.gcf().add_axes(ax_cb)
+    #</patchy>
+"""
