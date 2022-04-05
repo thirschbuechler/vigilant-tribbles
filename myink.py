@@ -1132,6 +1132,22 @@ class myinkc(hoppy.hopper):
             #pe.get_fig().colorbar(imim,ax=pe.get_ax())
         self.imims=[]#del imshow refs after rescaling
 
+
+    def reset_coordsys(self):
+        """ CLEAN UP PREV PLOT RANDOM SPACING
+            - e.g. histos have 0,0 on lower left and not 0,0 on upper right per def --> call before and after annotating it w pplot 
+        """ 
+        self.get_ax().margins(0) # AFTER plot - 
+        self.twinx() # new axes for both
+        self.twiny()
+        self.hidexy() # hide xy labels etc
+
+    def G53(self):
+        """ reset coord sys to absolute
+            - forwarder to reset_coordsys
+            """
+        self.reset_coordsys()
+
     #</myinkc> - if an indent level is wrong fcts afterwards not defined!
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
@@ -1313,7 +1329,7 @@ if testing:#call if selected, after defined, explanation see above
     test_make_im_gif()
 
 """ 
-plt.hist stuff using bins, copied from metric - unused
+plt.hist stuff using bins,patches, copied from metric - unused
 #
         #do some gradient magic - todo: check for "right axis" 
         #https://stackoverflow.com/questions/23061657/plot-histogram-with-colors-taken-from-colormap
