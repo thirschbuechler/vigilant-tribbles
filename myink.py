@@ -397,7 +397,11 @@ class myinkc(hoppy.hopper):
         self.xticklabels("") # remove numbers
         self.xlabel() # remove text (unit)
         
-        
+    def legend(self, **kwargs):
+        ax = self.get_ax()
+        ax.legend(**kwargs)
+
+
     def modlegend(self, mylegendtext=None, addtext=None, title=None, rmsubstr=None, ax=None, *args, **kwargs):#, *args, **kwargs for ax.legend only
         """ legend handler and creator 
             - create out of self.mylegend if no mylegendtext passed 
