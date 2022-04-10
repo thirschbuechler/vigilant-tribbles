@@ -1010,6 +1010,28 @@ class myinkc(hoppy.hopper):
         self.autoscale_fig()
 
 
+    def boxplot_summary(self, data=[], xlabels=None, ylabel=None, title=None):
+        """ makes boxplot summaries and scenario overlay from "raw datapoints"
+        n-dim:
+        - data
+        - xlabels
+        annotations
+        - ylabel
+        - title
+        """
+        # # compute overlay # #
+        # generate x-axis for all datapoints
+        x = [np.ones(len(datasubset))* data.index(datasubset) for datasubset in data]
+        x = np.concatenate(x)
+        y = np.concatenate(data)
+
+        # vanilla base
+        self.boxplot(data=data, xlabels=xlabels, title=title, ylabel=ylabel)
+
+        # put overlay
+        self.scatter(x,y)            
+
+        
     def ecke(self, hidesmallframes=False): # inspired by mpl official doc
         """
         make a subplot with a corner in left bot, 5 plots around
@@ -1124,7 +1146,7 @@ class myinkc(hoppy.hopper):
         for imim in self.imims:
             imim.set_clim(mymin,mymax)
             #print(imim)
-            #pe.get_fig().colorbar(imim,ax=pe.get_ax())
+            #self.get_fig().colorbar(imim,ax=self.get_ax())
         self.imims=[]#del imshow refs after rescaling
 
 
