@@ -968,7 +968,7 @@ class myinkc(hoppy.hopper):
         plt.tight_layout()
 
 
-    def boxplot(self, data, xlabels="", meanoffset=False, ylabel="", title="", small=False):
+    def boxplot(self, data, xlabels="", meanoffset=False, ylabel="", title=""):
         """
         creates 2row subplot for a boxplot w many elements (e.g. RSSIs) and labeling
 
@@ -987,7 +987,6 @@ class myinkc(hoppy.hopper):
 
         mins, means, maxes, std  = np.array(statistics).astype("float").T # unpack
         x=np.arange(len(data))
-        #print(len(data),len(statistics))
 
         if meanoffset:
             off=means
@@ -996,12 +995,7 @@ class myinkc(hoppy.hopper):
             off=0
 
         # # plotting # #
-        nrows=1
-        #if not small:
-            #nrows=2 # provide extra space for labels
-        #else:
-            #nrows=1
-        self.subplots(nrows=nrows)
+        self.subplots()
         # create stacked errorbars
         self.errorbar(x, means-off, std, fmt='ok', lw=3) # fat std
         self.errorbar(x ,means-off, [means - mins, maxes - means], fmt='.k', ecolor='gray', lw=1) # thin min-max
@@ -1013,11 +1007,8 @@ class myinkc(hoppy.hopper):
         ax.set_xticklabels(xlabels, ha="right")#horizontal alignment
         self.rotate_xticks(45, autoscale=0)
         self.title(title)
-        #if not small:
-        #    self.ax_onward()
-        #    self.hide_frame()
-
         self.autoscale_fig()
+
 
     def ecke(self, hidesmallframes=False): # inspired by mpl official doc
         """
