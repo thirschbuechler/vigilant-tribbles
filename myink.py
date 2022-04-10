@@ -907,7 +907,7 @@ class myinkc(hoppy.hopper):
         self.imims.append(self.im) # for common_cb_lims
         return self.im
 
-    def pplot(self,*args,**kwargs):#thsmith already has a "plot"
+    def plot(self,*args,**kwargs):#thsmith already has a "plot"
         """ forward to mpl plot"""
         return self.get_ax().plot(*args,**kwargs)
 
@@ -1173,7 +1173,7 @@ def oldtest():
     k, d = ele.LSQ(x,y)
     
     #ele.subplots()
-    #ele.plot()#this is in thvsia
+    #ele.plot_mag()#this is in thvsia
     plt.plot(x, y, 'o', label='Original data', markersize=10)
     #plt.plot(x, k*x + d, 'r', label='Fitted line', c=ele.defaultcolorlist())#this did not fucking work wtf why didn't i check or uncomment
     plt.legend()

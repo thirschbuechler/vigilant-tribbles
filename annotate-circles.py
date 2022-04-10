@@ -216,7 +216,7 @@ if __name__ == '__main__': # test if called as executable, not as library
     k, d = ele.LSQ(x,y)
 
     #ele.subplots()
-    #ele.plot()#this is in thvsia
+    #ele.plot_mag()#this is in thvsia
     plt.plot(x, y, 'o', label='Original data', markersize=10)
     #plt.plot(x, k*x + d, 'r', label='Fitted line', c=ele.defaultcolorlist())
 
