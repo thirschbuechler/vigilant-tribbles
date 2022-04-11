@@ -30,8 +30,12 @@ def auto_floor(x):
     150
     """
     r =  int (np.log10(x)) - 1
-    expo = np.power(10,r)
-    x = np.floor(x/expo)*expo
+    if r>0:
+        expo = np.power(10,r)
+        x = np.floor(x/expo)*expo
+    else:
+        # avoid ValueError: Integers to negative integer powers are not allowed.
+        pass # don't change anything
     return int(x)
 
 
@@ -47,8 +51,12 @@ def auto_ceil(x):
     160
     """
     r =  int (np.log10(x)) - 1
-    expo = np.power(10,r)
-    x = np.ceil(x/expo)*expo
+    if r>0:
+        expo = np.power(10,r)
+        x = np.ceil(x/expo)*expo
+    else:
+        # avoid ValueError: Integers to negative integer powers are not allowed.
+        pass # don't change anything
     return int(x)
 
 
