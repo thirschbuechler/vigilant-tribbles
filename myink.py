@@ -66,19 +66,33 @@ class myinkc(hoppy.hopper):
         self.printimg=True # shall images be printed
         self.yright=None # var to be inspected on plot cleanup and reset
 
-        if "bigfig" in kwargs: # e.g. for jupyter fullwidth graphs
-            if kwargs["bigfig"]:
-                self.canvas_params(fontsize=5,figsize=[15,10])
-            kwargs.pop("bigfig")
-        if "medfig" in kwargs:
-            if kwargs["medfig"]:
-                self.canvas_params(fontsize=4,figsize=[10,6.6])
-            kwargs.pop("medfig")
+        kwargs = self.mycanvassize(**kwargs)
         
         super().__init__(*args, **kwargs) # superclass init, in case there is any
 
         if tikz:
             self.tikz_enable()
+
+
+    def mycanvassize(self, **kwargs):
+        """ take bigfig/medfig and make it happen!
+            - get kwargs
+            - adjust canvas/subplots
+            - pop used parameters
+            - return kwargs without used params
+            """
+        figsizes = {"bigfig":[15,10], "medfig":[10,6.6], "widefig" : [2*6.4, 4.8], "tallfig" : [6.4, 2*4.8], "dwarffig" : [6.4, 4.8/2]}
+        fontsizes = {"bigfig":5, "medfig":4, "widefig":4, "tallfig":4, "dwarffig":3}
+        # bigfig for jupyter fullwidth graphs
+        #uni_angle = '\U00002222'
+        
+        for key in figsizes.keys():
+            if key in kwargs:
+                self.canvas_params(fontsize=fontsizes[key],figsize=figsizes[key])
+                kwargs.pop(key)
+
+        return kwargs
+
 
     def tikz_enable(self):
         plt.style.use("ggplot")
@@ -1327,6 +1341,20 @@ def get_pics():
     return pics
 
 
+def mycanvassize_test():
+        ele=myinkc()
+        
+        figsizes = {"bigfig":[15,10], "medfig":[10,6.6], "widefig" : [2*6.4, 4.8], "tallfig" : [6.4, 2*4.8], "dwarffig" : [6.4, 4.8/2]}
+        for key in figsizes.keys():
+            kwargs = {}
+            kwargs[key]="True"
+            ele.mycanvassize(**kwargs)
+            ele.subplots()
+            ele.plot()
+            ele.title(key)
+        
+        ele.show()
+
 
 def test_make_im_gif():
     ele=myinkc()
@@ -1349,7 +1377,8 @@ if testing:#call if selected, after defined, explanation see above
     #tester()
 
     #ecke_tester()
-    test_make_im_gif()
+    #test_make_im_gif()
+    mycanvassize_test()
 
 """ 
 plt.hist stuff using bins,patches, copied from metric - unused
