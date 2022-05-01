@@ -14,7 +14,7 @@ from datetime import datetime, date
 import numpy as np    
 
 
-
+# todo use ast.literal_eval
 def askandreturn(question="Question", validresults=["yes","no"]): # THIS REQUIRES STRINGS AS INPUT for validresults!!
     #validresults = [str(x) for x in validresults] # typecast internal isse: other datatype returned
     while 1:
