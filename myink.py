@@ -16,9 +16,11 @@ from matplotlib.ticker import (MultipleLocator, FormatStrFormatter) # nicergrid
 try:
     import mystring as ms
     #from portal import portal
+    import hopper as hoppy
 except:
     try:
         import vigilant_tribbles.mystring as ms
+        from vigilant_tribbles import hopper as hoppy
         #from vigilant_tribbles.portal import portal
 
     except:
@@ -40,11 +42,11 @@ except:
 #-#-# module test #-#-#
 testing=False # imports don't seem to traverse this before reaching EOF and complaining about undef_bool !?
 if __name__ == '__main__': # test if called as executable, not as library
-    import hopper as hoppy
+    
     testing=True
     #tester()#since this is no fct definition, can't call this, also py has no forward-declaration option
 else:
-    from vigilant_tribbles import hopper as hoppy
+    pass
 
     #testing=False
 
