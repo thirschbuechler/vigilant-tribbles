@@ -1053,6 +1053,81 @@ class myinkc(hoppy.hopper):
         # put overlay
         self.scatter(x,y)            
 
+
+    # experienced kwargs error - if **kwargs used AND cmap="turbo_r" -> both are ignored
+    def waterfall(self, mx=None, x_axis = None, ax=None, title=None, 
+                    yticks=[], places=2, cb_label="mag (dB)", colorbar=True, **kwargs): #decimal "places" =2 # decimal acc
+                        # why turbo - https://ai.googleblog.com/2019/08/turbo-improved-rainbow-colormap-for.html
+        """ imshow of mx, aligning yticks
+            input:
+                - mx
+                - x_axis
+                - ..
+            output:
+                - mx (same as input)
+            """
+        
+        ## process arguments ##
+        #
+        #ylegend = self.mylegend
+        
+        if "cmap" not in kwargs:#if switch exists
+            kwargs["cmap"]="turbo_r"
+        if "interpolation" not in kwargs: # interpol-none removes blurr
+            kwargs["interpolation"]="none"
+        if "cb_label" in kwargs:
+            cb_label=kwargs["cb_label"]
+            #and remove, to not confuse the artist (imshow)
+            kwargs.remove("cb_label")
+        
+        if np.size(mx)<2 or np.size(x_axis)<2:
+            raise Exception("matrix and x_axis input required!")
+        magDBs = mx # input matrix     
+        #mx = np.array(mx, dtype=float)# imshow extent error?
+        #TypeError: ufunc 'isfinite' not supported for the input types, and the inputs could not be safely coerced to any supported types according to the casting rule ''safe
+
+        ## plotting ##
+        #
+        ax = self.get_ax(ax) # might generate figure if none defined
+        # "extent" doc
+        #   - needed to set ticks and grid correctly (not shifted into centers)
+        #   - can also label
+        #   - (0,0) is upper left of imshow but extent is flipped on y
+        #   - extent = (0+m, magDBs.shape[1]+m, magDBs.shape[0]+n, 0+n)# n,m freely chosen
+        #   - print(extent)# with testdata: 0 1001 3 0
+
+        if np.size(yticks)>0:
+            #print("hello")
+            if ((np.size(yticks)) == magDBs.shape[0]):
+                extent = (np.min(x_axis), np.max(x_axis),np.max(yticks), np.min(yticks))
+                #print("chosen dueto {}".format(magDBs.shape))
+            else:
+                extent = (np.min(x_axis), np.max(x_axis), magDBs.shape[0], 0)
+                #print("unchosen A dueto {}".format(magDBs.shape))
+        else:
+            extent = (np.min(x_axis), np.max(x_axis), magDBs.shape[0], 0)
+            #print("unchosen B dueto {}".format(magDBs.shape))
+        
+        #print(type(extent))#tuple
+        self.imshow(magDBs, **kwargs, aspect="auto", extent=extent)#aspect makes it rect etc #aspect auto enables arbitrary axis limits
+        cb = self.colorbar(cb_label)
+
+        if not colorbar: # colors wrong even though cmap is in kwargs
+            cb.remove() # mpl 3.5.1 removes :) but space issue
+            #self.autoscale_fig() # usecase twinx(), does not work - colorbar1 space is deleted so it overlaps if 2nd colorbar deleted
+        #else:
+            #self.cbs.append(cb) # ToDo remove - unused
+        #ax.grid()#interpol off sufficient
+
+        self.title(title)
+        #self.xlabel("bins from {}Hz to {}Hz".format(self.enginerd(min(x_axis)),self.enginerd(max(x_axis))))
+        
+        if places>0:
+            self.enginerd_xaxis(places=places)#commenting out works
+        self.rotate_xticks(45)
+
+        np.matrix(magDBs)
+
         
     def ecke(self, hidesmallframes=False): # inspired by mpl official doc
         """
