@@ -990,7 +990,7 @@ class myinkc(hoppy.hopper):
         plt.tight_layout()
 
 
-    def boxplot(self, data, xlabels="", meanoffset=False, ylabel="", title=""):
+    def boxplot(self, data, xlabels="", meanoffset=False, ylabel="", title="", make_canvas=True):
         """
         creates 2row subplot for a boxplot w many elements (e.g. RSSIs) and labeling
 
@@ -1017,7 +1017,8 @@ class myinkc(hoppy.hopper):
             off=0
 
         # # plotting # #
-        self.subplots()
+        if make_canvas:
+            self.subplots()
         # create stacked errorbars
         self.errorbar(x, means-off, std, fmt='ok', lw=3) # fat std
         self.errorbar(x ,means-off, [means - mins, maxes - means], fmt='.k', ecolor='gray', lw=1) # thin min-max
