@@ -605,20 +605,20 @@ class myinkc(hoppy.hopper):
 
     
     # oszi-like markers, buy one get two! limited offer!!
-    def vmarkers(self, start, stop, col, ax=None):
+    def vmarkers(self, start, stop, ax=None, col="black", linestyles="solid"):
         """ oszi like vertical cursors """
         ax = self.get_ax(ax)
         ylims=ax.get_ylim()
-        ax.vlines(start,  ylims[0], ylims[1], colors=col)
-        ax.vlines(stop,  ylims[0], ylims[1], colors=col)
+        ax.vlines(start,  ylims[0], ylims[1], colors=col, linestyles=linestyles)
+        ax.vlines(stop,  ylims[0], ylims[1], colors=col, linestyles=linestyles)
         
 
-    def hmarkers(self, start, stop, col, ax=None):
+    def hmarkers(self, start, stop, ax=None, col="black", linestyles="solid"):
         """ oszi like horizontal cursors"""
         ax = self.get_ax(ax)
         xlims=ax.get_xlim()
-        ax.hlines(start,  xlims[0], xlims[1], colors=col)
-        ax.hlines(stop,  xlims[0], xlims[1], colors=col)
+        ax.hlines(start,  xlims[0], xlims[1], colors=col, linestyles=linestyles)
+        ax.hlines(stop,  xlims[0], xlims[1], colors=col, linestyles=linestyles)
         
 
     # mixture of keyworded and non-keyworded arguments, aswell as routing not everything through makes this not practical
