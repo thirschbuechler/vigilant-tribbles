@@ -172,6 +172,7 @@ class hopper(portal):
         self.layouts=[] # pyweave pmd layout files
         self.touchstone=[]
         self.csv=[]
+        self.pti_files=[]
         
         for file in os.listdir(location):
             try:
@@ -184,8 +185,10 @@ class hopper(portal):
                 elif file.endswith(".s2p") or file.endswith(".s1p"):
                     self.touchstone.append(file)
                     counter +=1
-                elif file.endswith(".csv"):
-                    self.csv.append(file)
+                elif file.endswith(".csv") or file.endswith(".isd"):
+                    self.pti_files.append(file)
+                    if file.endswith(".csv"):
+                        self.csv.append(file)
                     counter +=1
                 else:
                     otherfiles.append(file)
