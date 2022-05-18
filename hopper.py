@@ -192,13 +192,13 @@ class hopper(portal):
                     counter +=1
                 else:
                     otherfiles.append(file)
-                    myprint("not classified: {}".format(file))
+                    #myprint("not classified: {}".format(file))
                     counter +=1
             except Exception as e:
                 print("No files found here!")
                 raise e
         
-        myprint("found {} files in total".format(counter))
+        myprint("classified {}/{} files".format(counter-len(otherfiles),counter))
 
 
 #-#-# module test #-#-#
