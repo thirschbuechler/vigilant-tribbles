@@ -429,7 +429,7 @@ class myinkc(hoppy.hopper):
             - create out of self.mylegend if no mylegendtext passed 
             - use mylegendtext (if passed and same len)
             - remove shit with rmsubstr
-            - DOES NOT WORK FOR pplot, as it does not save mylegendtext
+            - DOES NOT WORK FOR plot, as it does not save mylegendtext
             """
         # addtext is a list of same len as legend    
         ax = self.get_ax(ax)
@@ -1250,7 +1250,7 @@ class myinkc(hoppy.hopper):
 
     def reset_coordsys(self):
         """ CLEAN UP PREV PLOT RANDOM SPACING
-            - e.g. histos have 0,0 on lower left and not 0,0 on upper right per def --> call before and after annotating it w pplot 
+            - e.g. histos have 0,0 on lower left and not 0,0 on upper right per def --> call before and after annotating it w plot 
         """ 
         self.get_ax().margins(0) # AFTER plot - 
         self.twinx() # new axes for both
