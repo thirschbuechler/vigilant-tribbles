@@ -9,6 +9,16 @@ cute helper functions which might turn out to be a pain
 
 # graphics module myink
 
+
+
+waterfall             |  make_gif
+:-------------------------:|:-------------------------:
+![img5](myfigures/waterfall.png "fig1")  |  ![img1](myfigures/test_anim.gif "fig2")
+
+weighted scatter             |  ecke
+:-------------------------:|:-------------------------:
+![img5](myfigures/weighted_scatter.png "fig3")  |  ![img1](myfigures/ecke.png "fig4")
+
 First of all, a myinkc object needs to be generated, i'll call it pe (plot-element)
 
 - `from vigilant_tribbles.myink import myinkc`
@@ -32,7 +42,7 @@ new graph types built ontop existing ones
 - `boxplot_summary()`
   - make a boxplot and overlay the original datapoints
 - `pe.waterfall()`
-    make a waterfall-diagram from a matrix
+    make a waterfall-diagram from a matrix, an `imshow` on steroids
 - `pe.ecke()`
     make a subplot with a corner in left bot, 5 plots around, e.g.
     corner-booth style with table=biggest_graph, 5 "people" (smaller graphs/images) around

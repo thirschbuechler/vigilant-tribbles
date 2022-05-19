@@ -1267,12 +1267,22 @@ class myinkc(hoppy.hopper):
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 
-def tester(): # module test, superseeds ifdef-main (since used here for import shenanigans) #
+def tester():
+    """module test, superseeds ifdef-main (since used here for import shenanigans)"""
+
+    if not os.path.exists("myfigures/stinkbug.webp"):
+        raise Exception("for selftest of myinkc, please go (cd) to vigilant_tribbles and run \"python myink.py\" there")
+
     oldtest()
     test_fontsize()
     tickrot()
     stemmy()
     weigh_scatter()
+    ecke_tester()
+    test_make_im_gif()
+    mycanvassize_test()
+    test_waterfall()
+
 
 def oldtest():    
     ele = myinkc()
@@ -1450,13 +1460,28 @@ def test_make_im_gif():
     ele.make_im_gif(data=data)
 
 
+def test_waterfall():
+    # generate test data
+    data = np.random.rand(5,5)
+    x_axis = np.arange(1E6, 5E6, 1E6)
+    print(x_axis)
+    print(np.shape(data))
+    print(np.shape(x_axis))
+
+    # plot
+    ele=myinkc()
+    ele.subplots()
+    ele.waterfall(mx=data, title="random waterfall", x_axis=x_axis, cb_label="colorbar_label")
+    ele.show()
+
+
 #-#-# module test #-#-#
 if testing:#call if selected, after defined, explanation see above
-    #tester()
+    tester()
+    test_waterfall()
 
-    #ecke_tester()
-    #test_make_im_gif()
-    mycanvassize_test()
+    
+
 
 """ 
 plt.hist stuff using bins,patches, copied from metric - unused
