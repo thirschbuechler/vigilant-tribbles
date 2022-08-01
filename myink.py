@@ -917,11 +917,29 @@ class myinkc(hoppy.hopper):
 
 
     ## forwarders ##
-    def hist(self,*args,**kwargs):
+    def hist(self, *args, percent = False, **kwargs):
         """ forward to mpl hist
         note: old patchy-draw stuff at bottom of myink as comment
         """
-        return self.get_ax().hist(*args,**kwargs)
+        if percent:
+            # - find data or insert into dict
+            # - insert weights
+            if "x" in kwargs:
+                x = kwargs["x"]
+            else:
+                raise Exception("percent switch needs \"x=\" data kwarg")
+                #x = args[0]
+                #kwargs["x"] = x
+            weights=np.ones(len(x)) / len(x)
+            kwargs["weights"] = weights
+
+        ret = self.get_ax().hist(*args,**kwargs)
+
+        if percent:
+            from matplotlib.ticker import PercentFormatter # HACK
+            self.get_ax().yaxis.set_major_formatter(PercentFormatter(1))
+
+        return ret
 
     def imshow(self,*args,**kwargs):
         """ forward to mpl imshow"""
@@ -1282,6 +1300,7 @@ def tester():
     test_make_im_gif()
     mycanvassize_test()
     test_waterfall()
+    histo_test()
 
 
 def oldtest():    
@@ -1327,6 +1346,26 @@ def large_alltext():
     ele.ax_onward()
     
     ele.title("biig")
+    ele.show()
+
+
+def histo_test():
+    ele = myinkc()
+    #ele.rcparams_update({'font.size': 22})
+    
+    ele.subplots(nrows=2, ncols=2)
+    ele.suptitle("histo comparision")
+
+    for percent in [False, True]:
+        ele.title(f"one element, percent:{percent}")
+        ele.hist(x=[1], percent=percent)
+        ele.ax_onward()
+        
+        ele.title(f"3 equal elements, percent:{percent}")
+        ele.hist(x=[1,2,3,1,2,3,1,2,3], percent=percent)
+        if percent==0:
+            ele.ax_onward()
+    
     ele.show()
 
 
@@ -1478,7 +1517,8 @@ def test_waterfall():
 #-#-# module test #-#-#
 if testing:#call if selected, after defined, explanation see above
     tester()
-    test_waterfall()
+    #test_waterfall()
+    #histo_test()
 
     
 
