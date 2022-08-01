@@ -12,6 +12,8 @@ import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 from matplotlib.ticker import EngFormatter #enginerd stuff
 from matplotlib.ticker import (MultipleLocator, FormatStrFormatter) # nicergrid
+from matplotlib.ticker import PercentFormatter # histo percent
+
 
 try:
     import mystring as ms
@@ -919,6 +921,15 @@ class myinkc(hoppy.hopper):
     ## forwarders ##
     def hist(self, *args, percent = False, **kwargs):
         """ forward to mpl hist
+            - percent option
+            - auto-range issues!!
+                - # example w manual range bins and width
+                - xmin=0
+                - xmax=300
+                - bins=50
+                - bin_w = (xmax-xmin)/bins
+                - self.hist(x=x, bins = bins, percent=percent, width=bin_w); 
+        
         note: old patchy-draw stuff at bottom of myink as comment
         """
         if percent:
@@ -936,7 +947,6 @@ class myinkc(hoppy.hopper):
         ret = self.get_ax().hist(*args,**kwargs)
 
         if percent:
-            from matplotlib.ticker import PercentFormatter # HACK
             self.get_ax().yaxis.set_major_formatter(PercentFormatter(1))
 
         return ret
@@ -1357,11 +1367,11 @@ def histo_test():
     ele.suptitle("histo comparision")
 
     for percent in [False, True]:
-        ele.title(f"one element, percent:{percent}")
-        ele.hist(x=[1], percent=percent)
+        ele.title(f"one element 2 times, percent:{percent}")
+        ele.hist(x=[1.0,1.0], percent=percent)
         ele.ax_onward()
         
-        ele.title(f"3 equal elements, percent:{percent}")
+        ele.title(f"3 elements 3 times, percent:{percent}")
         ele.hist(x=[1,2,3,1,2,3,1,2,3], percent=percent)
         if percent==0:
             ele.ax_onward()
@@ -1516,9 +1526,9 @@ def test_waterfall():
 
 #-#-# module test #-#-#
 if testing:#call if selected, after defined, explanation see above
-    tester()
+    #tester()
     #test_waterfall()
-    #histo_test()
+    histo_test()
 
     
 
