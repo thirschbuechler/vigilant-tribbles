@@ -921,6 +921,10 @@ class myinkc(hoppy.hopper):
     ## forwarders ##
     def hist(self, *args, percent = False, **kwargs):
         """ forward to mpl hist
+            NOTE: whenever possible, use roadkill() to include matrix as list and reduce drawing overhead!!
+            for row/col ID and switch, see hist_tester()
+
+            options:
             - percent option
             - auto-range issues!!
                 - # example w manual range bins and width
