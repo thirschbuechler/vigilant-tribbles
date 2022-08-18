@@ -17,13 +17,13 @@ from matplotlib.ticker import PercentFormatter # histo percent
 
 try:
     import mystring as ms
-    #from portal import portal
     import hopper as hoppy
+    import mailuefterl as ml
 except:
     try:
         import vigilant_tribbles.mystring as ms
         from vigilant_tribbles import hopper as hoppy
-        #from vigilant_tribbles.portal import portal
+        import vigilant_tribbles.mailuefterl as ml
 
     except:
         print("failed to import module directly or via submodule -  mind adding them with underscores not operators (minuses aka dashes, etc.)")
@@ -1029,9 +1029,10 @@ class myinkc(hoppy.hopper):
         statistics = []
         for item in data:
             item = np.array(item).astype(np.float)
-            mins = np.min(item)
-            maxes = np.max(item)
-            means = np.mean(item)
+            # babysitted numpy nan* evals
+            mins = ml.nanmin(item)
+            maxes = ml.nanmax(item)
+            means = ml.nanmean(item)
             std = np.std(item)
             statistics.append([mins, means, maxes, std])
 
