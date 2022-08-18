@@ -79,11 +79,12 @@ class myinkc(hoppy.hopper):
 
 
     def mycanvassize(self, **kwargs):
-        """ take bigfig/medfig and make it happen!
+        """ if one of the keys (e.g. medfig) is set (e.g. medfig=True) in kwargs:
             - get kwargs
             - adjust canvas/subplots
             - pop used parameters
             - return kwargs without used params
+                (for further __init__ processing)
             """
         figsizes = {"bigfig":[15,10], "medfig":[10,6.6], "widefig" : [2*6.4, 4.8], "tallfig" : [6.4, 2*4.8], "dwarffig" : [6.4, 4.8/2]}
         fontsizes = {"bigfig":5, "medfig":4, "widefig":4, "tallfig":4, "dwarffig":3}
@@ -1319,6 +1320,7 @@ def tester():
     ecke_tester()
     test_make_im_gif()
     mycanvassize_test()
+    myinkc().mycanvassize(medfig=True) # reset afterwards via one-time-use myinkc element
     test_waterfall()
     histo_test()
 
@@ -1335,7 +1337,7 @@ def oldtest():
     #ele.subplots()
     #ele.plot_mag()#this is in thvsia
     plt.plot(x, y, 'o', label='Original data', markersize=10)
-    #plt.plot(x, k*x + d, 'r', label='Fitted line', c=ele.defaultcolorlist())#this did not fucking work wtf why didn't i check or uncomment
+    plt.plot(x, k*x + d, 'r', label='Fitted line', c=ele.defaultcolorlist()[1])
     plt.legend()
     plt.show()
     
@@ -1565,7 +1567,7 @@ def test_waterfall():
 
 #-#-# module test #-#-#
 if testing:#call if selected, after defined, explanation see above
-    #tester()
+    tester()
     #test_waterfall()
     histo_test()
 
