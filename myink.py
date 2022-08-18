@@ -941,7 +941,8 @@ class myinkc(hoppy.hopper):
                 raise Exception("percent switch needs \"x=\" data kwarg")
                 #x = args[0]
                 #kwargs["x"] = x
-            weights=np.ones(len(x)) / len(x)
+            weights=np.ones(np.shape(x)) / ml.count_non_nan(x) # NOT len() - ones need to have same shape, not np.size (returns also non-nan elements and skews percent)
+
             kwargs["weights"] = weights
 
         ret = self.get_ax().hist(*args,**kwargs)
@@ -1058,6 +1059,10 @@ class myinkc(hoppy.hopper):
         ax.set_xticks(np.arange(len(xlabels)))
         ax.set_xticklabels(xlabels, ha="right")#horizontal alignment
         self.rotate_xticks(45, autoscale=0)
+        plt.locator_params(axis='x', nbins=10)#, tight=True)
+        self.get_ax().minorticks_on()
+
+
         self.title(title)
         self.autoscale_fig()
 
@@ -1361,9 +1366,11 @@ def large_alltext():
 
 
 def histo_test():
+    """ test the hist fct adaptions - percent, matrix input """
     ele = myinkc()
     #ele.rcparams_update({'font.size': 22})
     
+    # first set is a quartett #
     ele.subplots(nrows=2, ncols=2)
     ele.suptitle("histo comparision")
 
@@ -1376,7 +1383,34 @@ def histo_test():
         ele.hist(x=[1,2,3,1,2,3,1,2,3], percent=percent)
         if percent==0:
             ele.ax_onward()
+    ## fix label clipping ##
+    ele.autoscale_fig()
     
+    # second send is a mx example #
+    ## data ##
+    x = np.array([[1,1], [1,2], [0,0]])
+    rows = ["ones", "mixed", "zeros"]
+    cols = ["col A", "col B"]
+    ele.subplots()
+    ele.imshow(x)
+
+    ## plot def ##
+    def myhist(x, names):
+        ele.subplots(ncols=2)
+        ele.hist(x=x, percent=True)
+        ele.modlegend(names)
+        ele.ax_onward()
+        #kwargs = getargs(percent=True, histtype = 'bar' , stacked = True )
+        ele.hist(x=x, percent=True, histtype = 'bar' , stacked = True )
+        
+        ele.modlegend(names)
+        ele.suptitle("bargraph - notstacked vs stacked")
+
+    # plot
+    myhist(x=x, names=cols)
+    myhist(x=x.T, names=rows)
+
+    # show all #
     ele.show()
 
 

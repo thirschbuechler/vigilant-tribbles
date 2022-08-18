@@ -3,6 +3,10 @@
 import numpy as np
 import warnings # numpy nanzero zeroslice stuff
 
+def count_non_nan(data):
+    return np.count_nonzero(~np.isnan(data))
+
+
 def auto_round(x):
     """
     round to significance
