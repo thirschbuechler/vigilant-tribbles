@@ -937,18 +937,7 @@ class myinkc(hoppy.hopper):
         
         note: old patchy-draw stuff at bottom of myink as comment
         """
-        if percent:
-            # - find data or insert into dict
-            # - insert weights
-            if "x" in kwargs:
-                x = kwargs["x"]
-            else:
-                raise Exception("percent switch needs \"x=\" data kwarg")
-                #x = args[0]
-                #kwargs["x"] = x
-            weights=np.ones(np.shape(x)) / ml.count_non_nan(x) # NOT len() - ones need to have same shape, not np.size (returns also non-nan elements and skews percent)
-
-            kwargs["weights"] = weights
+        kwargs = ml.histo_weighter(kwargs=kwargs, percent=percent)
 
         ret = self.get_ax().hist(*args,**kwargs)
 
@@ -1290,6 +1279,8 @@ class myinkc(hoppy.hopper):
     def reset_coordsys(self):
         """ CLEAN UP PREV PLOT RANDOM SPACING
             - e.g. histos have 0,0 on lower left and not 0,0 on upper right per def --> call before and after annotating it w plot 
+
+            NOTE: DANGER - MIGHT KILL x,y ticks
         """ 
         self.get_ax().margins(0) # AFTER plot - 
         self.twinx() # new axes for both
@@ -1299,6 +1290,8 @@ class myinkc(hoppy.hopper):
     def G53(self):
         """ reset coord sys to absolute
             - forwarder to reset_coordsys
+
+            NOTE: DANGER - MIGHT KILL x,y ticks
             """
         self.reset_coordsys()
 

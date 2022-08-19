@@ -3,6 +3,17 @@
 import numpy as np
 import warnings # numpy nanzero zeroslice stuff
 
+
+def bin_to_xaxis(bins):
+    """
+    takes a histo bin array and returns the corresponding x-axis
+    >>> bin_to_xaxis([0,1,2])
+    [0.5, 1.5]
+    """
+    xaxis = [bins[i]+(bins[i+1]-bins[i])/2 for i in range(0,len(bins)-1)]
+    return xaxis
+
+
 def count_non_nan(data):
     return np.count_nonzero(~np.isnan(data))
 
@@ -64,6 +75,40 @@ def auto_ceil(x):
     return int(x)
 
 
+def histo_weighter(kwargs, percent):
+    """ 
+    return weights in kwargs if data aka x present and percent True
+    both used in myinkc.histo and in mailuefterl.histogram
+    
+    default parameter in np.histogram is "a"
+    default parameter in matplotlib.hist is "x"
+    """
+    if percent:
+            # - find data or insert into dict
+            # - insert weights
+            if "x" in kwargs:
+                x = kwargs["x"]
+            else:
+                raise Exception("percent switch needs \"x=\" data kwarg")
+                #x = args[0]
+                #kwargs["x"] = x
+            weights=np.ones(np.shape(x)) / count_non_nan(x) # NOT len() - ones need to have same shape, not np.size (returns also non-nan elements and skews percent)
+
+            kwargs["weights"] = weights
+    return kwargs
+
+
+def histogram(percent=False, **kwargs):
+    kwargs = histo_weighter(percent=percent, kwargs=kwargs)
+    # remove x param from keyw-args
+    x=kwargs["x"]
+    kwargs.pop("x")
+    # insert x-param as non-keyw, since
+    #      default parameter in np.histogram is "a" 
+    #       default parameter in matplotlib.hist is "x" 
+    return np.histogram(x,**kwargs)
+
+
 def integritycheck():
     """ better call doctest """
     import doctest
@@ -95,3 +140,4 @@ def nanmin(*args, **kwargs):
 #-#-# module test #-#-#
 if __name__ == '__main__': # test if called as executable, not as library
     integritycheck()#does not work f class functions?
+    
