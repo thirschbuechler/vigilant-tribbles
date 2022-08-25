@@ -68,7 +68,7 @@ def make_mx_new(df, d_col="RSSI", t_col = "timestamp", x_col = "CH", xmax = 40, 
         mx[:] = np.nan
 
         # assign
-        mx[CHs,timestamps-t0]=RSSIs
+        mx[abs(CHs),timestamps-t0]=RSSIs
     else:
         t0 = 0
         t = np.arange(0, np.size(timestamps))
@@ -78,7 +78,7 @@ def make_mx_new(df, d_col="RSSI", t_col = "timestamp", x_col = "CH", xmax = 40, 
         mx[:] = np.nan
 
         # assign
-        mx[CHs,t]=RSSIs
+        mx[abs(CHs),t]=RSSIs
 
 
     return mx.T
