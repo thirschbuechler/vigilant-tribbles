@@ -8,6 +8,7 @@ Created on Mon May 18 21:26:53 2020
 import re
 import os
 import numpy as np
+import matplotlib as mpl
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 from matplotlib.ticker import EngFormatter #enginerd stuff
@@ -948,9 +949,9 @@ class myinkc(hoppy.hopper):
 
     def imshow(self,*args,**kwargs):
         """ forward to mpl imshow"""
-        self.im = self.get_ax().imshow(*args,**kwargs) # for animate
-        self.imims.append(self.im) # for common_cb_lims
-        return self.im
+        im = self.get_ax().imshow(*args,**kwargs) # for animate
+        self.imims.append(im) # for colorbar-stuff, eg. common_cb_lims
+        return im
 
     def plot(self,*args,**kwargs):#thsmith already has a "plot"
         """ forward to mpl plot"""
@@ -1204,7 +1205,7 @@ class myinkc(hoppy.hopper):
             - sec
             CAUTION: last im's axis labeling stays!
         """
-        im = self.im
+        im = self.imims[-1] # last imim
 
         def animate_func(i):
             if i % fps == 0:
@@ -1232,15 +1233,22 @@ class myinkc(hoppy.hopper):
             """
         ax = self.get_ax(ax)
 
-        # forward certian things to set_label
+        # forward certian fw_args to set_label
         kwargs2 = {}
-        things = ["horizontalalignment"]
-        for thing in things:
-            if thing in kwargs:
-                kwargs2[thing]=kwargs[thing]
-                kwargs.pop(thing)
+        fw_args = ["horizontalalignment"]
+        for fw_arg in fw_args:
+            if fw_arg in kwargs:
+                # put into new dict and delete from old
+                kwargs2[fw_arg]=kwargs[fw_arg]
+                kwargs.pop(fw_arg)
 
-        cb=self.get_fig().colorbar(self.im,ax=ax, **kwargs) # ( ((3.4.2) , 3.5.1 require cb to have correct color with custom cb!?
+        if self.imims:
+            mappable=self.imims[-1]
+        else:
+            cmap = kwargs["cmap"]
+            mappable = mpl.cm.ScalarMappable(norm=None, cmap=cmap)
+
+        cb=self.get_fig().colorbar(mappable=mappable, ax=ax, **kwargs) # ( ((3.4.2) , 3.5.1 require cb to have correct color with custom cb!?
         cb.set_label(label, **kwargs2)
 
         return cb
