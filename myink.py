@@ -1155,7 +1155,7 @@ class myinkc(hoppy.hopper):
             self.enginerd_xaxis(places=places)#commenting out works
         self.rotate_xticks(45)
 
-        np.matrix(magDBs)
+        return np.matrix(magDBs) 
 
         
     def ecke(self, hidesmallframes=False): # inspired by mpl official doc
