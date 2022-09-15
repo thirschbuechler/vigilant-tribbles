@@ -5,6 +5,7 @@
 Created on Mon May 18 21:26:53 2020
 @author: thirschbuechler
 """
+from logging import exception
 import re
 import os
 import numpy as np
@@ -360,7 +361,7 @@ class myinkc(hoppy.hopper):
         
     def enginerd_xaxis(self, ax=None, unit='Hz', **kwargs):
         ax = self.get_ax(ax)
-        self.enginerd_axis( ax.xaxis, unit=unit, **kwargs)
+        self.enginerd_axis(ax.xaxis, unit=unit, **kwargs)
         
 
     def enginerd_yaxis(self, ax=None, unit='Hz', **kwargs):
@@ -368,31 +369,32 @@ class myinkc(hoppy.hopper):
         self.enginerd_axis(ax.yaxis, unit=unit, **kwargs)        
         
 
-    def enginerd(self, value, unit='', places=2, sep="\N{THIN SPACE}", **kwargs):#todo: enginerd object/mystring-outsourcing instead of calling it this badly here and axis wise
+    def enginerd(self, value, unit='', places=2, sep="\N{THIN SPACE}", text=True, **kwargs):
         """ return engineer-nerd formatted string for a given float
             optional:
             - places : how many decimals (default = 2)
             - unit (str t append)
             - sep: separator (str, default Unicode-thin-space, non-ascii!)
+
+            # https://matplotlib.org/3.1.0/gallery/text_labels_and_annotations/engineering_formatter.html
+            
+            name is pun on engineer-nerd
         """
-        return(EngFormatter(places=places, sep=sep, **kwargs).format_eng(value)+unit)
+        if text==True:
+            return(EngFormatter(places=places, sep=sep, **kwargs).format_eng(value)+unit)
+        else:
+            return(EngFormatter(places=places, sep=sep, **kwargs))
     
         
-    def enginerd_axis(self, axissub="", unit='Hz', **kwargs):
-        # https://matplotlib.org/3.1.0/gallery/text_labels_and_annotations/engineering_formatter.html
-        
+    def enginerd_axis(self, axissub="", **kwargs):
+        """ set enginerd formatter for a axis"""
+
         if axissub=="":
-            axissub=plt.gca().xaxis # as default param, this would create
+            #axissub=plt.gca().xaxis # as default param, this would create
             #  an empty fig on importing, even without an obj instance
+            raise exception("Specify axis for enginerd format!")
         
-        # load defaults if necessary
-        if not "places" in kwargs:
-            kwargs["places"]=2 # decimal acc
-        if not "sep" in kwargs:
-            kwargs["sep"]="\N{THIN SPACE}"
-        
-        # set
-        axissub.set_major_formatter(EngFormatter(**kwargs))
+        axissub.set_major_formatter(self.enginerd(text=False, value=None, **kwargs))
     
     
     def killlegend(self,ax=None):
