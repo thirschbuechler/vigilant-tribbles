@@ -63,6 +63,7 @@ class myinkc(hoppy.hopper):
         # note: matplotlib may need to be reloaded to quit xkcd mode
         # importlib.reload(plt) # not required anymore (using with-context)
         self.ax = None
+        self.twins = []
         self.fig = None
         self.subplot_counter = 0
         self.tikz = 0
@@ -287,35 +288,26 @@ class myinkc(hoppy.hopper):
             self.fig=fig
     
     
-    def twinx(self, ax=None, yleft=None, yright=None, yleftadd=None, yrightadd=None):#make right axis #$todo:insert into axs maybe?
-        ax = self.get_ax(ax)#save old left
-        #self.pacman_worker(ax)#on left
-        
-        self.ax = ax.twinx()#make right
-        self.axdir="r"#next pacman_worker would be right
-        
-        #todo: make work #sandbox_14
-        addmode=(yleftadd!=None and yrightadd!=None)
-        writemode=(yleft!=None and yright!=None)
-        if addmode or writemode:
-            if addmode:    # then add
-                ylabell=ax.get_ylabel()#get old ax label
-                ylabelr=self.ax.get_ylabel()#get new label
-                print(ylabelr)
-                print(yleftadd)
-                spacer = "  "#two spaces
-                
-                yleft=ylabell+spacer+yleftadd
-                yright=ylabelr+spacer+yrightadd
-                self.yright=yright
-            
-            ax.set_ylabel(yleft)#set left axis
-            #self.ax.set_ylabel(yright)#set right axis#do later, after plotting in resetplot          
-            
-    
-    def twiny(self, ax=None):#make top axis
+    def twinx(self, ax=None):
+        """ dual use of x-axis generates y label and ticks on right """
         ax = self.get_ax(ax)
+        #pos = int(np.where (self.axs == ax)[0]) # integer of first occourance
+        
+        ax = ax.twinx()
+        #self.axs = np.insert(self.axs, pos+1, ax) # insert new ax after # CANNOT - this breaks the plot, as any ax inserted changes layout
+        #self.ax_i = self.ax_i+1 # count to new
+        self.ax = ax # take new
+        self.twins.append(self.ax)
+        #self.ax_onward()
+
+        
+    
+    def twiny(self, ax=None):
+        """ dual use of y-axis generates x label and ticks on top """
+        ax = self.get_ax(ax)
+        #pos = int(np.where (self.axs == self.ax)[0]) # integer of first occourance
         self.ax = ax.twiny()
+        self.twins.append(self.ax)
     
     
     def suptitle(self, title=""):
