@@ -368,22 +368,14 @@ class myinkc(hoppy.hopper):
         self.enginerd_axis(ax.yaxis, unit=unit, **kwargs)        
         
 
-    def enginerd(self, value, unit='', **kwargs):#todo: enginerd object/mystring-outsourcing instead of calling it this badly here and axis wise
+    def enginerd(self, value, unit='', places=2, sep="\N{THIN SPACE}", **kwargs):#todo: enginerd object/mystring-outsourcing instead of calling it this badly here and axis wise
         """ return engineer-nerd formatted string for a given float
             optional:
             - places : how many decimals (default = 2)
             - unit (str t append)
             - sep: separator (str, default Unicode-thin-space, non-ascii!)
         """
-        # load defaults if necessary
-        if not "places" in kwargs:
-            kwargs["places"]=2 # decimal acc
-        if not "sep" in kwargs:
-            kwargs["sep"]="\N{THIN SPACE}"
-            
-        #print(kwargs["places"])
-        #if kwargs["places"] > 0: # inactive for -1#does not work here, only in waterfall directly!?!?! #HACK
-        return(EngFormatter(**kwargs).format_eng(value)+unit)
+        return(EngFormatter(places=places, sep=sep, **kwargs).format_eng(value)+unit)
     
         
     def enginerd_axis(self, axissub="", unit='Hz', **kwargs):
@@ -1153,7 +1145,7 @@ class myinkc(hoppy.hopper):
         #self.xlabel("bins from {}Hz to {}Hz".format(self.enginerd(min(x_axis)),self.enginerd(max(x_axis))))
         
         if places>0:
-            self.enginerd_xaxis(places=places)#commenting out works
+            self.enginerd_xaxis(places=places)
         self.rotate_xticks(45)
 
         return np.matrix(magDBs) 
