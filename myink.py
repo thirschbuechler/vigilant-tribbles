@@ -843,8 +843,8 @@ class myinkc(hoppy.hopper):
         """ blank out frame aka hide_frame"""
         self.hide_frame(ax=ax)
         
-    def xlabel(self, label=""):
-        self.get_ax().set_xlabel(label)
+    def xlabel(self, label="", **kwargs):
+        self.get_ax().set_xlabel(label, **kwargs)
 
     def ylabel(self, label=""):
         self.get_ax().set_ylabel(label)
@@ -1310,6 +1310,7 @@ def tester():
     myinkc().mycanvassize(medfig=True) # reset afterwards via one-time-use myinkc element
     test_waterfall()
     histo_test()
+    doublebarrel_barberpole()
 
 
 def oldtest():    
@@ -1552,11 +1553,62 @@ def test_waterfall():
     ele.show()
 
 
+def doublebarrel_barberpole():
+    pe = myinkc()
+    pe.subplots(ncols=2)
+
+    x = [0,1,2,3]
+    y = [-15,0,5,18]
+
+
+    xlabel = "xlabel (unit)"
+    l1 = ""
+    l2 = ""
+    g_ylabeltext = "ylabel (unit)"
+
+    pe.yticklabels("") # clear yticks from left graphs y-axis
+    #pe.rotate_xticks(45) # somehow this needs massaging and waterfall's rotate doesn't count on twinx
+    pe.subplots_adjust(wspace=0.3)
+
+    pe.ylabel(g_ylabeltext)
+
+    pe.xlabel(xlabel) # before twinx!!
+    pe.twinx() # new axis to put label right # x is true, makes another y-axis as its dual-x
+    # graph 1
+    pe.plot(x, y)
+    pe.axlabel(l1)
+
+    pe.title("")
+    #pe.yticklabels("") # clear yticks from left graphs new y-axis # REMOVE IN PEEKBASE
+    # clear only labels not ticks
+    pe.get_ax().set_yticklabels("")
+
+    # graph 2 prep
+    pe.ax_onward()
+    # graph 2
+    pe.plot(x, y)
+
+    # get tick array, labels are empty atm as ticks shown directly
+    yticks = pe.get_ax().get_yticks()
+    # set tick labels instead of ticks directly, format text
+    pe.get_ax().set_yticklabels(yticks, ha="center", position=(-0.1, 0))
+
+    # graph 2 post
+    pe.axlabel(l2)
+    pe.xlabel(xlabel)
+
+    cb_label = " i am text, unittext (unit)"
+    pe.colorbar(label=cb_label, cmap="turbo", location="bottom", horizontalalignment="center", ax = pe.axs)# attach to axs aka all_axes not just one sub-ax
+
+    pe.show()
+
+
 #-#-# module test #-#-#
 if testing:#call if selected, after defined, explanation see above
-    tester()
+    #tester() # better - call myink_demos.ipynb
     #test_waterfall()
-    histo_test()
+    #histo_test()
+    doublebarrel_barberpole()
 
     
 
