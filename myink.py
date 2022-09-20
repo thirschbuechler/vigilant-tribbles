@@ -12,7 +12,7 @@ import numpy as np
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
-from matplotlib.ticker import EngFormatter #enginerd stuff
+from matplotlib.ticker import EngFormatter, LogFormatterSciNotation, ScalarFormatter #enginerd stuff
 from matplotlib.ticker import (MultipleLocator, FormatStrFormatter) # nicergrid
 from matplotlib.ticker import PercentFormatter # histo percent
 
@@ -67,6 +67,7 @@ class myinkc(hoppy.hopper):
         self.fig = None
         self.subplot_counter = 0
         self.tikz = 0
+        self.tex = 0
         
         self.imims=[] # remember imageshows for rescaling - common_cb_lims
 
@@ -361,7 +362,7 @@ class myinkc(hoppy.hopper):
         self.enginerd_axis(ax.yaxis, unit=unit, **kwargs)        
         
 
-    def enginerd(self, value, unit='', places=2, sep="\N{THIN SPACE}", text=True, **kwargs):
+    def enginerd(self, value, unit='', places=2, sep="\N{THIN SPACE}", text=True, **kwargs): #u2009 thinspace not nice in tex, also "G" in graph and Hz in label == unprofessional -_-
         """ return engineer-nerd formatted string for a given float
             optional:
             - places : how many decimals (default = 2)
@@ -372,10 +373,20 @@ class myinkc(hoppy.hopper):
             
             name is pun on engineer-nerd
         """
+        if self.tex:
+            sep = r"$\thinspace$"
         if text==True:
             return(EngFormatter(places=places, sep=sep, **kwargs).format_eng(value)+unit)
         else:
-            return(EngFormatter(places=places, sep=sep, **kwargs))
+            if not self.tex:
+                return(EngFormatter(places=places, sep=sep, **kwargs))
+            else:#places=places, sep=sep, 
+                #return(LogFormatterSciNotation(**kwargs))
+                return(ScalarFormatter(**kwargs)) # eg puts 10E9 on right
+                
+                
+
+
     
         
     def enginerd_axis(self, axissub="", **kwargs):
@@ -1603,14 +1614,39 @@ def doublebarrel_barberpole():
     pe.show()
 
 
+def tex_test():
+    pe = myinkc()
+    pe.subplots(nrows=2)
+
+    metrictext = "||A||_F"
+    pe.plot()
+    pe.title(metrictext)
+
+    pe.ax_onward()
+    
+    # https://matplotlib.org/stable/tutorials/text/usetex.html
+    def frob_texheader():
+        dict = {'text.usetex': True, "font.family": "Helvetica"}
+        return dict
+    pe.rcparams_update(frob_texheader())
+
+    metrictext = r"$ \left \| A \right \|_F $"
+    
+    pe.plot()
+    pe.title(metrictext)
+
+    pe.autoscale_fig()
+    
+    pe.show()
+
+
 #-#-# module test #-#-#
 if testing:#call if selected, after defined, explanation see above
     #tester() # better - call myink_demos.ipynb
     #test_waterfall()
     #histo_test()
-    doublebarrel_barberpole()
-
-    
+    #doublebarrel_barberpole()
+    tex_test()
 
 
 """ 
