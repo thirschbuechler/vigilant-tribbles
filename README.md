@@ -39,7 +39,7 @@ sometimes add extra functionality
 new graph types built ontop existing ones
 - `pe.boxplot()`
     make a boxplot
-- `boxplot_summary()`
+- `stickplot_summary()`
   - make a boxplot and overlay the original datapoints
 - `pe.waterfall()`
     make a waterfall-diagram from a matrix, an `imshow` on steroids

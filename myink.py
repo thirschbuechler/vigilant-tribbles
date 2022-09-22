@@ -1011,7 +1011,7 @@ class myinkc(hoppy.hopper):
         plt.tight_layout()
 
 
-    def stickplot(self, data, xlabels="", meanoffset=False, ylabel="", title="", make_canvas=True):
+    def stickplot(self, data, xlabels="", meanoffset=False, ylabel="", title=""):
         """
         boxplot-similar stickplot but mean, stdev, extrema are plotted only
 
@@ -1040,8 +1040,6 @@ class myinkc(hoppy.hopper):
             off=0
 
         # # plotting # #
-        if make_canvas:
-            self.subplots()
         # create stacked errorbars
         self.errorbar(x, means-off, std, fmt='ok', lw=3) # fat std
         self.errorbar(x ,means-off, [means - mins, maxes - means], fmt='.k', ecolor='gray', lw=1) # thin min-max
@@ -1060,7 +1058,7 @@ class myinkc(hoppy.hopper):
         self.autoscale_fig()
 
 
-    def boxplot(self, data=[], xlabels="", meanoffset=False, ylabel="", title="", make_canvas=False, mc = "green", **kwargs):
+    def boxplot(self, data=[], xlabels="", meanoffset=False, ylabel="", title="", mc = "green", **kwargs):
         """
         boxplot
 
@@ -1086,6 +1084,7 @@ class myinkc(hoppy.hopper):
         # consider boxplots are plotted at x-offset of +1 for some reason:
         x=np.arange(len(data))+1
         if xlabels:
+            xlabels = list(xlabels)
             xlabels.insert(0,0)#insert dummy at begin
 
         # user offset if wished
@@ -1095,10 +1094,7 @@ class myinkc(hoppy.hopper):
         else:
             off=np.zeros(len(data))
 
-        # # plotting # #
-        if make_canvas:
-            self.subplots()
-        
+        # # plotting # #        
         self.get_ax().boxplot(data.T-off, **kwargs)
         self.scatter(x, means+std, marker="^", c=mc)
         self.scatter(x, means, marker="s", c=mc)
@@ -1118,7 +1114,7 @@ class myinkc(hoppy.hopper):
         self.autoscale_fig()
 
 
-    def boxplot_summary(self, data=[], xlabels=None, ylabel=None, title=None):
+    def stickplot_summary(self, data=[], xlabels=None, ylabel=None, title=None):
         """ makes boxplot summaries and scenario overlay from "raw datapoints"
         n-dim:
         - data
