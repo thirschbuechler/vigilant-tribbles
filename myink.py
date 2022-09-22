@@ -1011,14 +1011,15 @@ class myinkc(hoppy.hopper):
         plt.tight_layout()
 
 
-    def boxplot(self, data, xlabels="", meanoffset=False, ylabel="", title="", make_canvas=True):
+    def stickplot(self, data, xlabels="", meanoffset=False, ylabel="", title="", make_canvas=True):
         """
-        creates 2row subplot for a boxplot w many elements (e.g. RSSIs) and labeling
+        boxplot-similar stickplot but mean, stdev, extrema are plotted only
 
         forked from https://stackoverflow.com/questions/33328774/box-plot-with-min-max-average-and-standard-deviation
         """
 
         # # data conditioning # # 
+        data = np.array(data)
         statistics = []
         for item in data:
             item = np.array(item).astype(np.float)
@@ -1044,6 +1045,64 @@ class myinkc(hoppy.hopper):
         # create stacked errorbars
         self.errorbar(x, means-off, std, fmt='ok', lw=3) # fat std
         self.errorbar(x ,means-off, [means - mins, maxes - means], fmt='.k', ecolor='gray', lw=1) # thin min-max
+
+        # xy_labelling
+        ax = self.get_ax()
+        ax.set_ylabel(ylabel)
+        ax.set_xticks(np.arange(len(xlabels)))
+        ax.set_xticklabels(xlabels, ha="right")#horizontal alignment
+        self.rotate_xticks(45, autoscale=0)
+        plt.locator_params(axis='x', nbins=10)#, tight=True)
+        self.get_ax().minorticks_on()
+
+
+        self.title(title)
+        self.autoscale_fig()
+
+
+    def boxplot(self, data=[], xlabels="", meanoffset=False, ylabel="", title="", make_canvas=False, mc = "green", **kwargs):
+        """
+        boxplot
+
+        copied from stickplot, adapted
+        - input data array/list
+        - mc: markercolors for mean, std edges upper+lower
+        """
+
+        # # data conditioning # # 
+        data = np.array(data)
+        statistics = []
+        for item in data:
+            item = np.array(item).astype(np.float)
+            # babysitted numpy nan* evals
+            mins = ml.nanmin(item)
+            maxes = ml.nanmax(item)
+            means = ml.nanmean(item)
+            std = np.std(item)
+            statistics.append([mins, means, maxes, std])
+
+        mins, means, maxes, std  = np.array(statistics).astype("float").T # unpack
+
+        # consider boxplots are plotted at x-offset of +1 for some reason:
+        x=np.arange(len(data))+1
+        if xlabels:
+            xlabels.insert(0,0)#insert dummy at begin
+
+        # user offset if wished
+        if meanoffset:
+            off=means
+            ylabel+=", means subtracted"
+        else:
+            off=np.zeros(len(data))
+
+        # # plotting # #
+        if make_canvas:
+            self.subplots()
+        
+        self.get_ax().boxplot(data.T-off, **kwargs)
+        self.scatter(x, means+std, marker="^", c=mc)
+        self.scatter(x, means, marker="s", c=mc)
+        self.scatter(x, means-std, marker="v", c=mc)
 
         # xy_labelling
         ax = self.get_ax()
@@ -1322,6 +1381,8 @@ def tester():
     test_waterfall()
     histo_test()
     doublebarrel_barberpole()
+    statistics_visu()
+    boxplottest()
 
 
 def oldtest():    
@@ -1640,13 +1701,60 @@ def tex_test():
     pe.show()
 
 
+def statistics_visu():
+    y = [1,1,1,1,1,1,1,5,2,2,2,-10, -3, -3, -3]
+    x = [1 for i in y]
+
+    pe = myinkc()
+
+    pe.subplots(ncols=2)
+    pe.suptitle("raw input data")
+    pe.scatter(x,y, color="black")
+    pe.title("unweighted scatter")
+
+    pe.ax_onward()
+    pe.scatter(x,y,weigh=True)
+    pe.title("weighted scatter")
+
+    pe.subplots(ncols=3)
+    pe.suptitle("graphing methods")
+    pe.boxplot([y])
+    pe.title("actual boxplot")
+
+    pe.ax_onward()
+    pe.stickplot([y], make_canvas=False)
+    pe.title("stickplot")
+
+    pe.ax_onward()
+    pe.get_ax().violinplot(y, showmeans=True, showmedians=True)
+    pe.title("violin plot\n+ means meridians ")
+
+    pe.autoscale_fig()
+
+    pe.show()
+
+
+
+def boxplottest():
+    y = [1,1,1,1,1,1,1,5,2,2,2,-10, -3, -3, -3]
+
+    pe = myinkc()
+
+    pe.subplots()
+    pe.boxplot([y,-np.array(y)], xlabels=["y", "-y"])
+
+    pe.show()
+
+
 #-#-# module test #-#-#
 if testing:#call if selected, after defined, explanation see above
     #tester() # better - call myink_demos.ipynb
     #test_waterfall()
     #histo_test()
     #doublebarrel_barberpole()
-    tex_test()
+    #tex_test()
+    #statistics_visu()
+    boxplottest()
 
 
 """ 
