@@ -66,7 +66,7 @@ class myinkc(hoppy.hopper):
         self.twins = []
         self.fig = None
         self.subplot_counter = 0
-        self.tikz = 0
+        self.outputformat = "png"
         self.tex = 0
         
         self.imims=[] # remember imageshows for rescaling - common_cb_lims
@@ -105,32 +105,70 @@ class myinkc(hoppy.hopper):
 
     def tikz_enable(self):
         plt.style.use("ggplot")
-        self.tikz = 1
+        self.outputformat = "tikz"
 
 
-    def tikz_save_lastgraph(self, fn="graph"):
+    def tikz_save_lastgraph(self, fn=""):
+        """ legacy fct for save-lastgraph in case of tikz_enable() called"""
+        self.save_lastgraph(fn=fn)
+
+
+    def save_lastgraph(self, fn=""):
+        """ save last graph as png or tikz """
+        # filename init #
+        if not fn:
+            if self.current_suptitle:
+                fn = self.current_suptitle
+            elif self.current_title:
+                fn = self.current_title
+            else:
+                raise Exception("no title to use")
         
-        # fetch title #
-        if fn!="graph":
-            title = fn
-        elif self.current_suptitle:
-            title = self.current_suptitle
-        else:
-            title = self.current_title
-        
-        # filename #
-        fn = "{}_{}.tex".format(title, self.subplot_counter)
+        # filename massaging
         fn = self.sanitize(fn)
         fn = fn.replace("/", "")# don't get folders by a desanitzed slash-n
-        import os
-        fn = os.path.join("tikz_out",fn)
+        dir = "figs_out"
+        os.makedirs(dir, exist_ok=True)
+        fn = os.path.join(dir,fn)
 
         # save #
-        import tikzplotlib
-        tikzplotlib.save(fn)
-        print("tikz saved {} in {}".format(fn, self.getpath() ) )
-        #self.subplot_counter+=1 # nope subplots does that
+        if self.outputformat=="tikz":
+            fn = "{}_{}.tex".format(fn, self.subplot_counter)
+            import tikzplotlib
+            tikzplotlib.save(fn)
+            print("tikz saved {} in {}".format(fn, self.getpath() ) )
+            #self.subplot_counter+=1 # nope subplots does tha
+        elif self.outputformat=="png":
+            fn = "{}.png".format(fn)
+            self.savefig(fname=fn, format="png", pad_inches=0)
+            """ forwarder to mpl
+                savefig(
+                    fname, *, dpi='figure', format=None, metadata=None,
+                    bbox_inches=None, pad_inches=0.1,
+                    facecolor='auto', edgecolor='auto',
+                    backend=None, **kwargs)
+            """
+                    
+
+    def saveallfigs(self, fns=[]):
+        figs = list(map(plt.figure, plt.get_fignums()))
+        if not figs:
+            raise Exception("no figs retrieved to save, there are none!")
         
+        # case filenames given
+        if fns:
+            if len(fns) == len(figs):
+                for fig, fn in zip(figs, fns):
+                    plt.figure(fig)
+                    self.save_lastgraph(fn)
+            else:
+                raise Exception(f"len(fns):{len(fns)} != len(figs):{len(figs)}")
+        
+        # case no filenames - take titles, suptitles or whatever
+        else:
+            plt.figure(fig)
+            self.save_lastgraph()
+
         
     def subplots(self, *args, **kwargs):
         """ make subplot axes (plt.subplots(..)) and save axs for iterating via fct
@@ -140,7 +178,7 @@ class myinkc(hoppy.hopper):
             """
         # # cleanup last graph  # #
         # save tikz if enabled #
-        if self.tikz: # if enabled - save here and with self.show()
+        if self.outputformat=="tikz": # if enabled - save here and with self.show()
             if self.subplot_counter>0: # not first one and var created by enabling
                 self.tikz_save_lastgraph()
         # cleanup tikz vars #
@@ -173,7 +211,7 @@ class myinkc(hoppy.hopper):
     
     def show(self):
         """ show last plots - for non-spyder IDEs which need manual trigger """
-        if self.tikz: # if enabled
+        if self.outputformat=="tikz": # if enabled
             self.tikz_save_lastgraph()
 
         plt.show()
@@ -202,6 +240,13 @@ class myinkc(hoppy.hopper):
         self.rcparams_update({'font.size': 10, 'figure.figsize': [6.4, 4.8], 'figure.dpi': 100})
 
     def savefig(self,*args, **kwargs):
+        """ forwarder to mpl
+                savefig(
+                    fname, *, dpi='figure', format=None, metadata=None,
+                    bbox_inches=None, pad_inches=0.1,
+                    facecolor='auto', edgecolor='auto',
+                    backend=None, **kwargs)
+        """
         plt.savefig(*args, **kwargs)
 
 
