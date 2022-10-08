@@ -39,6 +39,12 @@ except:
 #from skimage import idata, icolor
 #from skimage.transform import rescale, resize, downscale_local_mean
 
+
+figsizes = {"deffig":[6.4, 4.8], "bigfig":[15,10], "medfig":[10,6.6], "widefig" : [2*6.4, 4.8], "tallfig" : [6.4, 2*4.8], "dwarffig" : [6.4, 4.8/2]}
+fontsizes = {"deffig":3, "bigfig":5, "medfig":4, "widefig":4, "tallfig":4, "dwarffig":3}
+#uni_angle = '\U00002222'
+
+
 # ToDos myink general
 # - see littered to-dos / to-do tree
 
@@ -68,6 +74,7 @@ class myinkc(hoppy.hopper):
         self.subplot_counter = 0
         self.outputformat = "png"
         self.tex = 0
+        self.rc_autoreset = 0
         
         self.imims=[] # remember imageshows for rescaling - common_cb_lims
 
@@ -90,10 +97,7 @@ class myinkc(hoppy.hopper):
             - return kwargs without used params
                 (for further __init__ processing)
             """
-        figsizes = {"bigfig":[15,10], "medfig":[10,6.6], "widefig" : [2*6.4, 4.8], "tallfig" : [6.4, 2*4.8], "dwarffig" : [6.4, 4.8/2]}
-        fontsizes = {"bigfig":5, "medfig":4, "widefig":4, "tallfig":4, "dwarffig":3}
-        # bigfig for jupyter fullwidth graphs
-        #uni_angle = '\U00002222'
+
         
         for key in figsizes.keys():
             if key in kwargs:
@@ -127,7 +131,7 @@ class myinkc(hoppy.hopper):
         # filename massaging
         fn = self.sanitize(fn)
         fn = fn.replace("/", "")# don't get folders by a desanitzed slash-n
-        dir = "figs_out"
+        dir = "figs_out" # outputdir - lies in current path!! e.g. modified by hopper(), portal() or thereof
         os.makedirs(dir, exist_ok=True)
         fn = os.path.join(dir,fn)
 
@@ -176,6 +180,12 @@ class myinkc(hoppy.hopper):
             - ax_backtrack
             - ax_move(int) #relative
             """
+
+        if self.rc_autoreset:
+            # set medfig, bigfig or any other figsize right after subplots() init per graphset,
+            # and use this to make next ones default to default automatically
+            self.canvas_params_reset()
+
         # # cleanup last graph  # #
         # save tikz if enabled #
         if self.outputformat=="tikz": # if enabled - save here and with self.show()
@@ -237,7 +247,9 @@ class myinkc(hoppy.hopper):
         """ reset canvas_params to what is default, according to internet
             e.g. for a small plot to not look ugly and stretched
         """
-        self.rcparams_update({'font.size': 10, 'figure.figsize': [6.4, 4.8], 'figure.dpi': 100})
+        #self.rcparams_update({'font.size': 10, 'figure.figsize': [6.4, 4.8], 'figure.dpi': 100})
+        self.rcparams_update(mpl.rcParamsDefault)
+
 
     def savefig(self,*args, **kwargs):
         """ forwarder to mpl
@@ -1623,7 +1635,6 @@ def get_pics():
 def mycanvassize_test():
         ele=myinkc()
         
-        figsizes = {"bigfig":[15,10], "medfig":[10,6.6], "widefig" : [2*6.4, 4.8], "tallfig" : [6.4, 2*4.8], "dwarffig" : [6.4, 4.8/2]}
         for key in figsizes.keys():
             kwargs = {}
             kwargs[key]="True"
