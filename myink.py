@@ -75,6 +75,8 @@ class myinkc(hoppy.hopper):
         self.outputformat = "png"
         self.tex = 0
         self.rc_autoreset = 0
+        self.close_after_savefig = 0
+        self.figs_dir = "figs_out" # outputdir - lies in current path!! e.g. modified by hopper(), portal() or thereof
         
         self.imims=[] # remember imageshows for rescaling - common_cb_lims
 
@@ -131,7 +133,7 @@ class myinkc(hoppy.hopper):
         # filename massaging
         fn = self.sanitize(fn)
         fn = fn.replace("/", "")# don't get folders by a desanitzed slash-n
-        dir = "figs_out" # outputdir - lies in current path!! e.g. modified by hopper(), portal() or thereof
+        dir = self.figs_dir
         os.makedirs(dir, exist_ok=True)
         fn = os.path.join(dir,fn)
 
@@ -152,6 +154,10 @@ class myinkc(hoppy.hopper):
                     facecolor='auto', edgecolor='auto',
                     backend=None, **kwargs)
             """
+        
+        # optional cleanup
+        if self.close_after_savefig:
+            self.close()
                     
 
     def saveallfigs(self, fns=[]):
@@ -172,6 +178,18 @@ class myinkc(hoppy.hopper):
         else:
             plt.figure(fig)
             self.save_lastgraph()
+
+
+    def postprocess_figs(self, cmd):
+        """ execute shell cmd in self.figs_dir
+        
+        eg: imagemagick convert to remove borders
+            cmd = "for f in *.png; do convert $f -trim +repage $f; done"
+        """
+        import subprocess
+        with hoppy.hopper(self.figs_dir):
+            # todo - stdout=PIPE or sth to get useful return value
+            subprocess.Popen(cmd, shell=True)
 
         
     def subplots(self, *args, **kwargs):
