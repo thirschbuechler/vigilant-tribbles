@@ -144,9 +144,11 @@ class myinkc(hoppy.hopper):
             tikzplotlib.save(fn)
             print("tikz saved {} in {}".format(fn, self.getpath() ) )
             #self.subplot_counter+=1 # nope subplots does tha
-        elif self.outputformat=="png":
-            fn = "{}.png".format(fn)
-            self.savefig(fname=fn, format="png", pad_inches=0)
+        #elif self.outputformat=="png":
+        else:
+            # assume png, svg, pdf, .. (something mpl can do) is chosen
+            fn = "{}.{}".format(fn,self.outputformat)
+            self.savefig(fname=fn, format=self.outputformat, pad_inches=0)
             """ forwarder to mpl
                 savefig(
                     fname, *, dpi='figure', format=None, metadata=None,
@@ -1309,7 +1311,7 @@ class myinkc(hoppy.hopper):
                 for ax in axsi:
                     self.blank(ax)
 
-        fig.tight_layout()
+        fig.tight_layout() # ensure square subplots
 
         # put axs inside
         #self.axs = np.array([axbig, axs], dtype="object")
