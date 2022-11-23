@@ -1255,16 +1255,23 @@ class myinkc(hoppy.hopper):
         #   - extent = (0+m, magDBs.shape[1]+m, magDBs.shape[0]+n, 0+n)# n,m freely chosen
         #   - print(extent)# with testdata: 0 1001 3 0
 
+        # babysitted versions - not needed atm
+        #mymin = ml.nanmin
+        #mymax = ml.nanmax
+        # not babysitted with warning spam in stdout
+        mymin = np.nanmin
+        mymax = np.nanmax
+        
         if np.size(yticks)>0:
             #print("hello")
             if ((np.size(yticks)) == magDBs.shape[0]):
-                extent = (np.min(x_axis), np.max(x_axis),np.max(yticks), np.min(yticks))
+                extent = (mymin(x_axis), mymax(x_axis),mymax(yticks), mymin(yticks))
                 #print("chosen dueto {}".format(magDBs.shape))
             else:
-                extent = (np.min(x_axis), np.max(x_axis), magDBs.shape[0], 0)
+                extent = (mymin(x_axis), mymax(x_axis), magDBs.shape[0], 0)
                 #print("unchosen A dueto {}".format(magDBs.shape))
         else:
-            extent = (np.min(x_axis), np.max(x_axis), magDBs.shape[0], 0)
+            extent = (mymin(x_axis), mymax(x_axis), magDBs.shape[0], 0)
             #print("unchosen B dueto {}".format(magDBs.shape))
         
         #print(type(extent))#tuple
