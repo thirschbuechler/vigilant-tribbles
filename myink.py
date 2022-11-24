@@ -1160,7 +1160,7 @@ class myinkc(hoppy.hopper):
 
         # consider boxplots are plotted at x-offset of +1 for some reason:
         x=np.arange(len(data))+1
-        if xlabels:
+        if bool(list(xlabels)): # bool-list cast is alternative to a.any()
             xlabels = list(xlabels)
             xlabels.insert(0,0)#insert dummy at begin
 
