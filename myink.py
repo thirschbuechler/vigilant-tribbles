@@ -1160,7 +1160,7 @@ class myinkc(hoppy.hopper):
 
         # consider boxplots are plotted at x-offset of +1 for some reason:
         x=np.arange(len(data))+1
-        if bool(list(xlabels)): # bool-list cast is alternative to a.any()
+        if bool(list(xlabels)): # bool-list cast is alternative to a.any(), like np.size(yticks)>0:
             xlabels = list(xlabels)
             xlabels.insert(0,0)#insert dummy at begin
 
@@ -1262,17 +1262,20 @@ class myinkc(hoppy.hopper):
         mymin = np.nanmin
         mymax = np.nanmax
         
-        if np.size(yticks)>0:
-            #print("hello")
+        if np.size(yticks)>0: # bool(list(yticks)): # bool-list cast is alternative to a.any()
+            # app-specific auto-subsample example, add as route-through via inheritence and super()
+            # subsample yticks from 151 to 16 if needed, overwrite orig arg
+            #if len(yticks)>17 and (magDBs.shape[0]==16):
+            #    yticks=yticks[0::10]
             if ((np.size(yticks)) == magDBs.shape[0]):
                 extent = (mymin(x_axis), mymax(x_axis),mymax(yticks), mymin(yticks))
-                #print("chosen dueto {}".format(magDBs.shape))
+                #print(f"yticks extent permitted, {magDBs.shape=} vs {yticks.shape=}")
             else:
                 extent = (mymin(x_axis), mymax(x_axis), magDBs.shape[0], 0)
-                #print("unchosen A dueto {}".format(magDBs.shape))
+                print(f"FORBIDDEN yticks extent forbidden in waterfall, {magDBs.shape=} vs {yticks.shape=}")
         else:
+            # no yticks given
             extent = (mymin(x_axis), mymax(x_axis), magDBs.shape[0], 0)
-            #print("unchosen B dueto {}".format(magDBs.shape))
         
         #print(type(extent))#tuple
         self.imshow(magDBs, **kwargs, aspect="auto", extent=extent)#aspect makes it rect etc #aspect auto enables arbitrary axis limits
