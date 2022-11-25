@@ -859,20 +859,15 @@ class myinkc(hoppy.hopper):
         self.gallery(imgs=self.images)
         
         
-    def rotate_xticks(self, rotation, long=0, ha="right", autoscale=1):
-        """ rotate ticks and fix visual offset if long i guess
-            - ha and autoscale only get done if long is True
+    def rotate_xticks(self, rotation, long=0, ha="right", autoscale=1,to_int=0):
+        """ rotate ticks. also fix visual offset if long
+            - rotation (degrees)
+            - long (bool): further reformatting?
+                - ha: horizontal alignment
+                - autoscale: re-scale axis
+                - to_int: cast auto-fetched xlabels to int?
+                    (alternative: use enginerd_xaxis)
 
-            application example from plot_mse_mx after imshow:
-                
-            # show all ticks
-            ax.set_xticks(np.arange(len(xlabels)))
-            ax.set_yticks(np.arange(len(ylabels)))
-            # ... and label them with the respective list entries
-            ax.set_xticklabels(xlabels, ha="right")#horizontal alignment
-            ax.set_yticklabels(ylabels)
-            
-            self.rotate_xticks(45)
         """
         ax=self.get_ax()
     
@@ -885,6 +880,9 @@ class myinkc(hoppy.hopper):
         if long:#longer ones might appear shifted to right - compensate!
             
             xticks=ax.get_xticks()
+            if to_int:
+                vint = np.vectorize(int)
+                xticks = vint(xticks)
             ax.set_xticks(xticks)#works but does ugly autoscaling
             # re-autoscale
             if autoscale: # UNLESS you have an imshow then probably not
