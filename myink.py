@@ -1211,11 +1211,110 @@ class myinkc(hoppy.hopper):
         self.scatter(x,y)            
 
 
+    def plot_corr_mx(self, mx, xlabels=[],ylabels=[], clims=[], lowlim=None, cb_label="", optlabel="", **kwargs):
+        """
+        make subplot correlation matrix with imshow
+
+        - mx (mxn array): input matrix
+        - xlabels, ylabels
+        - clims (2-ele list): limits of colorbar
+        - lowlim (float) - clip away lower limit in colormap
+        - optlabel (str): put this label in lower left of (white triag) mx
+        """
+        #mx=ml.mx_diag_mirror(mx)#if full is desired
+
+        ## plot the thing ##
+        #raise Exception("i am really here") ok so its not another fct
+        #pe.mycanvassize(bigfig=1) # works but sticks and also changes fontsize
+        self.canvas_params(figsize=[15,10])#cm
+        self.rc_autoreset = 0 # to not reset temporarily, if already set
+        self.subplots(nrows=2, ncols=1)
+        #pe.mycanvassize(deffig=1)
+        #pe.canvas_params_reset() NOT HERE IT MESSES UP FONTS ON CURRENT
+
+        #ax=self.get_ax()
+        cmap = plt.cm.turbo.copy()
+        
+        if lowlim:
+            # modify colormap
+            cmap.set_extremes(bad="w")
+            #cmap.set_under(color="w")
+            
+            # mask values
+            mx=np.array(mx)
+            mx = np.ma.masked_where(mx < lowlim, mx)
+            # print(mse)
+        
+        # plot imshow pixely - don't mush it up with interpolation
+        imim = self.imshow(mx, interpolation="none", cmap=cmap, **kwargs)
+        
+        # show all ticks
+        if np.size(xlabels):
+            self.xticklabels(xlabels, ha="right") # horizontal alignment
+        if np.size(ylabels):
+            self.yticklabels(ylabels)
+        
+        # how many labels is too many to display all and rotate?
+        thres = 16
+        if (len(xlabels) > thres) or (len(ylabels) > thres):
+            n=3
+            ax = self.get_ax()
+
+            # major ticks that are multiples of n
+            # minor ticks that are multiples of 1.  
+            ax.xaxis.set_major_locator(MultipleLocator(n))
+            ax.xaxis.set_minor_locator(MultipleLocator(1))
+            ax.yaxis.set_major_locator(MultipleLocator(n))
+            ax.yaxis.set_minor_locator(MultipleLocator(1))
+
+            self.rotate_xticks(45, ha="center", long=1, autoscale=1, to_int=1)
+        else:                
+            self.rotate_xticks(45)        
+        
+        self.colorbar(cb_label)
+        if len(clims)==2:
+            imim.set_clim(clims[0],clims[1])
+
+        # reset figsize after end
+        #self.canvas_params_reset() # still messes up
+        self.rc_autoreset = 1 # do it only when next subplots() is called
+
+        # dress it up #
+        self.ax_onward()
+        self.hide_frame()
+        self.subplots_adjust(top=0.8,#dirty canvas centering fix - exported gui settings after playaround
+            bottom=0.0,
+            left=0.0,
+            right=0.8,
+            hspace=0.0,
+            wspace=0.15)
+
+        # optlabel annotation, floating in lower left corner
+        self.ax_backtrack()
+        n = np.shape(mx)[0] #nxn
+        """    
+        if ymax > 4: # large mx
+            ypos = ymax - 1.5 # more negative = more up
+            xpos = 0.5 # farther from left
+        else: # small mx
+            ypos = ymax - 0.65 # less neg = down
+            xpos = -0.45 # closer to left
+        """
+        ypos = n - (0.12*n+0.29)
+        xpos = 0.14*n-0.87
+
+        self.get_ax().text(xpos, ypos, optlabel,
+        bbox={'facecolor':'white','alpha':1,'edgecolor':'none','pad':1},
+        ha='left', va='center') 
+        self.ax_onward()
+
+
     # experienced kwargs error - if **kwargs used AND cmap="turbo_r" -> both are ignored
     def waterfall(self, mx=None, x_axis = None, ax=None, title=None, 
                     yticks=[], places=2, cb_label="mag (dB)", colorbar=True, **kwargs): #decimal "places" =2 # decimal acc
                         # why turbo - https://ai.googleblog.com/2019/08/turbo-improved-rainbow-colormap-for.html
-        """ imshow of mx, aligning yticks
+        """ plot a matrix without interpolation, set the yticks and stuff
+            imshow of mx, aligning yticks
             input:
                 - mx
                 - x_axis
@@ -1225,9 +1324,6 @@ class myinkc(hoppy.hopper):
             """
         
         ## process arguments ##
-        #
-        #ylegend = self.mylegend
-        
         if "cmap" not in kwargs:#if switch exists
             kwargs["cmap"]="turbo_r"
         if "interpolation" not in kwargs: # interpol-none removes blurr
@@ -1275,16 +1371,13 @@ class myinkc(hoppy.hopper):
             # no yticks given
             extent = (mymin(x_axis), mymax(x_axis), magDBs.shape[0], 0)
         
-        #print(type(extent))#tuple
         self.imshow(magDBs, **kwargs, aspect="auto", extent=extent)#aspect makes it rect etc #aspect auto enables arbitrary axis limits
         cb = self.colorbar(cb_label)
 
         if not colorbar: # colors wrong even though cmap is in kwargs
             cb.remove() # mpl 3.5.1 removes :) but space issue
             #self.autoscale_fig() # usecase twinx(), does not work - colorbar1 space is deleted so it overlaps if 2nd colorbar deleted
-        #else:
-            #self.cbs.append(cb) # ToDo remove - unused
-        #ax.grid()#interpol off sufficient
+
 
         self.title(title)
         #self.xlabel("bins from {}Hz to {}Hz".format(self.enginerd(min(x_axis)),self.enginerd(max(x_axis))))
@@ -1464,6 +1557,7 @@ def tester():
     doublebarrel_barberpole()
     statistics_visu()
     boxplottest()
+    calibrate_corr_mx_label()
 
 
 def oldtest():    
@@ -1802,7 +1896,7 @@ def statistics_visu():
     pe.title("actual boxplot")
 
     pe.ax_onward()
-    pe.stickplot([y], make_canvas=False)
+    pe.stickplot([y])
     pe.title("stickplot")
 
     pe.ax_onward()
@@ -1826,15 +1920,31 @@ def boxplottest():
     pe.show()
 
 
+def calibrate_corr_mx_label(ns = range(3,10)):
+    pe = myinkc()
+    clims = []
+    
+    for n in ns:
+        #mx = np.random.random(size=(n,n))
+        #folderlabels = ["" for i in range(0,n)]
+        folderlabels = np.arange(0,n, dtype=np.int)
+        vec = np.random.random(size=(n))
+        mx = np.diag(vec)
+        mx[mx==0] = np.nan
+        pe.plot_corr_mx(mx=mx,xlabels=folderlabels, ylabels=folderlabels, clims=clims, optlabel=f"{ns=}", cb_label="1E")
+        pe.show()
+
+
 #-#-# module test #-#-#
 if testing:#call if selected, after defined, explanation see above
-    #tester() # better - call myink_demos.ipynb
+    tester() # better - call myink_demos.ipynb
     #test_waterfall()
     #histo_test()
     #doublebarrel_barberpole()
     #tex_test()
     #statistics_visu()
-    boxplottest()
+    #boxplottest()
+    #calibrate_corr_mx_label()
 
 
 """ 

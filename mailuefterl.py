@@ -137,6 +137,11 @@ def nanmax(*args, **kwargs):
 def nanmin(*args, **kwargs):
     return babysit(np.nanmin,*args, **kwargs)
 
+def mx_diag_mirror(X):
+    # https://stackoverflow.com/questions/16444930/copy-upper-triangle-to-lower-triangle-in-a-python-matrix/42209263
+    X = np.triu(X) #remove NANs of lower triag, which were used to hide redundancy
+    return X + X.T - np.diag(np.diag(X))
+    
 #-#-# module test #-#-#
 if __name__ == '__main__': # test if called as executable, not as library
     integritycheck()#does not work f class functions?
