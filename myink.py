@@ -498,6 +498,11 @@ class myinkc(hoppy.hopper):
         self.xlabel() # remove text (unit)
         
     def legend(self, **kwargs):
+        """ forward to mpl legend
+            - handles (lines)
+            - labels
+            - bbox_to_anchor, loc, borderaxespad, ..
+        """
         ax = self.get_ax()
         ax.legend(**kwargs)
 
@@ -580,14 +585,11 @@ class myinkc(hoppy.hopper):
             
             ax.legend(legendlines, mytext)   
     
-    
-    def comradelegend(self, fig=None, **kwargs): 
-        """ collect all labels of one figure and collate to one master legend 
-            locations "loc": 
-                - upper/lower left/right/center - equals
-                - loc="ul/ll/lr/ur/c"
-        """
-        fig=self.get_fig(fig)#fetch
+
+    def comradekernel(self, **kwargs):
+        """ common for comradelegend, comradeaxlegend"""
+        
+        fig = self.get_fig(fig)#fetch
         
         # fuckin' babysit legend placing...
         yoff = 0.12 # empirical 
@@ -622,64 +624,45 @@ class myinkc(hoppy.hopper):
             # in any case:
             kwargs.update(kwargs1)
         
-        # collect old legends
-        #https://stackoverflow.com/questions/9834452/how-do-i-make-a-single-legend-for-many-subplots-with-matplotlib
-        lines_labels = [ax.get_legend_handles_labels() for ax in fig.axes]
-        lines, labels = [sum(lol, []) for lol in zip(*lines_labels)]
+        if not("handles" in kwargs and "labels" in kwargs):
+            # collect old legends
+            #https://stackoverflow.com/questions/9834452/how-do-i-make-a-single-legend-for-many-subplots-with-matplotlib
+            lines_labels = [ax.get_legend_handles_labels() for ax in fig.axes]
+            handles, labels = [sum(lol, []) for lol in zip(*lines_labels)]
+            kwargs["handles"] = handles
+            kwargs["labels"] = labels
+        else:
+            # pass them through - do nothing
+            pass
+
         # kill old legends
         for ax in fig.axes:
             self.killlegend(ax)
-                
-        # finally we invoke the legend 
-        fig.legend(lines, labels, **kwargs)
+
+        return kwargs
+
+
+    def comradelegend(self, fig=None, **kwargs): 
+        """ collect all labels of one Figure and collate to one master legend 
+            locations "loc": 
+                - upper/lower left/right/center - equals
+                - loc="ul/ll/lr/ur/c"
+        """
+        fig = self.get_fig(fig)#fetch
+        kwargs = self.comradekernel(**kwargs)
+        fig.legend(**kwargs)
         
         
     def comradeaxlegend(self, ax=None, **kwargs):
-        """ collect all labels of one axis and collate to one master legend """
+        """ collect all labels of one Axis and collate to one master legend,
+            same params as comradelegend    
+        """
         ax = self.get_ax(ax)
-
-        # fuckin' babysit legend placing...
-        yoff = 0.12 # empirical 
-        xoff = 0.11
-        if "outside" in kwargs:
-            if kwargs["outside"]:
-                yoff = 0 # would place it diagonally outside ON FULLSCREEN FIG ONLY $$todo: get dependent on size? aaa
-                xoff = 0
-            kwargs.pop("outside") # don't pass downstream matplotlib
-
-        
-        if "loc" in kwargs:
-
-            if kwargs["loc"]=='lr':#lowerright
-                kwargs1=dict(bbox_to_anchor=(1-xoff, yoff), loc='lower right', borderaxespad=0.)
-            
-            elif kwargs["loc"]=='ll':#lowerleft
-                kwargs1=dict(bbox_to_anchor=(xoff+0.025, yoff), loc='lower left', borderaxespad=0.)
-                
-            elif kwargs["loc"]=='ul':#upperleft
-                kwargs1=dict(bbox_to_anchor=(xoff+0.025, 1-(yoff+0.01)), loc='upper left', borderaxespad=0.)
-                
-            elif kwargs["loc"]=='ur':#upperright
-                kwargs1=dict(bbox_to_anchor=(1-xoff, 1-(yoff+0.01)), loc='upper right', borderaxespad=0.)
-                
-            else:
-                print("programmer, you screwed up.")
-                os.close(0)
-            
-            # in any case:
-            kwargs.update(kwargs1)
-        
-        
-        # collect old legends
-        #https://stackoverflow.com/questions/9834452/how-do-i-make-a-single-legend-for-many-subplots-with-matplotlib
-        lines_labels = ax.get_legend_handles_labels()
-        lines, labels = [sum(lol, []) for lol in zip(*lines_labels)]
-        # kill old legends
-        
-        self.killlegend(ax)
+        fig = self.get_fig(fig)#fetch
+        kwargs = self.comradekernel(**kwargs)
                 
         # finally we invoke the legend (that you probably would like to customize...)
-        ax.legend(lines, labels, **kwargs)
+        ax.legend(**kwargs)
 
     
     # oszi-like markers, buy one get two! limited offer!!
