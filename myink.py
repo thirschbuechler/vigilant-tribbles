@@ -1193,7 +1193,7 @@ class myinkc(hoppy.hopper):
         self.autoscale_fig()
 
 
-    def boxplot_summary(self, data=[], xlabels=None, ylabel=None, title=None):
+    def stickplot_summary(self, data=[], xlabels=None, ylabel=None, title=None):
         """ makes boxplot summaries and scenario overlay from "raw datapoints"
         n-dim:
         - data
@@ -1209,7 +1209,7 @@ class myinkc(hoppy.hopper):
         y = np.concatenate(data)
 
         # vanilla base
-        self.boxplot(data=data, xlabels=xlabels, title=title, ylabel=ylabel)
+        self.stickplot(data=data, xlabels=xlabels, title=title, ylabel=ylabel)
 
         # put overlay
         self.scatter(x,y)            

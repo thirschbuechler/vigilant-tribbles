@@ -38,9 +38,11 @@ sometimes add extra functionality
 ### new graph types
 new graph types built ontop existing ones
 - `pe.boxplot()`
-    make a boxplot
-- `boxplot_summary()`
-  - make a boxplot and overlay the original datapoints
+    make a boxplot, massaged mpl version
+- `pe.stickplot()`
+    make a simplified boxplot - "stickplot", just variance and mean
+- `pe.stickplot_summary()`
+  - make a stickplot and overlay the original datapoints
 - `pe.waterfall()`
     make a waterfall-diagram from a matrix, an `imshow` on steroids
 - `pe.ecke()`
