@@ -508,7 +508,8 @@ class myinkc(hoppy.hopper):
 
 
     def modlegend(self, mylegendtext=None, addtext=None, title=None, rmsubstr=None, ax=None, *args, **kwargs):#, *args, **kwargs for ax.legend only
-        """ legend handler and creator 
+        """ OLD - h,l = get_legend_handles_labels() is kinda better
+            legend handler and creator 
             - create out of self.mylegend if no mylegendtext passed 
             - use mylegendtext (if passed and same len)
             - remove shit with rmsubstr
@@ -1153,26 +1154,46 @@ class myinkc(hoppy.hopper):
             off=np.zeros(len(data))
 
         # # plotting # #        
-        self.get_ax().boxplot(data.T-off, **kwargs)
-        self.scatter(x, means+std, marker="^", c=mc)
-        self.scatter(x, means, marker="s", c=mc)
-        self.scatter(x, means-std, marker="v", c=mc)
+        # flierprops == outlier-marker type
+        #   - ","==pixel-marker
+        flierprops = dict(marker=',', markerfacecolor='black', markersize=12, linestyle='none')
+        ax = self.get_ax()
+        ax.boxplot(data.T-off, flierprops=flierprops, **kwargs)
+        self.scatter(x, means+std, marker="^", c=mc, label="mean+stdev") # triag up
+        self.scatter(x, means, marker="s", c=mc, label="mean") # square
+        self.scatter(x, means-std, marker="v", c=mc, label="mean-stdev") # triag down
 
         # xy_labelling
-        ax = self.get_ax()
+        
         ax.set_ylabel(ylabel)
         ax.set_xticks(np.arange(len(xlabels)))
         ax.set_xticklabels(xlabels, ha="right")#horizontal alignment
         self.rotate_xticks(45, autoscale=0)
         plt.locator_params(axis='x', nbins=10)#, tight=True)
-        self.get_ax().minorticks_on()
+        ax.minorticks_on()
+        self.legend()
+        from matplotlib.lines import Line2D
+        #https://matplotlib.org/stable/gallery/text_labels_and_annotations/custom_legends.html
+        medianlinelegendline = Line2D([0], [0], color='orange', marker="_", lw=1, label='Line')
+        quartilelegendline = Line2D([0], [0], color='black', marker="_", lw=1, label='Line')
 
+        h, l = ax.get_legend_handles_labels()
+
+        # insert
+        l.insert(0,"quartiles")
+        h.insert(0,quartilelegendline)
+        l.insert(1,"median")
+        h.insert(1,medianlinelegendline)
+
+        # put 
+        self.legend(handles=h,labels=l)   
+    
 
         self.title(title)
         self.autoscale_fig()
 
 
-    def stickplot_summary(self, data=[], xlabels=None, ylabel=None, title=None):
+    def boxplot_summary(self, data=[], xlabels=None, ylabel=None, title=None):
         """ makes boxplot summaries and scenario overlay from "raw datapoints"
         n-dim:
         - data
