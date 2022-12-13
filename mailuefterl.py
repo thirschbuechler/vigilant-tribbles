@@ -142,6 +142,26 @@ def mx_diag_mirror(X):
     X = np.triu(X) #remove NANs of lower triag, which were used to hide redundancy
     return X + X.T - np.diag(np.diag(X))
     
+
+def singledim_mod_testdata():
+    data = np.array([[1,2],[3,4]])
+    data = [data,data]
+    data = [data,data]
+    return data
+
+def singledim_mod(data):
+    """ takes multidimensional array and flattens all but first one - useful for boxplot(), etc.
+
+    >>> np.shape(singledim_mod(singledim_mod_testdata()))
+    (2, 8)
+    """
+    #print(f"{np.shape(data)=}")
+    args = []
+    args = np.shape(data)
+    data = np.reshape(data, newshape=(args[0], np.prod(args[1:])))
+    return data
+
+
 #-#-# module test #-#-#
 if __name__ == '__main__': # test if called as executable, not as library
     integritycheck()#does not work f class functions?
