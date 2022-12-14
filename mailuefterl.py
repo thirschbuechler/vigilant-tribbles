@@ -151,6 +151,10 @@ def singledim_mod_testdata():
 
 def singledim_mod(data):
     """ takes multidimensional array and flattens all but first one - useful for boxplot(), etc.
+        aka dimred, dimension reduction, ...
+        --> only keep first dimension
+        
+        - I/O: np.array()
 
     >>> np.shape(singledim_mod(singledim_mod_testdata()))
     (2, 8)

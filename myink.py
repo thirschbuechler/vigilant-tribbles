@@ -1128,6 +1128,7 @@ class myinkc(hoppy.hopper):
 
         # # data conditioning # # 
         data = np.array(data)
+        data = ml.singledim_mod(data) # only keep first dimension, ax.boxplot() dies otherwise
         statistics = []
         for item in data:
             item = np.array(item).astype(np.float)
