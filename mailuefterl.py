@@ -166,6 +166,64 @@ def singledim_mod(data):
     return data
 
 
+def availability(data, thresh=-90, plot_test=False):
+    """
+    get availability arrays of dataset, in percent
+    output: (x,y)
+
+    - data
+    - thresh (-90 default): btw. -120 and 0
+    - plot_test: dbg, don't output percent but all bins n xaxis
+
+    >>> availability(range(-115,-10))
+    ([0, 1], array([0.23809524, 0.76190476]))
+    
+    >>> availability(range(-200,500), plot_test=True)
+    Traceback (most recent call last):
+    Exception: programmer, you are ugly! (availability range doesn't make sense)
+    
+    >>> availability(range(-115,-10), plot_test=True)
+    ([-310.0, -105.0, -45.0, 250.0], array([ 0, 25, 80,  0]))
+    """
+
+    dl = count_non_nan(data)
+
+    bins = [-500,-120, thresh,0,500]
+    binned, edges = np.histogram(a=data, bins=bins)
+
+    if any(edges != bins):
+        raise Exception("python is ugly")
+
+    if (binned[0]) or (binned[len(binned)-1]):
+        raise Exception("programmer, you are ugly! (availability range doesn't make sense)")
+
+
+    if plot_test:
+        x_plot_pos = bin_to_xaxis(bins)
+        return x_plot_pos, binned
+    else:
+        return [0,1], binned[1:-1]/dl # omit first and last border-bins, only used for exception, also turn to percent
+
+
+def availability_plottests():
+    import myink as mi
+    pe = mi.myinkc()
+
+    for plot_test in [True, False]:
+        pe.subplots()    
+        a = availability(range(-115,-10), plot_test=plot_test)
+        pe.scatter(*a, color="blue")
+
+        b = np.array(list(range(-100,-90))+ list(range(-70,-40)))
+        a = availability(b, plot_test=plot_test)
+        pe.scatter(*a, color="red")
+
+        b = np.array(list(range(-110,-90)))
+        a = availability(b, plot_test=plot_test)
+        pe.scatter(*a, color="green")
+
+    pe.show()
+
 #-#-# module test #-#-#
 if __name__ == '__main__': # test if called as executable, not as library
     integritycheck()#does not work f class functions?
