@@ -15,6 +15,13 @@ def bin_to_xaxis(bins):
 
 
 def count_non_nan(data):
+    """ count non_nan in numpy array
+    
+    CAUTION: cannot handle np.array([np.array, np.array])
+            --> use np.concatenate with transposed arr, etc.
+    """
+    #print(type(data))
+    #print(f"{data=}")
     return np.count_nonzero(~np.isnan(data))
 
 
@@ -75,38 +82,70 @@ def auto_ceil(x):
     return int(x)
 
 
-def histo_weighter(kwargs, percent):
+def histo_weighter(percent=False, basearray = 0, **kwargs):
     """ 
-    return weights in kwargs if data aka x present and percent True
+    return weights in kwargs for histo
+    - x: data
+    - percent: make via count_non_nan self or basearray
+    - basearray: use countnonnan(basearray) as percent base
+
     both used in myinkc.histo and in mailuefterl.histogram
     
+    attention: 
     default parameter in np.histogram is "a"
     default parameter in matplotlib.hist is "x"
     """
     if percent:
             # - find data or insert into dict
             # - insert weights
-            if "x" in kwargs:
-                x = kwargs["x"]
-            else:
+            if "x" not in kwargs:
                 raise Exception("percent switch needs \"x=\" data kwarg")
-                #x = args[0]
-                #kwargs["x"] = x
-            weights=np.ones(np.shape(x)) / count_non_nan(x) # NOT len() - ones need to have same shape, not np.size (returns also non-nan elements and skews percent)
+            
+            x = kwargs["x"]
+
+            if not np.size(basearray):
+                basearray = x
+
+            weights=np.ones(np.shape(x)) / count_non_nan(basearray) # NOT len() - ones need to have same shape, not np.size (returns also non-nan elements and skews percent)
 
             kwargs["weights"] = weights
     return kwargs
 
 
-def histogram(percent=False, **kwargs):
-    kwargs = histo_weighter(percent=percent, kwargs=kwargs)
-    # remove x param from keyw-args
-    x=kwargs["x"]
-    kwargs.pop("x")
-    # insert x-param as non-keyw, since
-    #      default parameter in np.histogram is "a" 
-    #       default parameter in matplotlib.hist is "x" 
-    return np.histogram(x,**kwargs)
+def histogram(x=[], percent=False, autorange=False, basearray = 0, **kwargs):
+    """ weighted histograms
+        - x (arr): data
+        - autorange (bool): range=[nanmin(x), nanmax(x)]
+        - percent (bool): weigh to reflect percent
+        - basearray (arr): use countnonnan(basearray) as percent base
+    """
+
+    if autorange:
+        kwargs["range"] = (nanmin(x), nanmax(x))
+
+    # which percentbase
+    if not np.size(basearray):
+        basearray = x
+
+    #if percent:
+        x = x/(np.ones(np.shape(x)) * count_non_nan(basearray))
+
+    # numpy hist
+    n, bins = np.histogram(a=x,**kwargs)
+
+    # percent re-scaling
+    #if percent:
+        #n=np.ones(np.shape(n)) / (count_non_nan(basearray) * len(n)) 'STUPID u
+        #n = n/ (np.ones(np.shape(n)) * count_non_nan(basearray))
+
+    return n,bins
+    """
+    attention: 
+    default parameter in np.histogram is "a"
+        numpy histogram ignores weights, so re-do n afterwards
+    default parameter in matplotlib.hist is "x"
+        mpl hist works with weights as expected
+    """
 
 
 def integritycheck():
@@ -197,7 +236,6 @@ def availability(data, thresh=-90, plot_test=False):
     if (binned[0]) or (binned[len(binned)-1]):
         raise Exception("programmer, you are ugly! (availability range doesn't make sense)")
 
-
     if plot_test:
         x_plot_pos = bin_to_xaxis(bins)
         return x_plot_pos, binned
@@ -205,24 +243,6 @@ def availability(data, thresh=-90, plot_test=False):
         return [0,1], binned[1:-1]/dl # omit first and last border-bins, only used for exception, also turn to percent
 
 
-def availability_plottests():
-    import myink as mi
-    pe = mi.myinkc()
-
-    for plot_test in [True, False]:
-        pe.subplots()    
-        a = availability(range(-115,-10), plot_test=plot_test)
-        pe.scatter(*a, color="blue")
-
-        b = np.array(list(range(-100,-90))+ list(range(-70,-40)))
-        a = availability(b, plot_test=plot_test)
-        pe.scatter(*a, color="red")
-
-        b = np.array(list(range(-110,-90)))
-        a = availability(b, plot_test=plot_test)
-        pe.scatter(*a, color="green")
-
-    pe.show()
 
 #-#-# module test #-#-#
 if __name__ == '__main__': # test if called as executable, not as library
