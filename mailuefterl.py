@@ -83,32 +83,8 @@ def auto_ceil(x):
 
 
 def histo_weighter(percent=False, basearray = 0, **kwargs):
-    """ 
-    return weights in kwargs for histo
-    - x: data
-    - percent: make via count_non_nan self or basearray
-    - basearray: use countnonnan(basearray) as percent base
-
-    both used in myinkc.histo and in mailuefterl.histogram
-    
-    attention: 
-    default parameter in np.histogram is "a"
-    default parameter in matplotlib.hist is "x"
-    """
     if percent:
-            # - find data or insert into dict
-            # - insert weights
-            if "x" not in kwargs:
-                raise Exception("percent switch needs \"x=\" data kwarg")
-            
-            x = kwargs["x"]
-
-            if not np.size(basearray):
-                basearray = x
-
-            weights=np.ones(np.shape(x)) / count_non_nan(basearray) # NOT len() - ones need to have same shape, not np.size (returns also non-nan elements and skews percent)
-
-            kwargs["weights"] = weights
+            raise Exception("use mailuefterl histogram and plot") # too lazy to fix again
     return kwargs
 
 
