@@ -21,7 +21,7 @@ def availability_plottests():
 
 
 def ml_hist_plottests():
-    data = range(0,100)
+    data = [1,1,3,5]
     import matplotlib.pyplot as plt
     #raw_n, raw_bins = histogram(x=data)
 

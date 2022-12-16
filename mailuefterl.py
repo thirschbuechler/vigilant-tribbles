@@ -112,7 +112,7 @@ def histo_weighter(percent=False, basearray = 0, **kwargs):
     return kwargs
 
 
-def histogram(x=[], percent=False, autorange=False, basearray = 0, **kwargs):
+def histogram(x=[], percent=False, autorange=False, basearray = None, **kwargs):
     """ weighted histograms
         - x (arr): data
         - autorange (bool): range=[nanmin(x), nanmax(x)]
@@ -124,19 +124,20 @@ def histogram(x=[], percent=False, autorange=False, basearray = 0, **kwargs):
         kwargs["range"] = (nanmin(x), nanmax(x))
 
     # which percentbase
-    if not np.size(basearray):
+    if type(basearray) != type(None):
+        if not len(basearray): # if len 0
+            basearray = x
+        else:
+            #basearray = basearray # ok
+            pass
+    else: # if no basearray
         basearray = x
 
-    #if percent:
-        x = x/(np.ones(np.shape(x)) * count_non_nan(basearray))
-
+    if percent:
+        weights=np.ones(np.shape(x)) / count_non_nan(basearray)
+        kwargs["weights"]=weights
     # numpy hist
     n, bins = np.histogram(a=x,**kwargs)
-
-    # percent re-scaling
-    #if percent:
-        #n=np.ones(np.shape(n)) / (count_non_nan(basearray) * len(n)) 'STUPID u
-        #n = n/ (np.ones(np.shape(n)) * count_non_nan(basearray))
 
     return n,bins
     """
