@@ -227,19 +227,27 @@ def availability(data, thresh=-90, plot_test=False):
 '''
 
 
-def availability_frac(data, threshold):
+def availability_frac(data, threshold, nan_bad=True):
     """ get availability fraction >= threshold
-        - data (1d array)
+        - data (1D array)
         - threshold (included on good_count interval)
+        - nan_bad: NANs are bad?
+            - True: missing datapoints (DEFAULT)
+            - False: empty matrix elements (less to count, e.g. padding in some position_matrix)
 
         return good_count/total_count
 
     """
     data = np.array(data)
     total_count = len(data)
+    nan_count = count_nan(data)
     good_count = len(data[data>=threshold])
     bad_count = len(data[data<threshold])
-    bad_count += count_nan(data)
+    
+    if nan_bad:
+        bad_count += nan_count
+    else:
+        total_count -= nan_count
 
     if good_count+bad_count != total_count:
         raise Exception(f"{good_count=}+{bad_count=} != {total_count=}")
