@@ -1139,13 +1139,11 @@ class myinkc(hoppy.hopper):
             std = np.std(item)
             statistics.append([mins, means, maxes, std])
 
-        mins, means, maxes, std  = np.array(statistics).astype("float").T # unpack
+        # unpack
+        mins, means, maxes, std  = np.array(statistics).astype("float").T
 
         # consider boxplots are plotted at x-offset of +1 for some reason:
         x=np.arange(len(data))+1
-        if bool(list(xlabels)): # bool-list cast is alternative to a.any(), like np.size(yticks)>0:
-            xlabels = list(xlabels)
-            xlabels.insert(0,0)#insert dummy at begin
 
         # user offset if wished
         if meanoffset:
@@ -1164,31 +1162,31 @@ class myinkc(hoppy.hopper):
         self.scatter(x, means, marker="s", c=mc, label="mean") # square
         self.scatter(x, means-std, marker="v", c=mc, label="mean-stdev") # triag down
 
-        # xy_labelling
-        
+        # # xy_labelling
         ax.set_ylabel(ylabel)
+        if bool(list(xlabels)): # bool-list cast is alternative to a.any(), like np.size(yticks)>0:
+            xlabels = list(xlabels)
+            xlabels.insert(0,0)#insert dummy at begin        
         ax.set_xticks(np.arange(len(xlabels)))
         ax.set_xticklabels(xlabels, ha="right")#horizontal alignment
         self.rotate_xticks(45, autoscale=0)
         plt.locator_params(axis='x', nbins=10)#, tight=True)
         ax.minorticks_on()
+        
+        # # legend customization
         self.legend()
         from matplotlib.lines import Line2D
         #https://matplotlib.org/stable/gallery/text_labels_and_annotations/custom_legends.html
         medianlinelegendline = Line2D([0], [0], color='orange', marker="_", lw=1, label='Line')
         quartilelegendline = Line2D([0], [0], color='black', marker="_", lw=1, label='Line')
-
         h, l = ax.get_legend_handles_labels()
-
         # insert
         l.insert(0,"quartiles")
         h.insert(0,quartilelegendline)
         l.insert(1,"median")
         h.insert(1,medianlinelegendline)
-
         # put 
         self.legend(handles=h,labels=l)   
-    
 
         self.title(title)
         self.autoscale_fig()
