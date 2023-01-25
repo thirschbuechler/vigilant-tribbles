@@ -25,6 +25,12 @@ def count_non_nan(data):
     return np.count_nonzero(~np.isnan(data))
 
 
+def count_nan(data):
+    """ count nan values in numpy array / matrix """
+    b = np.isnan(data)
+    return len(b[b==True])
+
+
 def auto_round(x):
     """
     round to significance
@@ -181,7 +187,7 @@ def singledim_mod(data):
     data = np.reshape(data, newshape=(args[0], np.prod(args[1:])))
     return data
 
-
+'''
 def availability(data, thresh=-90, plot_test=False):
     """
     get availability arrays of dataset, in percent
@@ -218,7 +224,28 @@ def availability(data, thresh=-90, plot_test=False):
         return x_plot_pos, binned
     else:
         return [0,1], binned[1:-1]/dl # omit first and last border-bins, only used for exception, also turn to percent
+'''
 
+
+def availability_frac(data, threshold):
+    """ get availability fraction >= threshold
+        - data (1d array)
+        - threshold (included on good_count interval)
+
+        return good_count/total_count
+
+    """
+    data = np.array(data)
+    total_count = len(data)
+    good_count = len(data[data>=threshold])
+    bad_count = len(data[data<threshold])
+    bad_count += count_nan(data)
+
+    if good_count+bad_count != total_count:
+        raise Exception(f"{good_count=}+{bad_count=} != {total_count=}")
+
+    return good_count/total_count
+    
 
 
 #-#-# module test #-#-#

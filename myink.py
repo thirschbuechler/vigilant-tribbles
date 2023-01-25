@@ -1117,13 +1117,17 @@ class myinkc(hoppy.hopper):
         self.autoscale_fig()
 
 
-    def boxplot(self, data=[], xlabels="", meanoffset=False, ylabel="", title="", mc = "green", **kwargs):
+    def boxplot(self, data=[], xlabels="", meanoffset=False, ylabel="", title="", mc = "green", availability_thres=False, **kwargs):
         """
         boxplot
 
         copied from stickplot, adapted
-        - input data array/list
+        - data: input array/list
         - mc: markercolors for mean, std edges upper+lower
+        - xlabels: data labels
+        - ylabel
+        - meanoffset
+        - availability: add availability [%] into xlabel?
         """
 
         # # data conditioning # # 
@@ -1152,15 +1156,26 @@ class myinkc(hoppy.hopper):
         else:
             off=np.zeros(len(data))
 
+        # offsetted data
+        o_data = data.T-off
+
         # # plotting # #        
         # flierprops == outlier-marker type
         #   - ","==pixel-marker
         flierprops = dict(marker=',', markerfacecolor='black', markersize=12, linestyle='none')
         ax = self.get_ax()
-        ax.boxplot(data.T-off, flierprops=flierprops, **kwargs)
+        ax.boxplot(o_data, flierprops=flierprops, **kwargs)
         self.scatter(x, means+std, marker="^", c=mc, label="mean+stdev") # triag up
         self.scatter(x, means, marker="s", c=mc, label="mean") # square
         self.scatter(x, means-std, marker="v", c=mc, label="mean-stdev") # triag down
+
+        if availability_thres:
+            if not xlabels:
+                xlabels=np.zeros(len(o_data.T))
+            for i, datacolumn in enumerate(o_data.T):
+                avail_pc = ml.availability_frac(data=datacolumn, threshold=availability_thres)*100
+                xlabels[i] = f"{xlabels[i]}\n({avail_pc:.1f}%)"
+
 
         # # xy_labelling
         ax.set_ylabel(ylabel)
