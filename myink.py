@@ -15,6 +15,7 @@ import matplotlib.animation as animation
 from matplotlib.ticker import EngFormatter, LogFormatterSciNotation, ScalarFormatter #enginerd stuff
 from matplotlib.ticker import (MultipleLocator, FormatStrFormatter) # nicergrid
 from matplotlib.ticker import PercentFormatter # histo percent
+from matplotlib.transforms import Bbox
 
 
 try:
@@ -664,7 +665,28 @@ class myinkc(hoppy.hopper):
         # finally we invoke the legend (that you probably would like to customize...)
         ax.legend(**kwargs)
 
+
+    def make_legend_scrollbar(self, ax=None):
+        """ add an invisible scrollbar to the legend
+            - ax: axis to fetch legend from (optional)
+        """
+        legend = self.get_ax(ax).get_legend()
+        fig = self.get_fig()
+
+        # pixels to scroll per mousewheel event
+        d = {"down" : 30, "up" : -30}
+
+        def func(evt):
+            if legend.contains(evt):
+                bbox = legend.get_bbox_to_anchor()
+                bbox = Bbox.from_bounds(bbox.x0, bbox.y0+d[evt.button], bbox.width, bbox.height)
+                tr = legend.axes.transAxes.inverted()
+                legend.set_bbox_to_anchor(bbox.transformed(tr))
+                fig.canvas.draw_idle()
+
+        fig.canvas.mpl_connect("scroll_event", func)
     
+
     # oszi-like markers, buy one get two! limited offer!!
     def vmarkers(self, start, stop, ax=None, col="black", linestyles="solid"):
         """ oszi like vertical cursors """
@@ -1757,6 +1779,26 @@ def ecke_tester():
     ele.show()
 
 
+def legend_scrollbar_test():
+    ele=myinkc()
+    
+    #https://stackoverflow.com/questions/55863590/adding-scroll-button-to-matlibplot-axes-legend
+    n = 50
+    t = np.linspace(0,20,51)
+    data = np.cumsum(np.random.randn(51,n), axis=0)
+
+    ele.subplots()
+
+    for i in range(data.shape[1]):
+        ele.plot(t, data[:,i], label=f"Label {i}")
+
+
+    ele.legend(loc="upper left", bbox_to_anchor=(1.02, 0, 0.07, 1))
+
+    ele.make_legend_scrollbar()
+    ele.show()
+
+
 def get_pics():
     from PIL import Image
     pics = []
@@ -1960,7 +2002,8 @@ def calibrate_corr_mx_label(ns = range(3,10)):
 
 #-#-# module test #-#-#
 if testing:#call if selected, after defined, explanation see above
-    tester() # better - call myink_demos.ipynb
+    #tester() # better - call myink_demos.ipynb
+    legend_scrollbar_test()
     #test_waterfall()
     #histo_test()
     #doublebarrel_barberpole()
