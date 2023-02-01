@@ -1433,6 +1433,32 @@ class myinkc(hoppy.hopper):
 
         return np.matrix(magDBs) 
 
+
+    def spind_rechts(self):
+        """ 
+        make two axes, left one is double as wide as right one ()
+
+        copied and mod from ecke """
+        
+        # generate plot, get gridspec
+        fig, axs = plt.subplots(ncols=3, nrows=1)
+        gs = axs[0].get_gridspec()
+        
+        # hide and remove the original visible subplot axes
+        for ax in axs:
+            self.blank(ax) 
+            ax.remove()
+        
+        # gridspec magic
+        axbig = fig.add_subplot(gs[:2]) 
+        axthin = fig.add_subplot(gs[2])
+        axs = np.array([axbig, axthin])
+
+        # put axs inside self
+        self.ax = axbig
+        self.axs = axs
+        self.ax_i = 0
+
         
     def ecke(self, hidesmallframes=False): # inspired by mpl official doc
         """
@@ -1468,7 +1494,7 @@ class myinkc(hoppy.hopper):
         self.axs = np.delete(self.axs, [3,4,6,7])
 
         self.ecke_axs = axs
-        self.ax_i = -1 # HACK
+        self.ax_i = -1 # HACK, to have plotting-loop start w. self.onward() and get 0 in first iteration
 
 
 # https://stackoverflow.com/questions/17212722/matplotlib-imshow-how-to-animate
@@ -1910,6 +1936,51 @@ def doublebarrel_barberpole():
 
     cb_label = " i am text, unittext (unit)"
     pe.colorbar(label=cb_label, cmap="turbo", location="bottom", horizontalalignment="center", ax = pe.axs)# attach to axs aka all_axes not just one sub-ax
+
+    pe.show()
+
+
+def axis_inversion_test():
+    pe = myinkc()
+
+    pe.subplots(nrows=3, ncols=2)
+    x=[1,2,3,4,5]
+    y=[10,5,1,2,1]
+    x=np.array(x)
+    y=np.array(y)
+
+    pe.plot(x,y)
+    pe.title("x,y")
+
+    pe.ax_onward()
+    pe.plot(y,x)
+    pe.title("y,x")
+
+    pe.ax_onward()
+    pe.plot(y,-x)
+    pe.title("y,-x")
+
+    pe.ax_onward()
+    pe.plot(y,-x)
+
+    ax=pe.get_ax()
+    yticks = ax.get_yticks()
+    #ax.set_yticks(np.flip(yticks))
+    # are floats, remove unnecessary .0
+    vint = np.vectorize(int)
+    yticks = vint(yticks)
+    # invert
+    yticks = -yticks
+    ax.set_yticklabels(yticks)
+    pe.title("y,-x, relabeled")
+
+    pe.ax_onward()
+    pe.plot(y,x)
+    pe.title("y,x - ylim and invert_yaxis")
+    ax=pe.get_ax()
+    ax.set_ylim(ax.get_ylim()[::-1])
+    ax.invert_yaxis()
+
 
     pe.show()
 
