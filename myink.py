@@ -308,7 +308,7 @@ class myinkc(hoppy.hopper):
         else:
             return thing
     
-            
+    
     def ax_move(self, where):
         """ move relative up/down to another subplot axis """
         self.ax_i = self.ax_i + where
@@ -378,7 +378,6 @@ class myinkc(hoppy.hopper):
         self.twins.append(self.ax)
         #self.ax_onward()
 
-        
     
     def twiny(self, ax=None):
         """ dual use of y-axis generates x label and ticks on top """
@@ -1117,7 +1116,8 @@ class myinkc(hoppy.hopper):
         self.autoscale_fig()
 
 
-    def boxplot(self, data=[], xlabels="", meanoffset=False, ylabel="", title="", mc = "green", availability_thres=False, **kwargs):
+    def boxplot(self, data=[], xlabels="", meanoffset=False, ylabel="", title="", mc = "green",
+                availability=False, nan_bad=True, **kwargs):
         """
         boxplot
 
@@ -1127,7 +1127,12 @@ class myinkc(hoppy.hopper):
         - xlabels: data labels
         - ylabel
         - meanoffset
+        
+        availability related:
         - availability: add availability [%] into xlabel?
+        - nan_bad: NANs are bad?
+            - True: missing datapoints (DEFAULT)
+            - False: empty matrix elements (less to count, e.g. padding in some position_matrix)
         """
 
         # # data conditioning # # 
@@ -1169,11 +1174,11 @@ class myinkc(hoppy.hopper):
         self.scatter(x, means, marker="s", c=mc, label="mean") # square
         self.scatter(x, means-std, marker="v", c=mc, label="mean-stdev") # triag down
 
-        if availability_thres:
+        if availability:
             if not xlabels:
                 xlabels=np.zeros(len(o_data.T))
             for i, datacolumn in enumerate(o_data.T):
-                avail_pc = ml.availability_frac(data=datacolumn, threshold=availability_thres)*100
+                avail_pc = ml.availability_frac(data=datacolumn, nan_bad=nan_bad)*100
                 xlabels[i] = f"{xlabels[i]}\n({avail_pc:.1f}%)"
 
 

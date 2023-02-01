@@ -187,6 +187,21 @@ def singledim_mod(data):
     data = np.reshape(data, newshape=(args[0], np.prod(args[1:])))
     return data
 
+
+def roadkill(thing, hard=False):
+    """ flatten if possible - remove any dimensions and make a list """
+    if (hasattr(thing, "__iter__")):
+        if not hard:
+            return(thing.flatten()) # please be flat
+        else:
+            # sudo be_flat
+            # - join np.arrays in list via conc
+            # - then join lists via ravel)
+            return(np.concatenate(thing).ravel())
+
+    else:
+        return thing
+        
 '''
 def availability(data, thresh=-90, plot_test=False):
     """
@@ -227,10 +242,10 @@ def availability(data, thresh=-90, plot_test=False):
 '''
 
 
-def availability_frac(data, threshold, nan_bad=True):
+def availability_frac(data, nan_bad=True):
     """ get availability fraction >= threshold
         - data (1D array)
-        - threshold (included on good_count interval)
+        - threshold (included on good_count interval) - HARDCODED
         - nan_bad: NANs are bad?
             - True: missing datapoints (DEFAULT)
             - False: empty matrix elements (less to count, e.g. padding in some position_matrix)
@@ -238,22 +253,30 @@ def availability_frac(data, threshold, nan_bad=True):
         return good_count/total_count
 
     """
+    # hardcoded thres - hardcoded as accessed across multiple repos in weird git nestings
+    threshold=-90
+    
+    # condition input to 1D array
     data = np.array(data)
-    total_count = len(data)
+    data = roadkill(data)
+
+    # counts
+    total_count = len(data) # nan, good, bad
     nan_count = count_nan(data)
     good_count = len(data[data>=threshold])
     bad_count = len(data[data<threshold])
     
+    # interprete NANs
     if nan_bad:
         bad_count += nan_count
     else:
         total_count -= nan_count
 
     if good_count+bad_count != total_count:
-        raise Exception(f"{good_count=}+{bad_count=} != {total_count=}")
+        raise Exception(f"{good_count=}+{bad_count=} != {total_count=}, {nan_bad=}")
 
+    # return fraction
     return good_count/total_count
-    
 
 
 #-#-# module test #-#-#
