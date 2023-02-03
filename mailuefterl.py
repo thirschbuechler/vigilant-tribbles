@@ -143,12 +143,21 @@ def integritycheck():
 # HACK all runtime warnings of one fct ignored
 # ToDo only ignore zeromean nan slice ones
 def babysit(eval, *args, **kwargs):
-    # numpy nanzero zeroslice stuff
-    # nan-matrices shall be allowed to have means over nans or zeros without giving a warning
-    # I expect to see RuntimeWarnings in this block - a mean(0) warning
+    """ numpy nan-operation silencer
+    
+        nan-matrices shall be allowed to have means over nans or zeros without giving a warning,
+        expect to see RuntimeWarnings otherwise
+    """
+
     with warnings.catch_warnings():
         warnings.simplefilter("ignore", category=RuntimeWarning)
         return eval(*args,**kwargs)
+    
+    # alternatively (even thouth with_context is superior):
+    # np.seterr(divide='ignore', invalid='ignore') # temp disable for nan operations
+    # nan operations
+    # np.seterr(divide='warn', invalid='warn') # re-enable
+        
         
 def nanmean(*args, **kwargs):
     return babysit(np.nanmean,*args, **kwargs)
@@ -158,6 +167,9 @@ def nanmax(*args, **kwargs):
 
 def nanmin(*args, **kwargs):
     return babysit(np.nanmin,*args, **kwargs)
+
+def divide(*args, **kwargs):
+    return babysit(np.divide,*args, **kwargs)
 
 def mx_diag_mirror(X):
     # https://stackoverflow.com/questions/16444930/copy-upper-triangle-to-lower-triangle-in-a-python-matrix/42209263
