@@ -1434,14 +1434,17 @@ class myinkc(hoppy.hopper):
         return np.matrix(magDBs) 
 
 
-    def spind_rechts(self):
+    def spind_rechts(self, mainwidth=2, smallaxes=2):
         """ 
-        make two axes, left one is double as wide as right one ()
-
-        copied and mod from ecke """
+        make n axes, first left "main" bigger, others same size
+        - mainwidth: biggest axis size
+        - smallaxes: ammount of axes total
+        (copied and mod from ecke) """
         
+        n=mainwidth+smallaxes
+
         # generate plot, get gridspec
-        fig, axs = plt.subplots(ncols=3, nrows=1)
+        fig, axs = plt.subplots(ncols=n, nrows=1)
         gs = axs[0].get_gridspec()
         
         # hide and remove the original visible subplot axes
@@ -1450,10 +1453,11 @@ class myinkc(hoppy.hopper):
             ax.remove()
         
         # gridspec magic
-        axbig = fig.add_subplot(gs[:2]) 
-        axthin = fig.add_subplot(gs[2])
-        axs = np.array([axbig, axthin])
-
+        axbig = fig.add_subplot(gs[:mainwidth]) 
+        #axthin = fig.add_subplot(gs[n])
+        #axs = np.array([axbig, axthin])
+        axs = np.array([axbig, *[fig.add_subplot(gs[i+mainwidth]) for i in range(0,smallaxes)]])
+        print(axs)
         # put axs inside self
         self.ax = axbig
         self.axs = axs
