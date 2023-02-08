@@ -1623,6 +1623,7 @@ def tester():
     stemmy()
     weigh_scatter()
     ecke_tester()
+    spind_tester()
     test_make_im_gif()
     mycanvassize_test()
     myinkc().mycanvassize(medfig=True) # reset afterwards via one-time-use myinkc element
@@ -1805,6 +1806,15 @@ def ecke_tester():
     # https://i.stack.imgur.com/Za66N.png
 
     # finally, show
+    ele.show()
+
+
+def spind_tester():
+    ele=myinkc()
+
+    ele.spind_rechts(mainwidth=2,smallaxes=2)
+    ele.spind_rechts(mainwidth=4,smallaxes=3)
+
     ele.show()
 
 
