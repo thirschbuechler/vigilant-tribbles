@@ -1441,6 +1441,7 @@ class myinkc(hoppy.hopper):
         - smallaxes: ammount of axes total
         (copied and mod from ecke) """
         
+        # total graph slots, for gridspec basis
         n=mainwidth+smallaxes
 
         # generate plot, get gridspec
@@ -1452,12 +1453,10 @@ class myinkc(hoppy.hopper):
             self.blank(ax) 
             ax.remove()
         
-        # gridspec magic
+        # gridspec magic - make a big ax and some small ones
         axbig = fig.add_subplot(gs[:mainwidth]) 
-        #axthin = fig.add_subplot(gs[n])
-        #axs = np.array([axbig, axthin])
         axs = np.array([axbig, *[fig.add_subplot(gs[i+mainwidth]) for i in range(0,smallaxes)]])
-        print(axs)
+        
         # put axs inside self
         self.ax = axbig
         self.axs = axs
