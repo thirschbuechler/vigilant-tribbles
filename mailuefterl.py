@@ -171,6 +171,31 @@ def nanmin(*args, **kwargs):
 def divide(*args, **kwargs):
     return babysit(np.divide,*args, **kwargs)
 
+def sign_sym(var):
+    """ return plus/minus sign of number
+
+        input: scalar number
+        output: char (+/-/?)
+    
+    >>> sign_sym(3)
+    '+'
+    >>> sign_sym(-10)
+    '-'
+    >>> sign_sym(np.nan)
+    '?'
+    >>> sign_sym("b")
+    '?'
+    """
+    # filter bs
+    if type(var) == str:
+        return "?"
+    if np.isnan(var):
+        return "?"
+    # otherwise, return sign char
+    # (numpy's sign returns +-1 number)
+    else:
+        return (f'{var:+g}')[0]
+    
 def mx_diag_mirror(X):
     # https://stackoverflow.com/questions/16444930/copy-upper-triangle-to-lower-triangle-in-a-python-matrix/42209263
     X = np.triu(X) #remove NANs of lower triag, which were used to hide redundancy
