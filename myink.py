@@ -1571,15 +1571,22 @@ class myinkc(hoppy.hopper):
             imim.colorbar.remove()
 
 
-    def common_cb_lims(self, data):
+    def common_cb_lims(self, data, nan_allowed=True):
         """ 
             - finds common min/max of data
             - iterates over self.imim
             - sets common colorbar limits
             - resets self.imim
         """
-        mymin=np.amin(data)
-        mymax=np.amax(data)
+        if nan_allowed:
+            mymin=ml.nanmin(data)
+            mymax=ml.nanmax(data)
+        else:
+            # works with non-nan, but fucks up colorscale if nans present
+            # effectively warning visually that illegal nans are present
+            mymin=np.amin(data)
+            mymax=np.amax(data)
+        
         #print("{},{}".format(mymin,mymax))
         for imim in self.imims:
             imim.set_clim(mymin,mymax)
