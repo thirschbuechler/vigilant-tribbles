@@ -1578,6 +1578,10 @@ class myinkc(hoppy.hopper):
             - sets common colorbar limits
             - resets self.imim
         """
+        # squash data, in case of different shapes
+        #   works always if np.matrix instances are inside data
+        #   (not necessarily with np.array tough, e.g. 1D case)
+        data = self.roadkill(np.array(data, dtype=object), hard=True)
         if nan_allowed:
             mymin=ml.nanmin(data)
             mymax=ml.nanmax(data)
