@@ -100,6 +100,8 @@ def histogram(x=[], percent=False, autorange=False, basearray = None, **kwargs):
         - autorange (bool): range=[nanmin(x), nanmax(x)]
         - percent (bool): weigh to reflect percent
         - basearray (arr): use countnonnan(basearray) as percent base
+
+        BE CAUTIOUS OF np.nan in weights! no-output, even for many non-zero weights can happen
     """
 
     if autorange:
