@@ -590,7 +590,7 @@ class myinkc(hoppy.hopper):
     def comradekernel(self, **kwargs):
         """ common for comradelegend, comradeaxlegend"""
         
-        fig = self.get_fig(fig)#fetch
+        fig = self.get_fig()#fetch
         
         # fuckin' babysit legend placing...
         yoff = 0.12 # empirical 
