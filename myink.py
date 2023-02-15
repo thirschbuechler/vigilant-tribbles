@@ -950,12 +950,14 @@ class myinkc(hoppy.hopper):
         plt.ylabel(ylabel)#("common Y")
 
 
-    def nicergrid(self,y_major=20E6, y_minor=2.5E6, x_major=0.5, x_minor=0.1):
+    def nicergrid(self,y_major=20E6, y_minor=2.5E6, x_major=0.5, x_minor=0.1, grid=True, **kwargs):
         """ add x,y grid based on spacings
             - x_minor
             - y_minor
             - x_major
             - y_major
+            - kwargs for enginerd_axis x,y
+            - grid: on/off (True default)
         
         """
         ax = self.get_ax()
@@ -964,15 +966,16 @@ class myinkc(hoppy.hopper):
         ax.yaxis.set_major_locator(MultipleLocator(y_major))
         ax.yaxis.set_major_formatter(FormatStrFormatter('%d'))
         ax.yaxis.set_minor_locator(MultipleLocator(y_minor))
-        self.enginerd_yaxis()
+        self.enginerd_yaxis(**kwargs)
         #axis x         # 0.1 minor and 0.5 major
         ax.xaxis.set_major_locator(MultipleLocator(x_major))
         ax.xaxis.set_major_formatter(FormatStrFormatter('%d'))
         ax.xaxis.set_minor_locator(MultipleLocator(x_minor))
-        self.enginerd_xaxis()
-        #ax.grid("on")
-        ax.grid(b=True, which='major', color='grey', linestyle='-', alpha=0.5)
-        ax.grid(b=True, which='minor', color='grey', linestyle=':', alpha=0.5)
+        self.enginerd_xaxis(**kwargs)
+        if grid:
+            #ax.grid("on")
+            ax.grid(b=True, which='major', color='grey', linestyle='-', alpha=0.5)
+            ax.grid(b=True, which='minor', color='grey', linestyle=':', alpha=0.5)
 
 
     def hidey(self):
