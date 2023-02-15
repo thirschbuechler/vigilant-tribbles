@@ -1363,7 +1363,12 @@ class myinkc(hoppy.hopper):
             input:
                 - mx
                 - x_axis
-                - ..
+                - yticks
+            annotations 
+                - title   
+                - places (self.engineerd xaxis)
+                - cb_label (colorbar)
+                - colorbar (bool or h/w aspect ratio 20<x<200)
             output:
                 - mx (same as input)
             """
@@ -1380,20 +1385,19 @@ class myinkc(hoppy.hopper):
         
         if np.size(mx)<2 or np.size(x_axis)<2:
             raise Exception("matrix and x_axis input required!")
-        magDBs = mx # input matrix     
-        #mx = np.array(mx, dtype=float)# imshow extent error?
-        #TypeError: ufunc 'isfinite' not supported for the input types, and the inputs could not be safely coerced to any supported types according to the casting rule ''safe
 
-        ## plotting ##
-        #
-        ax = self.get_ax(ax) # might generate figure if none defined
-        # "extent" doc
+        
+        # # # plotting # # #
+        # legacy axis setting
+        ax = self.get_ax(ax)#
+
+        # # imshow "extent" doc
         #   - needed to set ticks and grid correctly (not shifted into centers)
         #   - can also label
         #   - (0,0) is upper left of imshow but extent is flipped on y
-        #   - extent = (0+m, magDBs.shape[1]+m, magDBs.shape[0]+n, 0+n)# n,m freely chosen
+        #   - extent = (0+m, mx.shape[1]+m, mx.shape[0]+n, 0+n)# n,m freely chosen
         #   - print(extent)# with testdata: 0 1001 3 0
-
+        # # minima maxima
         # babysitted versions - not needed atm
         #mymin = ml.nanmin
         #mymax = ml.nanmax
@@ -1404,34 +1408,39 @@ class myinkc(hoppy.hopper):
         if np.size(yticks)>0: # bool(list(yticks)): # bool-list cast is alternative to a.any()
             # app-specific auto-subsample example, add as route-through via inheritence and super()
             # subsample yticks from 151 to 16 if needed, overwrite orig arg
-            #if len(yticks)>17 and (magDBs.shape[0]==16):
+            #if len(yticks)>17 and (mx.shape[0]==16):
             #    yticks=yticks[0::10]
-            if ((np.size(yticks)) == magDBs.shape[0]):
+            if ((np.size(yticks)) == mx.shape[0]):
                 extent = (mymin(x_axis), mymax(x_axis),mymax(yticks), mymin(yticks))
-                #print(f"yticks extent permitted, {magDBs.shape=} vs {yticks.shape=}")
+                #print(f"yticks extent permitted, {mx.shape=} vs {yticks.shape=}")
             else:
-                extent = (mymin(x_axis), mymax(x_axis), magDBs.shape[0], 0)
-                print(f"FORBIDDEN yticks extent forbidden in waterfall, {magDBs.shape=} vs {yticks.shape=}")
+                extent = (mymin(x_axis), mymax(x_axis), mx.shape[0], 0)
+                print(f"FORBIDDEN yticks extent forbidden in waterfall, {mx.shape=} vs {yticks.shape=}")
         else:
             # no yticks given
-            extent = (mymin(x_axis), mymax(x_axis), magDBs.shape[0], 0)
+            extent = (mymin(x_axis), mymax(x_axis), mx.shape[0], 0)
         
-        self.imshow(magDBs, **kwargs, aspect="auto", extent=extent)#aspect makes it rect etc #aspect auto enables arbitrary axis limits
-        cb = self.colorbar(cb_label)
-
-        if not colorbar: # colors wrong even though cmap is in kwargs
-            cb.remove() # mpl 3.5.1 removes :) but space issue
+        # main plot
+        self.imshow(mx, **kwargs, aspect="auto", extent=extent)#aspect makes it rect etc #aspect auto enables arbitrary axis limits
+        
+        # colorbar options
+        #cb = self.colorbar(cb_label)
+        #if not colorbar: # colors wrong even though cmap is in kwargs
+        #    cb.remove() # mpl 3.5.1 removes :) but space issue
             #self.autoscale_fig() # usecase twinx(), does not work - colorbar1 space is deleted so it overlaps if 2nd colorbar deleted
+        if int(colorbar) > 1:
+            cb = self.colorbar(cb_label, aspect=colorbar)
+        elif colorbar == 1:
+            cb = self.colorbar(cb_label)
 
-
+        # postprocessing
         self.title(title)
-        #self.xlabel("bins from {}Hz to {}Hz".format(self.enginerd(min(x_axis)),self.enginerd(max(x_axis))))
-        
         if places>0:
             self.enginerd_xaxis(places=places)
         self.rotate_xticks(45)
 
-        return np.matrix(magDBs) 
+        # return matrix, for legacy reasons
+        return np.matrix(mx) 
 
 
     def spind_rechts(self, mainwidth=2, smallaxes=2):
@@ -1532,8 +1541,11 @@ class myinkc(hoppy.hopper):
     def colorbar(self, label="", ax=None, **kwargs):
         """ make a colorbar for the last imshow plot
             - label
-            - ax: to wich ax (or axs-for-all) to attach to
-            - cmap?
+            - cmap: mandatory colormap
+            - aspect
+                - set heigth/width fraction of colormap
+                - useful aspect ratio 20<x<200
+            - ax (optional): to wich ax (or axs-for-all) to attach to
             """
         ax = self.get_ax(ax)
 
@@ -2035,6 +2047,23 @@ def tex_test():
     pe.show()
 
 
+def narrow_colorbar_test():
+    #https://stackoverflow.com/questions/33443334/how-to-decrease-colorbar-width-in-matplotlib
+    pe = myinkc()
+    pe.subplots()
+
+    x = np.random.normal(0.5, 0.1, 1000)
+    y = np.random.normal(0.1, 0.5, 1000)
+    
+    hist = plt.hist2d(x,y, bins=100)
+
+    cmap = plt.cm.turbo.copy()
+    for aspect in [20,100,200]:
+        pe.colorbar(cmap=cmap, aspect=aspect)
+    
+    pe.show()
+
+
 def statistics_visu():
     y = [1,1,1,1,1,1,1,5,2,2,2,-10, -3, -3, -3]
     x = [1 for i in y]
@@ -2098,7 +2127,8 @@ def calibrate_corr_mx_label(ns = range(3,10)):
 #-#-# module test #-#-#
 if testing:#call if selected, after defined, explanation see above
     #tester() # better - call myink_demos.ipynb
-    legend_scrollbar_test()
+    #legend_scrollbar_test()
+    narrow_colorbar_test()
     #test_waterfall()
     #histo_test()
     #doublebarrel_barberpole()
