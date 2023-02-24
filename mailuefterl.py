@@ -4,6 +4,21 @@ import numpy as np
 import warnings # numpy nanzero zeroslice stuff
 
 
+def sample_var(*args, **kwargs):
+    """ sample variance
+        "provides an unbiased estimator of the variance of a hypothetical infinite population"
+
+        be careful with multidim, "axis" kwarg might help
+
+    # [1,5], mean=6, n=2, (2²+2²)/(n-1)=8
+    >>> sample_var([1,5])
+    8.0
+
+    """
+    kwargs["ddof"]=1
+    return np.var(*args, **kwargs)
+
+
 def bin_to_xaxis(bins):
     """
     takes a histo bin array and returns the corresponding x-axis
