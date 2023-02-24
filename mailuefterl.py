@@ -16,7 +16,7 @@ def sample_var(*args, **kwargs):
 
     """
     kwargs["ddof"]=1
-    return np.var(*args, **kwargs)
+    return np.nanvar(*args, **kwargs)
 
 
 def bin_to_xaxis(bins):

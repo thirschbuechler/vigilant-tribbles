@@ -615,8 +615,15 @@ class myinkc(hoppy.hopper):
             elif kwargs["loc"]=='ur': # upperright
                 kwargs1=dict(bbox_to_anchor=(1-xoff, 1-(yoff+0.01)), loc='upper right', borderaxespad=0.)
 
-            elif kwargs["loc"]=='c': # center - of figure not current ax :(
+            # center - of figure not current ax :( - and variants
+            elif kwargs["loc"]=='c': 
                 kwargs1=dict(bbox_to_anchor=[0.5, 0.5], loc='center', borderaxespad=0.)
+
+            elif kwargs["loc"]=='cr': # center right
+                kwargs1=dict(bbox_to_anchor=[0.75, 0.75], loc='center', borderaxespad=0.)
+
+            elif kwargs["loc"]=='cl': # center left
+                kwargs1=dict(bbox_to_anchor=[0.25, 0.25], loc='center', borderaxespad=0.)
                 
             else:
                 print("programmer, you screwed up.")
