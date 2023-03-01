@@ -103,13 +103,45 @@ def auto_ceil(x):
     return int(x)
 
 
-def histo_weighter(percent=False, basearray = 0, **kwargs):
-    if percent:
-            raise Exception("use mailuefterl histogram and plot") # too lazy to fix again
+def histo_weighter(**kwargs):
+    """ common histo weighter for myink and mailüfterl"""
+    ## read in
+    x = kwargs["x"]
+
+    #local kwargs - defaults
+    lk_def = {"percent":False, "autorange":False, "basearray": None}
+    lk = {"percent":False, "autorange":False, "basearray": None}
+    # update lk with new vals, without taking other kwarg keys
+    #lk.update((k, kwargs[k]) for k in set(kwargs).intersection(lk)) # doesnt work
+    lk.update(kwargs) # also reads new keys
+
+    ## eval logic
+    # autorange
+    if lk["autorange"]:
+        kwargs["range"] = (nanmin(x), nanmax(x))
+
+    # percent
+    if lk["percent"]:
+        # which percentbase
+        if type(lk["basearray"]) != type(None):
+            if not len(lk["basearray"]): # if len 0
+                basearray = x
+            else:
+                basearray = lk["basearray"]
+                #pass
+        else: # if no basearray
+            basearray = x
+        #basearray = np.array(basearray)
+        lk["weights"]=np.ones(np.shape(x)) / count_non_nan(basearray)
+        kwargs["weights"]=lk["weights"]
+
+    # remove processed keys, return
+    for key in list(lk_def.keys()):
+        kwargs.pop(key, "")
     return kwargs
 
 
-def histogram(x=[], percent=False, autorange=False, basearray = None, **kwargs):
+def histogram(**kwargs):
     """ weighted histograms
         - x (arr): data
         - autorange (bool): range=[nanmin(x), nanmax(x)]
@@ -119,23 +151,12 @@ def histogram(x=[], percent=False, autorange=False, basearray = None, **kwargs):
         BE CAUTIOUS OF np.nan in weights! no-output, even for many non-zero weights can happen
     """
 
-    if autorange:
-        kwargs["range"] = (nanmin(x), nanmax(x))
+    # process args, delete non-hist kwargs
+    kwargs = histo_weighter(**kwargs)
+    x = kwargs["x"]
+    kwargs.pop("x")
 
-    # which percentbase
-    if type(basearray) != type(None):
-        if not len(basearray): # if len 0
-            basearray = x
-        else:
-            #basearray = basearray # ok
-            pass
-    else: # if no basearray
-        basearray = x
-
-    if percent:
-        weights=np.ones(np.shape(x)) / count_non_nan(basearray)
-        kwargs["weights"]=weights
-    # numpy hist
+    # numpy hist, forward hist kwargs
     n, bins = np.histogram(a=x,**kwargs)
 
     return n,bins

@@ -1008,8 +1008,10 @@ class myinkc(hoppy.hopper):
 
 
     ## forwarders ##
-    def hist(self, *args, percent = False, **kwargs):
+    def hist(self, *args, **kwargs):
         """ forward to mpl hist
+            x .. input data
+
             NOTE: whenever possible, use roadkill() to include matrix as list and reduce drawing overhead!!
             for row/col ID and switch, see hist_tester()
 
@@ -1023,16 +1025,28 @@ class myinkc(hoppy.hopper):
                 - bin_w = (xmax-xmin)/bins
                 - self.hist(x=x, bins = bins, percent=percent, width=bin_w); 
         
+        # return n, bins, patches
+        
         note: old patchy-draw stuff at bottom of myink as comment
         """
-        kwargs = ml.histo_weighter(kwargs=kwargs, percent=percent)
 
+        # extract percent
+        if "percent" in kwargs:
+            percent = kwargs["percent"]
+
+        # process args, delete non-hist kwargs
+        kwargs = ml.histo_weighter(**kwargs)
+
+        # call plot hist, forward kwargs
         ret = self.get_ax().hist(*args,**kwargs)
 
+        # format
         if percent:
             self.get_ax().yaxis.set_major_formatter(PercentFormatter(1))
 
+        # return n, bins, patches
         return ret
+
 
     def imshow(self,*args,**kwargs):
         """ forward to mpl imshow"""
@@ -1693,25 +1707,20 @@ def test_fontsize():
 
 
 def large_title2():
-    ele = myinkc()
-    #plt.subplots(nrows=2)
-    ele.subplots(nrows=2)
-    ele.title("regular size")
-    ele.ax_onward()
-    ele.rcparams_update({'font.size': 22})
-    ele.title("biig")
-    ele.show()
+    with myinkc() as ele:
+        #plt.subplots(nrows=2)
+        ele.subplots(nrows=2)
+        ele.title("regular size title")
+        ele.ax_onward()
+        ele.rcparams_update({'font.size': fontsizes["bigfig"]})
+        ele.title("biig title")
+        ele.show()
+        # with-context doesnt clear that, so manually reset        
+        ele.rcparams_update({'font.size': fontsizes["deffig"]})
 
 
 def large_alltext():
-    ele = myinkc()
-    ele.rcparams_update({'font.size': 22})
-    ele.subplots(nrows=2)
-    ele.title("regular size")
-    ele.ax_onward()
-    
-    ele.title("biig")
-    ele.show()
+    large_title2()
 
 
 def histo_test():
