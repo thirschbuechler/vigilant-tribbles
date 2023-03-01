@@ -4,7 +4,7 @@ from mailuefterl import *
 import myink as mi
 pe = mi.myinkc()
 
-
+"""
 def availability_plottests():
     for plot_test in [True, False]:
         pe.subplots()    
@@ -18,16 +18,34 @@ def availability_plottests():
         b = np.array(list(range(-110,-90)))
         a = availability(b, plot_test=plot_test)
         pe.scatter(*a, color="green")
+"""
+def availability_plottests():
+    pe.subplots()    
 
+    b = np.array(range(-115,-10))
+    a = availability_frac(b)
+    pe.plot(b, color="blue", label=a)
+
+    b = np.array(list(range(-100,-90))+ list(range(-70,-40)))
+    a = availability_frac(b)
+    pe.plot(b, color="red", label=a)
+
+    b = np.array(list(range(-110,-90)))
+    a = availability_frac(b)
+    pe.plot(b, color="green", label=a)
+
+    pe.ylabel("RSSI")
+    pe.legend()
 
 def ml_hist_plottests():
+    pe.subplots()
     data = [1,1,3,5]
     import matplotlib.pyplot as plt
     #raw_n, raw_bins = histogram(x=data)
 
     pc_n, pc_bins = histogram(x=data, percent=True, autorange=True)
     x, xbins, xlines = plt.hist(x=data, weights=np.ones(np.shape(data))/count_non_nan(data) )
-    plt.close("all")
+    #plt.close("all")
 
     #print({f"{raw_n=}"})
     print(f"{pc_n=}")
@@ -45,7 +63,8 @@ def ml_hist_plottests():
 
 #-#-# module test #-#-#
 if __name__ == '__main__': # test if called as executable, not as library
-    #availability_plottests()
+    print("hi")
+    availability_plottests()
     ml_hist_plottests()
 
     pe.show()
