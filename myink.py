@@ -624,6 +624,9 @@ class myinkc(hoppy.hopper):
 
             elif kwargs["loc"]=='cl': # center left
                 kwargs1=dict(bbox_to_anchor=[0.25, 0.25], loc='center', borderaxespad=0.)
+            
+            elif type(kwargs["loc"])==type([1,2]):
+                kwargs1=dict(bbox_to_anchor=kwargs["loc"], loc='center', borderaxespad=0.)
                 
             else:
                 print("programmer, you screwed up.")
