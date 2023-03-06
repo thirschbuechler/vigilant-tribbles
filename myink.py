@@ -1495,6 +1495,39 @@ class myinkc(hoppy.hopper):
         self.axs = axs
         self.ax_i = 0
 
+    def spinds(self, mylist=[1,1,3,1]):
+        """ 
+        make n column axes
+        - mylist: array of widths of columns
+            - for each column, hava an element
+            - the element defines its width
+        (copied and mod from ecke) """
+        
+        # total graph slots, for gridspec basis
+        n=sum(mylist)
+        
+        # generate plot, get gridspec
+        fig, axs = plt.subplots(ncols=n, nrows=1)
+        gs = axs[0].get_gridspec()
+        
+        # hide and remove the original visible subplot axes
+        for ax in axs:
+            self.blank(ax) 
+            ax.remove()
+        
+        # gridspec magic - make a big ax and some small ones
+        axs=[]
+        start = 0 # first loop start
+        for currentwidth in (mylist):
+            end = start + currentwidth
+            axs.append(fig.add_subplot(gs[start:end]))
+            start = end # set next loop start
+        axs = np.array(axs)
+
+        # put axs inside self
+        self.ax = axs[0]
+        self.axs = axs
+        self.ax_i = 0
         
     def ecke(self, hidesmallframes=False): # inspired by mpl official doc
         """
@@ -1856,6 +1889,7 @@ def spind_tester():
 
     ele.spind_rechts(mainwidth=2,smallaxes=2)
     ele.spind_rechts(mainwidth=4,smallaxes=3)
+    ele.spinds()
 
     ele.show()
 
@@ -2147,7 +2181,8 @@ def calibrate_corr_mx_label(ns = range(3,10)):
 if testing:#call if selected, after defined, explanation see above
     #tester() # better - call myink_demos.ipynb
     #legend_scrollbar_test()
-    narrow_colorbar_test()
+    #narrow_colorbar_test()
+    spind_tester()
     #test_waterfall()
     #histo_test()
     #doublebarrel_barberpole()
