@@ -1382,9 +1382,12 @@ class myinkc(hoppy.hopper):
 
 
     # experienced kwargs error - if **kwargs used AND cmap="turbo_r" -> both are ignored
-    def waterfall(self, mx=None, x_axis = None, ax=None, title=None, 
-                    yticks=[], places=2, cb_label="mag (dB)", colorbar=True, **kwargs): #decimal "places" =2 # decimal acc
-                        # why turbo - https://ai.googleblog.com/2019/08/turbo-improved-rainbow-colormap-for.html
+    def waterfall(self, mx=None, ax=None, title=None, # general
+                        x_axis = None, places=2,  # x_axis
+                        yticks=[], y_minor_grid=None, # y_axis
+                        cb_label="mag (dB)", colorbar=True, # values
+                        **kwargs): # mixed formatting, picked out, rest goes to imshow
+                        # cmap turbo - https://ai.googleblog.com/2019/08/turbo-improved-rainbow-colormap-for.html
         """ plot a matrix without interpolation, set the yticks and stuff
             imshow of mx, aligning yticks
             input:
@@ -1396,6 +1399,7 @@ class myinkc(hoppy.hopper):
                 - places (self.engineerd xaxis)
                 - cb_label (colorbar)
                 - colorbar (bool or h/w aspect ratio 20<x<200)
+                y_minor_grid: spacing of minor y-ticks, if any
             output:
                 - mx (same as input)
             """
@@ -1449,7 +1453,8 @@ class myinkc(hoppy.hopper):
         
         # main plot
         self.imshow(mx, **kwargs, aspect="auto", extent=extent)#aspect makes it rect etc #aspect auto enables arbitrary axis limits
-        
+        if y_minor_grid:
+            self.get_ax().yaxis.set_minor_locator(MultipleLocator(y_minor_grid))
         # colorbar options
         #cb = self.colorbar(cb_label)
         #if not colorbar: # colors wrong even though cmap is in kwargs
