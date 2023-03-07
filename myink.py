@@ -2185,6 +2185,18 @@ def calibrate_corr_mx_label(ns = range(3,10)):
         pe.show()
 
 
+def get_maximum_gui_plot_figsize():
+    # usecase: figure looks nice maximized, how to save it automatically? howto extract fig size:
+    # https://stackoverflow.com/questions/62195970/get-size-of-maximized-matplotlib-figure
+    figManager = plt.get_current_fig_manager()
+    figManager.window.showMaximized()
+
+    plt.pause(0.0001)
+
+    fig = plt.gcf()
+    print(fig.get_size_inches())
+
+
 #-#-# module test #-#-#
 if testing:#call if selected, after defined, explanation see above
     #tester() # better - call myink_demos.ipynb
