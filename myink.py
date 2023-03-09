@@ -1806,7 +1806,7 @@ def histo_test():
         ele.hist(x=x, percent=True)
         ele.modlegend(names)
         ele.ax_onward()
-        #kwargs = getargs(percent=True, histtype = 'bar' , stacked = True )
+        #kwargs =dict(percent=True, histtype = 'bar' , stacked = True )
         ele.hist(x=x, percent=True, histtype = 'bar' , stacked = True )
         
         ele.modlegend(names)

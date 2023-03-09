@@ -18,10 +18,6 @@ except:
 from scipy.sparse import lil_matrix, bsr_array # needs scipy 1.8.0!!
 
 
-def getargs(**kwargs):
-    return kwargs
-
-
 def make_mx(df):
 
     RSSIs = df.RSSI
@@ -147,7 +143,7 @@ if __name__ == '__main__': # test if called as executable, not as library
 
         win_len = int(n_snake / rows_out)
 
-        kwargs_common = getargs(win_len = win_len, rows_out = rows_out, outp_zeros_allowed=True)
+        kwargs_common =dict(win_len = win_len, rows_out = rows_out, outp_zeros_allowed=True)
         mx3, shapestr = rs.col_window_eval(mx = mx2, eval = np.nanmean, **kwargs_common)
         
         d = n - n_snake
@@ -161,7 +157,7 @@ if __name__ == '__main__': # test if called as executable, not as library
         # plot #
         pe = myinkc()
         pe.subplots(ncols=3)
-        ikwargs_common = getargs(aspect="auto")
+        ikwargs_common =dict(aspect="auto")
 
         pe.imshow(mx, **ikwargs_common)
         pe.yticklabels(timestamps)
