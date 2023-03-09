@@ -1053,9 +1053,13 @@ class myinkc(hoppy.hopper):
 
     def imshow(self,*args,**kwargs):
         """ forward to mpl imshow"""
-        im = self.get_ax().imshow(*args,**kwargs) # for animate
-        self.imims.append(im) # for colorbar-stuff, eg. common_cb_lims
+        
+        im = self.get_ax().imshow(*args,**kwargs)
+        # remember handle for colorbar-stuff, eg. common_cb_lims
+        self.imims.append(im)
+
         return im
+
 
     def plot(self,*args,**kwargs):#thsmith already has a "plot"
         """ forward to mpl plot"""
@@ -1640,10 +1644,13 @@ class myinkc(hoppy.hopper):
             NOTE: DOESNT SEEM TO WORK UNLESS common_CB lims called, or sth
                     maybe needs some plt.update() or sth?
         """
-        if i==None:
+        if i == None:
+            # remove all colorbars from collected self.imshow handles (e.g. waterfalls)
             for imim in self.imims:
-                imim.colorbar.remove()
+                if imim.colorbar: # if it has one
+                    imim.colorbar.remove()
         else:
+            # remove specific indexes cb
             imim = self.imims[i]
             imim.colorbar.remove()
 
