@@ -19,6 +19,21 @@ def dummy(*args, **kwargs):
     pass
 
 
+def dict_to_str(mydict):
+    """ turn dictionary into human readable string
+    
+    >>> dict_to_str({"a":10, "b":20})
+    'a: 10, b: 20'
+    >>> str({"a":10, "b":20})
+    "{'a': 10, 'b': 20}"
+    """
+    st = str(mydict)
+    st=removestringparts(["\"", "'", "{", "}"], [st])
+    st="".join(st)
+
+    return st
+
+
 #https://stackoverflow.com/questions/5967500/how-to-correctly-sort-a-string-with-a-number-inside
 def atoi(text):
     return int(text) if text.isdigit() else text
