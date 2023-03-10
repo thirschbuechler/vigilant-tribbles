@@ -34,6 +34,29 @@ def dict_to_str(mydict):
     return st
 
 
+def dictlist_intersection(mydictlist):
+    """
+    find common key-value pairs in a list of dictionaries
+    (as "dict1 & dict2" doesn't work)
+
+    dccsillag: https://stackoverflow.com/questions/18554012/intersecting-two-dictionaries
+
+    >>> dictlist_intersection([{"a":3, "b":4, "d":0},{"a":1, "c":4, "d":0},{"d":0, "a":4, "x":0}])
+    {'d': 0}
+    """
+    if not (type(mydictlist[0]) == dict):
+        raise Exception("not a dict as list element")
+    
+    for i, item in enumerate(mydictlist):
+        if i==0:
+            # initialize
+            commons = item
+        else:
+            # intersect with last one
+            commons = dict(commons.items() & item.items()) # dict.items() produces keys+values
+    return commons
+
+
 #https://stackoverflow.com/questions/5967500/how-to-correctly-sort-a-string-with-a-number-inside
 def atoi(text):
     return int(text) if text.isdigit() else text
