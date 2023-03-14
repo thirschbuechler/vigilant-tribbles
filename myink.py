@@ -1036,6 +1036,8 @@ class myinkc(hoppy.hopper):
         # extract percent
         if "percent" in kwargs:
             percent = kwargs["percent"]
+        else:
+            percent = False
 
         # process args, delete non-hist kwargs
         kwargs = ml.histo_weighter(**kwargs)
