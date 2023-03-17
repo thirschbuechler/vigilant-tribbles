@@ -297,13 +297,16 @@ class myinkc(hoppy.hopper):
     
     def roadkill(self, thing, hard=False):
         """ flatten if possible - remove any dimensions and make a list """
-        if (hasattr(thing, "__iter__")):
+        if np.shape(thing) == np.shape(1):
+            return thing # no dimension
+        elif (hasattr(thing, "__iter__")):
             if not hard:
                 return(thing.flatten()) # please be flat
             else:
                 # sudo be_flat
                 # - join np.arrays in list via conc
                 # - then join lists via ravel)
+                # add a dummy dimension
                 return(np.concatenate(thing).ravel())
 
         else:
@@ -1667,7 +1670,11 @@ class myinkc(hoppy.hopper):
         # squash data, in case of different shapes
         #   works always if np.matrix instances are inside data
         #   (not necessarily with np.array tough, e.g. 1D case)
-        data = self.roadkill(np.array(data, dtype=object), hard=True)
+        if ml.is_ragged(data):
+            data = self.roadkill(np.array(data, dtype=object), hard=True)
+        else:
+            data = self.roadkill(np.array(data)) 
+
         if nan_allowed:
             mymin=ml.nanmin(data)
             mymax=ml.nanmax(data)

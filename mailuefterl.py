@@ -168,6 +168,35 @@ def histogram(**kwargs):
         mpl hist works with weights as expected
     """
 
+#https://www.appsloveworld.com/numpy/100/89/in-numpy-how-to-detect-whether-an-argument-is-a-ragged-nested-sequences
+def is_scalar(a):
+    if np.isscalar(a):
+        return True
+    try:
+        len(a)
+    except TypeError:
+        return True
+    return False
+
+def get_shape(a):
+    """
+    Returns the shape of `a`, if `a` has a regular array-like shape.
+
+    Otherwise returns None.
+    """
+    if is_scalar(a):
+        return ()
+    shapes = [get_shape(item) for item in a]
+    if len(shapes) == 0:
+        return (0,)
+    if any([shape is None for shape in shapes]):
+        return None
+    if not all([shapes[0] == shape for shape in shapes[1:]]):
+        return None
+    return (len(shapes),) + shapes[0]
+
+def is_ragged(a):
+    return get_shape(a) is None
 
 def integritycheck():
     """ better call doctest """
