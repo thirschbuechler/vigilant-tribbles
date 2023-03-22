@@ -295,22 +295,8 @@ class myinkc(hoppy.hopper):
         return self.ax
     
     
-    def roadkill(self, thing, hard=False):
-        """ flatten if possible - remove any dimensions and make a list """
-        if np.shape(thing) == np.shape(1):
-            return thing # no dimension
-        elif (hasattr(thing, "__iter__")):
-            if not hard:
-                return(thing.flatten()) # please be flat
-            else:
-                # sudo be_flat
-                # - join np.arrays in list via conc
-                # - then join lists via ravel)
-                # add a dummy dimension
-                return(np.concatenate(thing).ravel())
-
-        else:
-            return thing
+    def roadkill(self, *args, **kwargs):
+        return ml.roadkill(*args, **kwargs)
     
     
     def ax_move(self, where):

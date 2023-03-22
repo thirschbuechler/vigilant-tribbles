@@ -293,19 +293,68 @@ def singledim_mod(data):
 
 
 def roadkill(thing, hard=False):
-    """ flatten if possible - remove any dimensions and make a list """
-    if (hasattr(thing, "__iter__")):
-        if not hard:
-            return(thing.flatten()) # please be flat
-        else:
-            # sudo be_flat
-            # - join np.arrays in list via conc
-            # - then join lists via ravel)
-            return(np.concatenate(thing).ravel())
+        """ flatten if possible - remove any dimensions and make a list """
+        if np.shape(thing) == np.shape(1):
+            return thing # no dimension
+        elif (hasattr(thing, "__iter__")):
+            if not hard:
+                return(thing.flatten()) # please be flat
+            else:
+                # sudo be_flat
+                # - join np.arrays in list via conc
+                # - then join lists via ravel)
+                # add a dummy dimension
+                return(np.concatenate(thing).ravel())
 
+        else:
+            return thing
+
+
+def tuple_concat(*args):
+    """ input two tuples with same dimension to concatenate
+
+    # # unpacking examples # #
+
+    # iterate over (packed) tuple-columns
+    for a,b,c in data:
+        print(a,b,c)
+
+    # unpack tuple-columns
+    a,b,c = data.T
+        print(b[4])
+
+    # loop over unpacked columns via packing
+    for a,b,c in zip(a,b,c):
+        print(a,b,c)
+
+    # unpack and re-pack for looping, just because :P
+    for a,b,c in zip(*data.T):
+        print(a,b,c)
+
+    >>> a = list(range(0,3))
+    >>> b = ["a", "b", "c"]
+    >>> c = [0.0, 1.1, 3.3]
+    >>> tuple1 = a,b,c
+    >>> a = list(range(0,3))
+    >>> b = ["d", "e", "f"]
+    >>> c = [5.0, 6.6, 3.3]
+    >>> tuple2 = a,b,c
+    >>> x = tuple_concat(tuple1, tuple2)    
+    >>> x[3]
+    array([0, 'd', 5.0], dtype=object)
+    """
+    # unpack tuples
+    if len(args) >1:
+        tuples = args
     else:
-        return thing
-        
+        tuples = args[0]
+
+    # convert to concatenable and orient
+    tuples = [np.array(ti, dtype=object).T for ti in tuples]
+    
+    # concatenate into matrix
+    return np.concatenate(tuples)
+
 '''
 def availability(data, thresh=-90, plot_test=False):
     """
@@ -381,6 +430,7 @@ def availability_frac(data, nan_bad=True):
 
     # return fraction
     return good_count/total_count
+
 
 
 #-#-# module test #-#-#
