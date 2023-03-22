@@ -294,9 +294,12 @@ def singledim_mod(data):
 
 def roadkill(thing, hard=False):
         """ flatten if possible - remove any dimensions and make a list """
-        if np.shape(thing) == np.shape(1):
+        if not (type(thing) == type(np.array([1]))):
+                thing = np.array(thing, dtype="object")
+        if np.shape(thing) == np.shape(1): # numpy shape returns warning ragged nested sequences, unless dtype=obj 
             return thing # no dimension
         elif (hasattr(thing, "__iter__")):
+            
             if not hard:
                 return(thing.flatten()) # please be flat
             else:
