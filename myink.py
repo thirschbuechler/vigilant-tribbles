@@ -1502,36 +1502,47 @@ class myinkc(hoppy.hopper):
         return self.spinds(cols_def=mylist)
     
 
-    def spinds(self, cols_def=[1,1,3,1], nrows=1):
+    def spinds(self, cols_def=[1,1,3,1], rows_def=[1]):
         """ 
         make n column axes
-        - mylist: array of widths of columns
+        - cols_def: array of widths of columns
             - for each column, hava an element
             - the element defines its width
-        - nrows: rows of identical mylist formatting
+        - rows_def: analog to cols_def with heights
 
         (orig old spind_rechts: copied and mod from ecke) """
         
         # total graph slots, for gridspec basis
-        n=sum(cols_def)
+        ncols = sum(cols_def)
+        nrows = sum(rows_def)
         
         # generate plot, get gridspec
-        fig, axs_mx = plt.subplots(ncols=n, nrows=nrows)
+        fig, axs_mx = plt.subplots(ncols=ncols, nrows=nrows)
         if nrows==1:
             axs_mx = [axs_mx] # enable loop also for single line
         
         ax_out = []
-        for i,axs_row in enumerate(axs_mx):
-            # gridspec magic - make a big ax and some small ones
-            gs = axs_row[0].get_gridspec()
-            start = 0 # first loop start
-            for currentwidth in cols_def:
-                end = start + currentwidth
-                # remember new ax
-                ax_out.append(fig.add_subplot(gs[i,start:end])) # format [row-slice,column-slice]
-                start = end # set next loop start
+        # gridspec magic - fetch main pointer
+        gs = axs_mx[0][0].get_gridspec()
         
-            # after gridspec magic, remove old axs
+        # on top left of figure is 0,0
+        top = 0 # first height-loop offset
+        for height in rows_def:
+            # calc edges along z-axis
+            bot = top + height
+            
+            start = 0 # first width-loop offset
+            for width in cols_def:
+                # calc edges along x-axis
+                end = start + width
+                # remember new ax; gridspec format: [row-slice,column-slice]
+                ax_out.append(fig.add_subplot(gs[top:bot,start:end]))
+                start = end # set next width-loop offset
+        
+            top = bot # set next loop start
+
+        # after gridspec magic, remove old axs
+        for axs_row in axs_mx:    
             for ax in axs_row:
                 self.blank(ax) 
                 ax.remove()
@@ -1933,15 +1944,15 @@ def spind_tester():
     ele.spind_rechts(mainwidth=4,smallaxes=3)
     ele.suptitle("layout: huge and 3 small ones")
     
-    mylist = [1,1,3,1]
-    nrows = 1
-    ele.spinds(cols_def=mylist, nrows=nrows)
-    ele.suptitle(f"layout: {mylist}, {nrows=}")
+    cols_def = [1,1,3,1]
+    rows_def = [1]
+    ele.spinds(cols_def=cols_def, rows_def=rows_def)
+    ele.suptitle(f"layout: {cols_def}, {rows_def=}")
     
-    nrows = 2
-    mylist=[1,2,1]
-    ele.spinds(cols_def=mylist, nrows=nrows)
-    ele.suptitle(f"layout: {mylist}, {nrows=}")
+    rows_def = [1,1]
+    cols_def=[1,2,1]
+    ele.spinds(cols_def=cols_def, rows_def=rows_def)
+    ele.suptitle(f"layout: {cols_def}, {rows_def=}")
     for i in range(0,6):
         ele.scatter([1,2],[1,2])
         if i<5:
