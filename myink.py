@@ -1513,10 +1513,10 @@ class myinkc(hoppy.hopper):
         self.ax_i = 0
         """
         mylist=[mainwidth, *list(np.ones(smallaxes, dtype=np.int))]
-        return self.spinds(mylist=mylist)
+        return self.spinds(cols_def=mylist)
     
 
-    def spinds(self, mylist=[1,1,3,1], nrows=1):
+    def spinds(self, cols_def=[1,1,3,1], nrows=1):
         """ 
         make n column axes
         - mylist: array of widths of columns
@@ -1527,7 +1527,7 @@ class myinkc(hoppy.hopper):
         (orig old spind_rechts: copied and mod from ecke) """
         
         # total graph slots, for gridspec basis
-        n=sum(mylist)
+        n=sum(cols_def)
         
         # generate plot, get gridspec
         fig, axs_mx = plt.subplots(ncols=n, nrows=nrows)
@@ -1539,7 +1539,7 @@ class myinkc(hoppy.hopper):
             # gridspec magic - make a big ax and some small ones
             gs = axs_row[0].get_gridspec()
             start = 0 # first loop start
-            for currentwidth in (mylist):
+            for currentwidth in cols_def:
                 end = start + currentwidth
                 # remember new ax
                 ax_out.append(fig.add_subplot(gs[i,start:end])) # format [row-slice,column-slice]
@@ -1949,12 +1949,12 @@ def spind_tester():
     
     mylist = [1,1,3,1]
     nrows = 1
-    ele.spinds(mylist=mylist, nrows=nrows)
+    ele.spinds(cols_def=mylist, nrows=nrows)
     ele.suptitle(f"layout: {mylist}, {nrows=}")
     
     nrows = 2
     mylist=[1,2,1]
-    ele.spinds(mylist=mylist, nrows=nrows)
+    ele.spinds(cols_def=mylist, nrows=nrows)
     ele.suptitle(f"layout: {mylist}, {nrows=}")
     for i in range(0,6):
         ele.scatter([1,2],[1,2])
