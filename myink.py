@@ -1490,7 +1490,7 @@ class myinkc(hoppy.hopper):
         - mainwidth: biggest axis size
         - smallaxes: ammount of axes total
         (copied and mod from ecke) """
-        
+        """        
         # total graph slots, for gridspec basis
         n=mainwidth+smallaxes
 
@@ -1511,8 +1511,55 @@ class myinkc(hoppy.hopper):
         self.ax = axbig
         self.axs = axs
         self.ax_i = 0
+        """
+        mylist=[mainwidth, *list(np.ones(smallaxes, dtype=np.int))]
+        return self.spinds(mylist=mylist)
+    
 
-    def spinds(self, mylist=[1,1,3,1]):
+    def spinds(self, mylist=[1,1,3,1], nrows=1):
+        """ 
+        make n column axes
+        - mylist: array of widths of columns
+            - for each column, hava an element
+            - the element defines its width
+        - nrows: rows of identical mylist formatting
+
+        (orig old spind_rechts: copied and mod from ecke) """
+        
+        # total graph slots, for gridspec basis
+        n=sum(mylist)
+        
+        # generate plot, get gridspec
+        fig, axs_mx = plt.subplots(ncols=n, nrows=nrows)
+        if nrows==1:
+            axs_mx = [axs_mx] # enable loop also for single line
+        
+        ax_out = []
+        for i,axs_row in enumerate(axs_mx):
+            # gridspec magic - make a big ax and some small ones
+            gs = axs_row[0].get_gridspec()
+            start = 0 # first loop start
+            for currentwidth in (mylist):
+                end = start + currentwidth
+                # remember new ax
+                ax_out.append(fig.add_subplot(gs[i,start:end])) # format [row-slice,column-slice]
+                start = end # set next loop start
+        
+            # after gridspec magic, remove old axs
+            for ax in axs_row:
+                self.blank(ax) 
+                ax.remove()
+            
+        # put into np.array as expected via other fct
+        ax_out = np.array(ax_out)
+
+        # put axs inside self
+        self.ax = ax_out[0]
+        self.axs = ax_out
+        self.ax_i = 0
+    
+
+    def spinds_fail(self, mylist=[1,1,3,1], nrows=1):
         """ 
         make n column axes
         - mylist: array of widths of columns
@@ -1523,29 +1570,16 @@ class myinkc(hoppy.hopper):
         # total graph slots, for gridspec basis
         n=sum(mylist)
         
-        # generate plot, get gridspec
-        fig, axs = plt.subplots(ncols=n, nrows=1)
-        gs = axs[0].get_gridspec()
+        ax_out = []
+        fig = plt.figure()
+        [print((f"{nrows}{(n-ele)}{i+1}")) for i,ele in enumerate(mylist)]
+        [ax_out.append(fig.add_subplot(int(f"{nrows}{(n-ele)}{i+1}"))) for i,ele in enumerate(mylist)]
         
-        # hide and remove the original visible subplot axes
-        for ax in axs:
-            self.blank(ax) 
-            ax.remove()
-        
-        # gridspec magic - make a big ax and some small ones
-        axs=[]
-        start = 0 # first loop start
-        for currentwidth in (mylist):
-            end = start + currentwidth
-            axs.append(fig.add_subplot(gs[start:end]))
-            start = end # set next loop start
-        axs = np.array(axs)
-
-        # put axs inside self
-        self.ax = axs[0]
-        self.axs = axs
+        self.ax = ax_out[0]
+        self.axs = np.array(ax_out)
         self.ax_i = 0
-        
+
+
     def ecke(self, hidesmallframes=False): # inspired by mpl official doc
         """
         make a subplot with a corner in left bot, 5 plots around
@@ -1553,17 +1587,15 @@ class myinkc(hoppy.hopper):
         """
         fig, axs = plt.subplots(ncols=3, nrows=3)
         gs = axs[1, 2].get_gridspec()
+        
         # remove the underlying axes
         for axsi in axs[1:, :2]:
             for ax in axsi:
                 ax.remove()
 
-        # first dim: how much of y-axis: "0:" means everything starting from 0
-        # second dim: how much of x-axis: (starting right)
-        axbig = fig.add_subplot(gs[1:, :2]) 
-        #axbig.annotate('Big Axes \nGridSpec[1:, -1]', (0.1, 0.5),
-        #                xycoords='axes fraction', va='center')
-
+        # generate big one
+        axbig = fig.add_subplot(gs[1:, :2])  # format [row-slice,column-slice]
+        
         if hidesmallframes:
             for axsi in axs:
                 for ax in axsi:
@@ -1572,8 +1604,6 @@ class myinkc(hoppy.hopper):
         fig.tight_layout() # ensure square subplots
 
         # put axs inside
-        #self.axs = np.array([axbig, axs], dtype="object")
-        #self.axs = axbig, axs
         self.ax = axbig
         self.axs = axs
 
@@ -1912,8 +1942,24 @@ def spind_tester():
     ele=myinkc()
 
     ele.spind_rechts(mainwidth=2,smallaxes=2)
+    ele.suptitle("layout: big and 2 small ones")
+    
     ele.spind_rechts(mainwidth=4,smallaxes=3)
-    ele.spinds()
+    ele.suptitle("layout: huge and 3 small ones")
+    
+    mylist = [1,1,3,1]
+    nrows = 1
+    ele.spinds(mylist=mylist, nrows=nrows)
+    ele.suptitle(f"layout: {mylist}, {nrows=}")
+    
+    nrows = 2
+    mylist=[1,2,1]
+    ele.spinds(mylist=mylist, nrows=nrows)
+    ele.suptitle(f"layout: {mylist}, {nrows=}")
+    for i in range(0,6):
+        ele.scatter([1,2],[1,2])
+        if i<5:
+            ele.ax_onward()
 
     ele.show()
 
