@@ -269,11 +269,15 @@ def mx_diag_mirror(X):
     return X + X.T - np.diag(np.diag(X))
     
 
-def singledim_mod_testdata():
-    data = np.array([[1,2],[3,4]])
-    data = [data,data]
-    data = [data,data]
-    return data
+def singledim_mod_testdata(i):
+    if i==0:
+        data = np.array([[1,2],[3,4]])
+        data = [data,data]
+        data = [data,data]
+        return data
+
+    if i==1:
+        return [np.array([ 17,  14,  10,  47, 171,  44, 105,  91,  88,  14])]
 
 def singledim_mod(data):
     """ takes multidimensional array and flattens all but first one - useful for boxplot(), etc.
@@ -282,18 +286,41 @@ def singledim_mod(data):
         
         - I/O: np.array()
 
-    >>> np.shape(singledim_mod(singledim_mod_testdata()))
+    >>> np.shape(singledim_mod_testdata(0))
+    (2, 2, 2, 2)
+    >>> np.shape(singledim_mod(singledim_mod_testdata(0)))
     (2, 8)
+    >>> np.shape(singledim_mod_testdata(1))
+    (1, 10)
+    >>> np.shape(singledim_mod(singledim_mod_testdata(1)))
+    (1, 10)
+
     """
     #print(f"{np.shape(data)=}")
     args = []
     args = np.shape(data)
-    data = np.reshape(data, newshape=(args[0], np.prod(args[1:])))
+    data = np.reshape(data, newshape=(int(args[0]), int(np.prod(args[1:]))))
+    #if np.shape(data)[0] == 1:
+    #    data = data[0]
+    #if np.shape(data)[0] == 1:
+    #    raise Exception("singledim_mod failed - shape==1")
+    #print(np.shape(data))
     return data
 
 
 def roadkill(thing, hard=False):
-        """ flatten if possible - remove any dimensions and make a list """
+        """ flatten if possible - remove any dimensions and make a list 
+        
+        >>> np.shape(singledim_mod_testdata(0))
+        (2, 2, 2, 2)
+        >>> np.shape(roadkill(singledim_mod_testdata(0)))
+        (16,)
+        >>> np.shape(singledim_mod_testdata(1))
+        (1, 10)
+        >>> np.shape(roadkill(singledim_mod_testdata(1)))
+        (10,)
+        
+        """
         if not (type(thing) == type(np.array([1]))):
                 thing = np.array(thing, dtype="object")
         if np.shape(thing) == np.shape(1): # numpy shape returns warning ragged nested sequences, unless dtype=obj 

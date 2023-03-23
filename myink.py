@@ -1152,7 +1152,7 @@ class myinkc(hoppy.hopper):
         ax.set_xticks(np.arange(len(xlabels)))
         ax.set_xticklabels(xlabels, ha="right")#horizontal alignment
         self.rotate_xticks(45, autoscale=0)
-        plt.locator_params(axis='x', nbins=10)#, tight=True)
+        ax.locator_params(axis='x', nbins=10)#, tight=True)
         self.get_ax().minorticks_on()
 
 
@@ -1184,7 +1184,9 @@ class myinkc(hoppy.hopper):
         data = ml.singledim_mod(data) # only keep first dimension, ax.boxplot() dies otherwise
         statistics = []
         for item in data:
-            item = np.array(item).astype(np.float)
+            
+            #item = self.roadkill(item)
+            #item = np.array(item).astype(np.float64)
             # babysitted numpy nan* evals
             mins = ml.nanmin(item)
             maxes = ml.nanmax(item)
