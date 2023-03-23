@@ -1121,7 +1121,7 @@ class myinkc(hoppy.hopper):
         """
 
         # # data conditioning # # 
-        data = np.array(data)
+        data = np.array(data, dtype=object) # can be a ragged list instead of mxn matrix - suppress the warning
         statistics = []
         for item in data:
             item = np.array(item).astype(np.float)
@@ -1177,11 +1177,17 @@ class myinkc(hoppy.hopper):
         - nan_bad: NANs are bad?
             - True: missing datapoints (DEFAULT)
             - False: empty matrix elements (less to count, e.g. padding in some position_matrix)
+
+        # Troubleshooting #
+        - data = ml.singledim_mod(data)
+            - only keeps first dimension
+            - ax.boxplot() dies otherwise sometimes
+            - applied all the time, might result in a numpy-nanmean-nonzero error however
+
         """
 
         # # data conditioning # # 
-        data = np.array(data)
-        data = ml.singledim_mod(data) # only keep first dimension, ax.boxplot() dies otherwise
+        data = np.array(data, dtype=object) # can be a ragged list instead of mxn matrix - suppress the warning
         statistics = []
         for item in data:
             
