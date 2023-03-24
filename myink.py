@@ -1189,7 +1189,7 @@ class myinkc(hoppy.hopper):
         # # data conditioning # # 
         data = np.array(data, dtype=object) # can be a ragged list instead of mxn matrix - suppress the warning
         statistics = []
-        for item in data:
+        for i,item in enumerate(data):
             
             #item = self.roadkill(item)
             #item = np.array(item).astype(np.float64)
@@ -1200,28 +1200,26 @@ class myinkc(hoppy.hopper):
             std = np.std(item)
             statistics.append([mins, means, maxes, std])
 
+            # user offset if wished, per loop-item to be compatible w ragged-lists
+            if meanoffset:
+                off=means
+                ylabel+=", means subtracted"
+                data[i] = item-off # change loop base data after analysis
+
         # unpack
         mins, means, maxes, std  = np.array(statistics).astype("float").T
 
         # consider boxplots are plotted at x-offset of +1 for some reason:
         x=np.arange(len(data))+1
 
-        # user offset if wished
-        if meanoffset:
-            off=means
-            ylabel+=", means subtracted"
-        else:
-            off=np.zeros(len(data))
 
-        # offsetted data
-        o_data = data.T-off
-
+        data = data.T
         # # plotting # #        
         # flierprops == outlier-marker type
         #   - ","==pixel-marker
         flierprops = dict(marker=',', markerfacecolor='black', markersize=12, linestyle='none')
         ax = self.get_ax()
-        ax.boxplot(o_data, flierprops=flierprops, **kwargs)
+        ax.boxplot(data, flierprops=flierprops, **kwargs)
         self.scatter(x, means+std, marker="^", c=mc, label="mean+stdev") # triag up
         self.scatter(x, means, marker="s", c=mc, label="mean") # square
         self.scatter(x, means-std, marker="v", c=mc, label="mean-stdev") # triag down
@@ -1242,7 +1240,7 @@ class myinkc(hoppy.hopper):
         ax.set_xticks(np.arange(len(xlabels)))
         ax.set_xticklabels(xlabels, ha="right")#horizontal alignment
         self.rotate_xticks(45, autoscale=0)
-        plt.locator_params(axis='x', nbins=10)#, tight=True)
+        ax.locator_params(axis='x', nbins=10)#, tight=True)
         ax.minorticks_on()
         
         # # legend customization
