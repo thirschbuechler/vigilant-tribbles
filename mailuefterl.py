@@ -262,7 +262,72 @@ def sign_sym(var):
     # (numpy's sign returns +-1 number)
     else:
         return (f'{var:+g}')[0]
+
+
+def ragged_nan_to_val(rag, val, copy=True):
+    """
+    cycle over ragged list an replace nans with a value
+    - rag (input)
+    - value (to find)
+    - copy: output array new memory? (def: true)
+
+    returns modded rag
+
+    >>> ragged_nan_to_val(rag=np.array([[1,2,3], [0,np.nan]], dtype=object), val=0)
+    array([array([1, 2, 3]), array([0., 0.])], dtype=object)
+    >>> ragged_nan_to_val(rag=np.array([np.array([1,2,3]), np.array([0,np.nan])], dtype=object), val=0)
+    array([array([1, 2, 3]), array([0., 0.])], dtype=object)
+    """
+    if copy:
+        x = rag.copy()
+    else:
+        x=rag
+
+    # for symmetry for ragged_val_to_nan:
+    # convert potential lists to arrays,
+    # also fixes "TypeError: only integer scalar arrays can be converted to a scalar index"
+    x = np.array([np.array(xi) for xi in x], dtype=object)
+
+    for xi in x:
+        xi[np.isnan(xi)] = val
+
+    return x
+
+def ragged_val_to_nan(rag, val, copy=True, new_dtype=None):
+    """
+    cycle over ragged list and replace value with nans
+    - rag (input)
+    - value (to replace)
+    - copy: output array new memory? (def: true)
+    - new_dtype: choose np.float16/32/64, if issues
     
+    returns modded rag
+
+    >>> ragged_val_to_nan(rag=np.array([[1,2,3], [0,np.nan]], dtype=object), val=0, new_dtype=np.float16)
+    array([array([1., 2., 3.], dtype=float16),
+           array([nan, nan], dtype=float16)], dtype=object)
+    >>> ragged_val_to_nan(rag=np.array([np.array([1,2,3]), np.array([0,np.nan])], dtype=object), val=0, new_dtype=np.float16)
+    array([array([1., 2., 3.], dtype=float16),
+           array([nan, nan], dtype=float16)], dtype=object)
+
+    """
+    if copy:
+        x = rag.copy()
+    else:
+        x=rag
+
+    if new_dtype:
+        x = np.array([np.array(xi, dtype=new_dtype) for xi in x], dtype=object)
+    else:
+        # just convert potential lists to arrays
+        x = np.array([np.array(xi) for xi in x], dtype=object)
+
+    for xi in x:
+        xi[xi == val] = np.nan
+
+    return x
+
+
 def mx_diag_mirror(X):
     # https://stackoverflow.com/questions/16444930/copy-upper-triangle-to-lower-triangle-in-a-python-matrix/42209263
     X = np.triu(X) #remove NANs of lower triag, which were used to hide redundancy
