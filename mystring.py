@@ -34,6 +34,21 @@ def dict_to_str(mydict):
     return st
 
 
+def list_to_str(mydict):
+    """ turn dictionary into human readable string
+    
+    >>> dict_to_str({"a":10, "b":20})
+    'a: 10, b: 20'
+    >>> str({"a":10, "b":20})
+    "{'a': 10, 'b': 20}"
+    """
+    st = str(mydict)
+    st=removestringparts(["\"", "'", "[", "]"], [st])
+    st="".join(st)
+
+    return st
+
+
 def dictlist_intersection(mydictlist):
     """
     find common key-value pairs in a list of dictionaries
