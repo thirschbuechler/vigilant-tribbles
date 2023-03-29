@@ -11,6 +11,7 @@ Created on June 21, 2021
 @author: thirschbuechler
 """
 import re #sorting
+from matplotlib.ticker import EngFormatter # enginerd
 #import numpy as np # ndarray for list vecorization in split string index bla
 
 
@@ -180,6 +181,20 @@ def str_split_via_indices(s="",split_points=[]):
     #split_points = [0,*split_points, len(s)]
     # stackoverflow magic
     return([s[i: j] for i, j in zip(split_points, split_points[1:])])
+
+
+def enginerd(value, unit='', places=2, sep="\N{THIN SPACE}", **kwargs): #u2009 thinspace not nice in tex, also "G" in graph and Hz in label == unprofessional -_-
+    """ return engineer-nerd formatted string for a given float
+        optional:
+        - places : how many decimals (default = 2)
+        - unit (str t append)
+        - sep: separator (str, default Unicode-thin-space, non-ascii!)
+
+        # https://matplotlib.org/3.1.0/gallery/text_labels_and_annotations/engineering_formatter.html
+        
+        name is pun on engineer-nerd
+    """
+    return(EngFormatter(places=places, sep=sep, **kwargs).format_eng(value)+unit)
 
 
 ###################### testing #############################
