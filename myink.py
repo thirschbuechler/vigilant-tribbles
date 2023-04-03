@@ -1161,7 +1161,7 @@ class myinkc(hoppy.hopper):
 
 
     def boxplot(self, data=[], xlabels="", meanoffset=False, ylabel="", title="", mc = "green",
-                availability=False, nan_bad=True, **kwargs):
+                availability=False, nan_bad=True, annot=True, **kwargs):
         """
         boxplot
 
@@ -1171,6 +1171,7 @@ class myinkc(hoppy.hopper):
         - xlabels: data labels
         - ylabel
         - meanoffset
+        - annot: annotate ,ean, mean+-stdev?
         
         availability related:
         - availability: add availability [%] into xlabel?
@@ -1220,14 +1221,15 @@ class myinkc(hoppy.hopper):
         flierprops = dict(marker=',', markerfacecolor='black', markersize=12, linestyle='none')
         ax = self.get_ax()
         ax.boxplot(data, flierprops=flierprops, **kwargs)
-        self.scatter(x, means+std, marker="^", c=mc, label="mean+stdev") # triag up
-        self.scatter(x, means, marker="s", c=mc, label="mean") # square
-        self.scatter(x, means-std, marker="v", c=mc, label="mean-stdev") # triag down
+        if annot:
+            self.scatter(x, means+std, marker="^", c=mc, label="mean+stdev") # triag up
+            self.scatter(x, means, marker="s", c=mc, label="mean") # square
+            self.scatter(x, means-std, marker="v", c=mc, label="mean-stdev") # triag down
 
         if availability:
             if not xlabels:
-                xlabels=np.zeros(len(o_data.T))
-            for i, datacolumn in enumerate(o_data.T):
+                xlabels=np.zeros(len(data.T))
+            for i, datacolumn in enumerate(data.T):
                 avail_pc = ml.availability_frac(data=datacolumn, nan_bad=nan_bad)*100
                 xlabels[i] = f"{xlabels[i]}\n({avail_pc:.1f}%)"
 
