@@ -1124,7 +1124,7 @@ class myinkc(hoppy.hopper):
         data = np.array(data, dtype=object) # can be a ragged list instead of mxn matrix - suppress the warning
         statistics = []
         for item in data:
-            item = np.array(item).astype(np.float)
+            item = np.array(item).astype(np.float64)
             # babysitted numpy nan* evals
             mins = ml.nanmin(item)
             maxes = ml.nanmax(item)
@@ -1132,7 +1132,7 @@ class myinkc(hoppy.hopper):
             std = np.std(item)
             statistics.append([mins, means, maxes, std])
 
-        mins, means, maxes, std  = np.array(statistics).astype("float").T # unpack
+        mins, means, maxes, std  = np.array(statistics).astype(np.float64).T # unpack
         x=np.arange(len(data))
 
         if meanoffset:
@@ -1506,7 +1506,7 @@ class myinkc(hoppy.hopper):
         self.axs = axs
         self.ax_i = 0
         """
-        mylist=[mainwidth, *list(np.ones(smallaxes, dtype=np.int))]
+        mylist=[mainwidth, *list(np.ones(smallaxes, dtype=np.int8))]
         return self.spinds(cols_def=mylist)
     
 
@@ -2244,7 +2244,7 @@ def calibrate_corr_mx_label(ns = range(3,10)):
     for n in ns:
         #mx = np.random.random(size=(n,n))
         #folderlabels = ["" for i in range(0,n)]
-        folderlabels = np.arange(0,n, dtype=np.int)
+        folderlabels = np.arange(0,n, dtype=np.int8)
         vec = np.random.random(size=(n))
         mx = np.diag(vec)
         mx[mx==0] = np.nan
