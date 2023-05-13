@@ -118,7 +118,10 @@ def histo_weighter(**kwargs):
     ## eval logic
     # autorange
     if lk["autorange"]:
-        kwargs["range"] = (nanmin(x), nanmax(x))
+        myrange = (nanmin(x), nanmax(x))
+        if not np.any(myrange):
+            raise Exception(f"data autorange empty! - reported by ml.histogram.hosto_weighter.autorange\n{x=}")
+        kwargs["range"] = myrange
 
     # percent
     if lk["percent"]:
@@ -152,9 +155,12 @@ def histogram(**kwargs):
     """
 
     # process args, delete non-hist kwargs
-    kwargs = histo_weighter(**kwargs)
     x = kwargs["x"]
+    #if not np.any(x): # fail silent for now, not necessarily a problem
+    #    raise Exception("data empty! - reported by ml.histogram")
+    kwargs = histo_weighter(**kwargs)
     kwargs.pop("x")
+
 
     # numpy hist, forward hist kwargs
     n, bins = np.histogram(a=x,**kwargs)
