@@ -1236,7 +1236,7 @@ class myinkc(hoppy.hopper):
 
         # # xy_labelling
         ax.set_ylabel(ylabel)
-        if bool(list(xlabels)): # bool-list cast is alternative to a.any(), like np.size(yticks)>0:
+        if np.any(xlabels): # a.any() warning fix, for evaluating bool(list([1,2,3])) or bool(list([0,0,0])), bool(list([[],[],[]])) etc.
             xlabels = list(xlabels)
             xlabels.insert(0,0)#insert dummy at begin        
         ax.set_xticks(np.arange(len(xlabels)))
@@ -1439,7 +1439,7 @@ class myinkc(hoppy.hopper):
         mymin = np.nanmin
         mymax = np.nanmax
         
-        if np.size(yticks)>0: # bool(list(yticks)): # bool-list cast is alternative to a.any()
+        if np.size(yticks)>0: # np.size(yticks)): # bool-list cast is alternative to a.any()
             # app-specific auto-subsample example, add as route-through via inheritence and super()
             # subsample yticks from 151 to 16 if needed, overwrite orig arg
             #if len(yticks)>17 and (mx.shape[0]==16):
