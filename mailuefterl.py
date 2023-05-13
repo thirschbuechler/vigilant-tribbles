@@ -119,8 +119,8 @@ def histo_weighter(**kwargs):
     # autorange
     if lk["autorange"]:
         myrange = (nanmin(x), nanmax(x))
-        if not np.any(myrange):
-            raise Exception(f"data autorange empty! - reported by ml.histogram.hosto_weighter.autorange\n{x=}")
+        #if not np.any(myrange):
+        #    raise Exception(f"data autorange empty! - reported by ml.histogram.hosto_weighter.autorange\n{x=}")
         kwargs["range"] = myrange
 
     # percent
