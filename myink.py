@@ -1236,7 +1236,7 @@ class myinkc(hoppy.hopper):
 
         # # xy_labelling
         ax.set_ylabel(ylabel)
-        if np.any(xlabels): # a.any() warning fix, for evaluating bool(list([1,2,3])) or bool(list([0,0,0])), bool(list([[],[],[]])) etc.
+        if np.any(np.array(xlabels, dtype=object)): # a.any() warning fix, for evaluating bool(list([1,2,3])) or bool(list([0,0,0])), bool(list([[],[],[]])) etc.
             xlabels = list(xlabels)
             xlabels.insert(0,0)#insert dummy at begin        
         ax.set_xticks(np.arange(len(xlabels)))
