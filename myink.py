@@ -950,6 +950,13 @@ class myinkc(hoppy.hopper):
 
     def ylabel(self, label=""):
         self.get_ax().set_ylabel(label)
+
+    def sudo_xlabels(self, labels=[], x=""):
+        ax = self.get_ax()
+        if not x:
+            x = np.arange(0,len(labels))
+        ax.set_xticks(x)
+        ax.set_xticklabels(labels)
         
     def common_ax_labels(self,xlabel="",ylabel=""):
         """ add a big axis, hide frame """
