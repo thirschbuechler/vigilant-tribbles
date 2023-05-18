@@ -31,6 +31,7 @@ except:
     except:
         print("failed to import module directly or via submodule -  mind adding them with underscores not operators (minuses aka dashes, etc.)")
 
+modulepath = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 #from matplotlib.patches import Arc, Circle
 
@@ -709,6 +710,17 @@ class myinkc(hoppy.hopper):
     #def xkcd_ify(self, fct=plt.plot, *args, **kwargs):
     #    with plt.xkcd():
     #       fct(*args, **kwargs)
+
+
+    def bug(self,title="bug"):
+        self.subplots()
+        with hoppy.hopper(modulepath):
+            if os.path.exists("myfigures/stinkbug.webp"):
+                from PIL import Image
+                # using PIL
+                self.imshow(Image.open("myfigures/stinkbug.webp"))
+        self.blank()
+        self.title(title)
 
 
     def markernum(self, num):
@@ -1753,25 +1765,27 @@ class myinkc(hoppy.hopper):
 def tester():
     """module test, superseeds ifdef-main (since used here for import shenanigans)"""
 
-    if not os.path.exists("myfigures/stinkbug.webp"):
-        raise Exception("for selftest of myinkc, please go (cd) to vigilant_tribbles and run \"python myink.py\" there")
+    with hoppy.hopper(modulepath):
+        if not os.path.exists("myfigures/stinkbug.webp"):
+            raise Exception("for selftest of myinkc, please go (cd) to vigilant_tribbles and run \"python myink.py\" there")
 
-    oldtest()
-    test_fontsize()
-    tickrot()
-    stemmy()
-    weigh_scatter()
-    ecke_tester()
-    spind_tester()
-    test_make_im_gif()
-    mycanvassize_test()
-    myinkc().mycanvassize(medfig=True) # reset afterwards via one-time-use myinkc element
-    test_waterfall()
-    histo_test()
-    doublebarrel_barberpole()
-    statistics_visu()
-    boxplottest()
-    calibrate_corr_mx_label()
+        oldtest()
+        test_fontsize()
+        tickrot()
+        stemmy()
+        weigh_scatter()
+        ecke_tester()
+        spind_tester()
+        test_make_im_gif()
+        mycanvassize_test()
+        myinkc().mycanvassize(medfig=True) # reset afterwards via one-time-use myinkc element
+        test_waterfall()
+        histo_test()
+        doublebarrel_barberpole()
+        statistics_visu()
+        boxplottest()
+        calibrate_corr_mx_label()
+        myinkc().bug()
 
 
 def oldtest():    
