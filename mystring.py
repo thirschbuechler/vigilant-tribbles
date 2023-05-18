@@ -54,11 +54,19 @@ def dictlist_intersection(mydictlist):
     """
     find common key-value pairs in a list of dictionaries
     (as "dict1 & dict2" doesn't work)
+    
+    doesn't like if more than 1 sub-dict has a list!
 
     dccsillag: https://stackoverflow.com/questions/18554012/intersecting-two-dictionaries
 
     >>> dictlist_intersection([{"a":3, "b":4, "d":0},{"a":1, "c":4, "d":0},{"d":0, "a":4, "x":0}])
     {'d': 0}
+    >>> dictlist_intersection([{"a":3, "b":4, "nestedlist":[1,2,3,"aa"]},{"a":1, "c":4, "d":0},{"d":0, "a":4, "x":0}])
+    {}
+    #>>> dictlist_intersection([{"a":3, "b":4, "nestedlist":[1,2,3,"aa"]},{"a":1, "c":4, "nestedlist":[1,2,3,"aa"]}])
+    #   TypeError: unhashable type: 'list
+
+
     """
     if not (type(mydictlist[0]) == dict):
         raise Exception("not a dict as list element")
