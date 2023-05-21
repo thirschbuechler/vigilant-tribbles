@@ -4,6 +4,10 @@ import numpy as np
 import warnings # numpy nanzero zeroslice stuff
 
 
+def dummy(*args,**kwargs):
+    pass # NOP - do nothing
+
+
 def sample_var(*args, **kwargs):
     """ sample variance
         "provides an unbiased estimator of the variance of a hypothetical infinite population"
@@ -173,6 +177,11 @@ def histogram(**kwargs):
     default parameter in matplotlib.hist is "x"
         mpl hist works with weights as expected
     """
+
+
+def is_odd(num):
+    return num & 0x1
+
 
 #https://www.appsloveworld.com/numpy/100/89/in-numpy-how-to-detect-whether-an-argument-is-a-ragged-nested-sequences
 def is_scalar(a):
