@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-# %%
+
 """
 Mystring - collection of random helper functions, mostly string related
 
@@ -268,4 +268,4 @@ def integritycheck():
 #-#-# module test #-#-#
 if __name__ == '__main__': # test if called as executable, not as library            
     integritycheck()
-# %%
+

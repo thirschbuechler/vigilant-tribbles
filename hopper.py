@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-# %%
+
 """
 hopper - traverse folders and ease file operations
 
@@ -216,4 +216,4 @@ if testing:#call if selected, after defined, explanation see above
     print("\nnow, without extensions:")
     print(ms.removestringparts([".jpg",".png"],a.images ))
 
-# %%
+
