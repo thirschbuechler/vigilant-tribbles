@@ -20,6 +20,56 @@ def dummy(*args, **kwargs):
     pass
 
 
+def find_all(query, string):
+    """ get all occourences of substring in strin"""
+    return [m.start() for m in re.finditer(query, string)]
+
+
+def str_to_blocktext(input, in_sep, out_sep=" ", maxlen=5):
+    """ turns string separated by delimiters into newline-separated str of max(maxlen;maxlen_line)
+    out_sep != in_sep
+    
+    >>> str_to_blocktext("this, is, very, long, this, is, even, longer, so, to, speak", in_sep=", ", maxlen=10)
+    'this is very\\nlong this\\nis even\\nlonger\\nso to speak\\n\\n'
+    """
+    items = input.split(in_sep)
+
+    if out_sep == in_sep:
+        raise Exception(f"str_to_blocktext won't work for {out_sep=}=={in_sep=}")
+
+    lines = []
+    i=0
+
+    def fetch_if_possible(i, items):
+        if i <= len(items)-1:
+            o = items[i]
+            #items.pop(i)
+            return o
+        else:
+            return ""
+
+    while len(items)>0:
+        line = ""
+        item = []
+        while len(line)+len(item)<maxlen:
+            item = fetch_if_possible(i, items)
+            if line:
+                line = f"{line}{out_sep}{item}"
+            else: # omit sep for first
+                line = f"{line}{item}"
+            if item=="":
+                break
+            i+=1
+        # then, terminate
+        line+="\n"
+        #i+=1
+        lines.append(line)
+        if item=="":
+            break
+
+    return "".join(lines)
+
+
 def dict_to_str(mydict):
     """ turn dictionary into human readable string
     
@@ -63,10 +113,9 @@ def dictlist_intersection(mydictlist):
     {'d': 0}
     >>> dictlist_intersection([{"a":3, "b":4, "nestedlist":[1,2,3,"aa"]},{"a":1, "c":4, "d":0},{"d":0, "a":4, "x":0}])
     {}
+
     #>>> dictlist_intersection([{"a":3, "b":4, "nestedlist":[1,2,3,"aa"]},{"a":1, "c":4, "nestedlist":[1,2,3,"aa"]}])
     #   TypeError: unhashable type: 'list
-
-
     """
     if not (type(mydictlist[0]) == dict):
         raise Exception("not a dict as list element")
