@@ -201,6 +201,45 @@ class hopper(portal):
         myprint("classified {}/{} files".format(counter-len(otherfiles),counter))
 
 
+    def get_bins(self,folder,fext="", **kwargs):
+        """ get [bins,keys] of fext in a folder
+            - bins: dict, bins
+                eg all run1_i.bin files, for any i
+            - keys: to access dict of runs
+                eg run0..run99
+            - other kwargs: ignored
+        """
+
+        # get files
+        files = self.humanlist_fext(folder,fext)
+
+        # find all sets
+        bins = ms.groupByPrefix(files)
+        keys = [key for key in bins.keys()]
+
+        return bins,keys
+
+
+    def human_bin_list(self, bins="",keys="", **kwargs):
+        """ print keys n bins nicely 
+            - folder
+            - sparams
+            - myprint - optional
+            - bins, keys - optional
+        """
+        if (bins=="" and keys==""):
+            # fetch
+            bins,keys = self.get_bins(**kwargs)
+        elif (bins=="" or keys==""):
+            raise Exception("either provide no bins, keys (fetch them via folder) or both")
+        else:
+            # bins and keys are given values
+            pass
+        
+        txt = [("{}: {}".format(key,len(bins[key]))) for key in keys]
+        return(txt)
+    
+    
 #-#-# module test #-#-#
 if testing:#call if selected, after defined, explanation see above
     integritycheck() #doctest   
