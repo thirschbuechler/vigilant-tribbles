@@ -1747,7 +1747,7 @@ class myinkc(hoppy.hopper):
 
 
     def reset_coordsys(self):
-        """ CLEAN UP PREV PLOT RANDOM SPACING
+        """ reset coord sys to absolute - eg clean up previous plot random spacing
             - e.g. histos have 0,0 on lower left and not 0,0 on upper right per def --> call before and after annotating it w plot 
 
             NOTE: DANGER - MIGHT KILL x,y ticks
@@ -1757,13 +1757,6 @@ class myinkc(hoppy.hopper):
         self.twiny()
         self.hidexy() # hide xy labels etc
 
-    def G53(self):
-        """ reset coord sys to absolute
-            - forwarder to reset_coordsys
-
-            NOTE: DANGER - MIGHT KILL x,y ticks
-            """
-        self.reset_coordsys()
 
     #</myinkc> - if an indent level is wrong fcts afterwards not defined!
 
