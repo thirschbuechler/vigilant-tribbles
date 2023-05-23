@@ -201,7 +201,7 @@ class hopper(portal):
         myprint("classified {}/{} files".format(counter-len(otherfiles),counter))
 
 
-    def get_bins(self,folder,fext="", **kwargs):
+    def get_bins(self, folder, fext=""):
         """ get [bins,keys] of fext in a folder
             - bins: dict, bins
                 eg all run1_i.bin files, for any i
