@@ -172,7 +172,7 @@ def fruittester():
 def integritycheck():
     """ better call doctest """
     import doctest
-    print("performing doctest test..")
+    print(f"doctest called in ({__file__})")
     res=doctest.testmod() # process doctest methods
     print(res)
     print("attempted==succeeded, if no fails\n")
