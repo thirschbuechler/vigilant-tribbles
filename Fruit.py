@@ -42,7 +42,8 @@ class Fruit(object):
 
         # every Fruit has metadata
         self.metadata = metadata
-        # if not root node, then it has props
+        # include root meta
+        self.get_meta()
         
         #self.__dict__["data"] = data
         self.data = data
@@ -92,8 +93,9 @@ class Fruit(object):
 
     def get_meta(self):
         """ get root's metadata and update with own """
-        if self.root.metadata:
-            meta = self.root.metadata
+        if self.root:
+            if self.root.metadata:
+                meta = self.root.metadata
         else:
             meta = {}
         meta.update(self.metadata)
