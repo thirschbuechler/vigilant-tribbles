@@ -30,12 +30,12 @@ Created 230523
 """
 class Fruit(object):
     #__metaclass__ = GetAttr
-    def __init__(self, ID=None, stem=None, 
-                    data=[], data_x=[], metadata={}
-                        ):
-        #super().__init__(**kwargs) # (*args, **kwargs) # superclass inits
+    def __init__(self, ID=None, root=None, 
+                    data=[], data_x=[], metadata={},
+                    **kwargs):
+        super().__init__(**kwargs) # (*args, **kwargs) # superclass inits
         
-        self.stem = stem # root obj
+        self.root = root # root obj
         self.ID = ID # name of this container
 
         self.fruits = {} # dict of ID:obj of sub-objects
@@ -72,7 +72,7 @@ class Fruit(object):
 
     def sprout(self, *args, **kwargs):
         """make a fruit on this object,
-            be it a tree (no parent stem),
+            be it a tree (no parent root),
             or another fruit
             """
         if "ID" in kwargs:
@@ -82,8 +82,8 @@ class Fruit(object):
         else:
             raise Exception("need ID for new Fruit")
         
-        # insert self as root stem
-        kwargs["stem"] = self
+        # insert self as root
+        kwargs["root"] = self
         # put it into fruits-dict
         self.fruits.update({ID:Fruit(*args, **kwargs)})
         # also make it an attribute
@@ -91,9 +91,9 @@ class Fruit(object):
 
 
     def get_meta(self):
-        """ get root's (stem) metadata and update with own """
-        if self.stem.metadata:
-            meta = self.stem.metadata
+        """ get root's metadata and update with own """
+        if self.root.metadata:
+            meta = self.root.metadata
         else:
             meta = {}
         meta.update(self.metadata)

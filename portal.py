@@ -4,24 +4,36 @@
 
 # ToDo - import hoppy functions and make hoppy inherit hopper
 
-import os
+import sys, os
+
+# tmp import hack to import modules if in parent directory
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+from vigilant_tribbles import Fruit
+
+# undo tmp import hack
+sys.path.pop(len(sys.path)-1)
+
 
 
 def dummy(*args, **kwargs):
     pass
 
-# portal is auto child of object in py3, see https://stackoverflow.com/questions/4015417/why-do-python-classes-inherit-object
-class portal():
+# here: child of Fruit.Fruit for data collection purposes,
+# class portal(object) etc. will work as well
+class portal(Fruit.Fruit):
     """ - enter a subfolder
         - cleanup afterwards
         - no hopping
         """
 
-    def __init__(self, folder="", myprint=dummy):
+    def __init__(self, folder="", myprint=dummy, **kwargs):
         self.myprint = myprint
         self.__enterdir=self.getpath() # needed for cleanup!
         #self.cd(self.__enterdir) # for some reason, a cd of a sub-loop with a portal would fail (it assumes start from scriptdir) - nope was different rooted obj i think
         self.folder = folder
+
+        super().__init__(**kwargs) # (*args, **kwargs) # superclass inits
 
 
     def __del__(self):
