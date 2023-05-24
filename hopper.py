@@ -220,6 +220,24 @@ class hopper(portal):
         return bins,keys
 
 
+    def humanlist_fext(self,folder,fext="s2p"):
+        """ find all s1p,s2p or csv files in folder"""
+        
+        with portal(folder):
+            # find stuff and classify it
+            self.listfiles(myprint=ms.dummy)
+            
+            # select which found classifier to use
+            if fext=="s2p" or fext=="s1p" or fext==[]:
+                files=ms.sort_human(self.touchstone)    
+            elif fext=="csv":
+                files=ms.sort_human(self.csv)  
+            else:
+                raise Exception("humanlist - no valid fext selected")
+            
+            return files
+        
+        
     def human_bin_list(self, bins="",keys="", **kwargs):
         """ print keys n bins nicely 
             - folder
