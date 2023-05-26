@@ -110,9 +110,11 @@ class Fruit(object):
         self.__dict__.update(dict)
 
     def sprout(self, *args, **kwargs):
-        """make a fruit on this object,
+        """ spawn a fruit onto this object,
             be it a tree (no parent root),
             or another fruit
+
+            also return new obj, for convenience
             """
         if "ID" in kwargs:
             ID = kwargs["ID"]
@@ -124,9 +126,26 @@ class Fruit(object):
         # insert self as root
         kwargs["root"] = self
         # put it into fruits-dict
-        self.fruits.update({ID:Fruit(*args, **kwargs)})
+        new = Fruit(*args, **kwargs)
+        self.fruits.update({ID:new})
         # also make it an attribute
         self.__dict__.update(self.fruits)
+
+        return new
+
+
+    def slicer(self, slice=None):
+        """ sprout a slice of data, datax of slice,
+            FruitID = str(slice)
+
+            also return obj, for convenience
+            """
+        if slice:
+            data = self.data[slice[0]:slice[1]]
+            data_x = self.data_x[slice[0]:slice[1]]
+            return self.sprout(str(slice), data=data, data_x=data_x)
+        else:
+            return self
 
 
     def get_meta(self):
@@ -134,6 +153,8 @@ class Fruit(object):
         if self.root:
             if self.root.metadata:
                 meta = self.root.metadata
+            else:
+                meta = {}
         else:
             meta = {}
         meta.update(self.metadata)
@@ -198,12 +219,13 @@ def addLoggingLevel(levelName, levelNum, methodName=None):
 
 def fruittester():
     """
+    note: py3.10.6 has blankline-html tags and indented list-plotting
     >>> fruittester()
     Apple
     Apple
-
+    <BLANKLINE>
     iterate!
-
+    <BLANKLINE>
     Apple
     Apple
     [0 1 2 3 4 5 6 7 8 9]
@@ -213,23 +235,23 @@ def fruittester():
     Banana
     Banana
     [ 1.00000000e+00  9.80785280e-01  9.23879533e-01  8.31469612e-01
-    7.07106781e-01  5.55570233e-01  3.82683432e-01  1.95090322e-01
-    6.12323400e-17 -1.95090322e-01 -3.82683432e-01 -5.55570233e-01
-    -7.07106781e-01 -8.31469612e-01 -9.23879533e-01 -9.80785280e-01
-    -1.00000000e+00 -9.80785280e-01 -9.23879533e-01 -8.31469612e-01
-    -7.07106781e-01 -5.55570233e-01 -3.82683432e-01 -1.95090322e-01
-    -1.83697020e-16  1.95090322e-01  3.82683432e-01  5.55570233e-01
-    7.07106781e-01  8.31469612e-01  9.23879533e-01  9.80785280e-01]
+      7.07106781e-01  5.55570233e-01  3.82683432e-01  1.95090322e-01
+      6.12323400e-17 -1.95090322e-01 -3.82683432e-01 -5.55570233e-01
+     -7.07106781e-01 -8.31469612e-01 -9.23879533e-01 -9.80785280e-01
+     -1.00000000e+00 -9.80785280e-01 -9.23879533e-01 -8.31469612e-01
+     -7.07106781e-01 -5.55570233e-01 -3.82683432e-01 -1.95090322e-01
+     -1.83697020e-16  1.95090322e-01  3.82683432e-01  5.55570233e-01
+      7.07106781e-01  8.31469612e-01  9.23879533e-01  9.80785280e-01]
     {'color': 'green', 'origin': "Joe's"}
     Banana
     [ 1.00000000e+00  9.80785280e-01  9.23879533e-01  8.31469612e-01
-    7.07106781e-01  5.55570233e-01  3.82683432e-01  1.95090322e-01
-    6.12323400e-17 -1.95090322e-01 -3.82683432e-01 -5.55570233e-01
-    -7.07106781e-01 -8.31469612e-01 -9.23879533e-01 -9.80785280e-01
-    -1.00000000e+00 -9.80785280e-01 -9.23879533e-01 -8.31469612e-01
-    -7.07106781e-01 -5.55570233e-01 -3.82683432e-01 -1.95090322e-01
-    -1.83697020e-16  1.95090322e-01  3.82683432e-01  5.55570233e-01
-    7.07106781e-01  8.31469612e-01  9.23879533e-01  9.80785280e-01]
+      7.07106781e-01  5.55570233e-01  3.82683432e-01  1.95090322e-01
+      6.12323400e-17 -1.95090322e-01 -3.82683432e-01 -5.55570233e-01
+     -7.07106781e-01 -8.31469612e-01 -9.23879533e-01 -9.80785280e-01
+     -1.00000000e+00 -9.80785280e-01 -9.23879533e-01 -8.31469612e-01
+     -7.07106781e-01 -5.55570233e-01 -3.82683432e-01 -1.95090322e-01
+     -1.83697020e-16  1.95090322e-01  3.82683432e-01  5.55570233e-01
+      7.07106781e-01  8.31469612e-01  9.23879533e-01  9.80785280e-01]
     
     """
     # # setup 
@@ -263,6 +285,16 @@ def fruittester():
         print(item.data)
         
 
+def slice_test():
+    """
+    >>> slice_test()
+    [3, 4]
+    [8, 9]
+    """
+    root = Fruit("rottenapple", metadata={"color":"black", "origin": "Joe's"}, data_x=[1,2,3,4,5], data=[6,7,8,9,10])
+    slice = [2,4]
+    print(root.slicer(slice=slice).data_x)
+    print(root[str(slice)].data)
 
 def integritycheck():
     """ better call doctest """
@@ -275,5 +307,6 @@ def integritycheck():
 
 #-#-# module test #-#-#
 if __name__ == '__main__': # test if called as executable, not as library
-    fruittester()
-    #integritycheck()
+    #fruittester()
+    slice_test()
+    integritycheck()
