@@ -28,12 +28,25 @@ Created 230523
 
 @author: thirschbuechler
 """
+
+import sys, os
+import numpy as np
 import logging
+
+# tmp import hack to import modules if in parent directory
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+from vigilant_tribbles.mailuefterl import bin_to_xaxis
+
+# undo tmp import hack
+sys.path.pop(len(sys.path)-1)
+
+
 
 class Fruit(object):
     #__metaclass__ = GetAttr
     def __init__(self, ID=None, root=None, 
-                    data=[], data_x=[], metadata={},
+                    data=[], data_x=[], bins=[], metadata={},
                     **kwargs):
         
         super().__init__(**kwargs) # (*args, **kwargs) # superclass inits
@@ -82,9 +95,17 @@ class Fruit(object):
         # include root meta
         self.get_meta()
         
-        #self.__dict__["data"] = data
+        # direct assignment attrs
         self.data = data
-        self.data_x = data_x
+        self.bins = bins
+        # direct or indirect assignment
+        if np.any(data_x):
+            self.data_x = data_x
+        elif np.any(bins):
+            self.data_x = bin_to_xaxis(bins)
+        else:
+            self.data_x = [] # eg only contains data=mx
+        # endif, end __init__
         
 
     def __getitem__(self, obj): # Attribute handler
