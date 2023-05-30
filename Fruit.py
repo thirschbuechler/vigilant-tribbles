@@ -125,8 +125,11 @@ class Fruit(object):
         
         # insert self as root
         kwargs["root"] = self
-        # put it into fruits-dict
+        # make fruit
         new = Fruit(*args, **kwargs)
+        # auto inherit all metadata
+        new.metadata = new.get_meta()
+        # put into meta-dict
         self.fruits.update({ID:new})
         # also make it an attribute
         self.__dict__.update(self.fruits)
@@ -293,8 +296,13 @@ def slice_test():
     """
     root = Fruit("rottenapple", metadata={"color":"black", "origin": "Joe's"}, data_x=[1,2,3,4,5], data=[6,7,8,9,10])
     slice = [2,4]
-    print(root.slicer(slice=slice).data_x)
+    
+    ele = root.slicer(slice=slice)
+    # access directly or via dict of main
+    print(ele.data_x)
     print(root[str(slice)].data)
+    # check meta
+    print(ele.metadata)
 
 def integritycheck():
     """ better call doctest """
