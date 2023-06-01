@@ -168,7 +168,8 @@ class myinkc(hoppy.hopper):
         # save #
         if self.outputformat=="tikz":
             fn = "{}_{}.tex".format(fn, self.subplot_counter)
-            import tikzplotlib
+            # pyright, pylance: ignore import error on module not present
+            import tikzplotlib # type: ignore
             tikzplotlib.save(fn)
             print("tikz saved {} in {}".format(fn, self.getpath() ) )
             #self.subplot_counter+=1 # nope subplots does tha
@@ -885,10 +886,13 @@ class myinkc(hoppy.hopper):
             # matplotlib imshow params, if needed
             # https://matplotlib.org/api/_as_gen/matplotlib.pyplot.imshow.html
             if engine=="PIL":
-                from PIL import Image # pillow library --> MOVED DOWN TO IMPORT SWITCH
+                # pillow library --> MOVED DOWN TO IMPORT SWITCH
+                from PIL import Image
                 ax.imshow(Image.open(img)) # no rotation, theoretically slower
             elif engine=="cv":
-                import cv2 # python-opencv library - linux:pip install opencv-python --> MOVED DOWN TO IMPORT SWITCH
+                # python-opencv library - linux:pip install opencv-python --> MOVED DOWN TO IMPORT SWITCH
+                # pyright, pylance: ignore import error on module not present
+                import cv2 # type: ignore
                 ax.imshow(cv2.cvtColor(cv2.imread(img), cv2.COLOR_BGR2RGB)) # auto-rotation, slower on older machine i think
             else:
                 print("programmer you fucked up imshow")
