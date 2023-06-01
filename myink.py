@@ -1158,6 +1158,20 @@ class myinkc(hoppy.hopper):
         plt.tight_layout()
 
 
+    # https://matplotlib.org/stable/gallery/lines_bars_and_markers/bar_stacked.html
+    def barstacked(self, datadict={}, xlabels=[], barwidth=0.5, colorwheel=None, **kwargs):
+        """ generate stacked bars, so no datapoints hide each other
+            - colorwheel such as gradientplot()"""
+        ax = self.get_ax()
+        #bottom = np.zeros(len(weight_counts.values()[0])) # how long is one dataset
+        bottom = np.zeros(len(xlabels)) # how long is one dataset
+        for i, (rowlabel, datarow) in enumerate(datadict.items()):
+            if colorwheel:
+                kwargs["color"]=colorwheel(i)
+            ax.bar(xlabels, datarow, barwidth, label=rowlabel, bottom=bottom, **kwargs)
+            bottom += datarow
+
+
     def stickplot(self, data, xlabels="", meanoffset=False, ylabel="", title=""):
         """
         boxplot-similar stickplot but mean, stdev, extrema are plotted only
@@ -2322,13 +2336,21 @@ def gradientmaster_test():
     pe.show()
 
 
+def barstacked_test():
+    pe = myinkc()
+    pe.barstacked(datadict={"row0":[2,3], "row1":[1,3], "top": [1,2]}, xlabels=["tower small", "tower big"])
+    pe.legend()
+    pe.show()
+
+
 #-#-# module test #-#-#
 if testing:#call if selected, after defined, explanation see above
     #tester() # better - call myink_demos.ipynb
     #legend_scrollbar_test()
     #narrow_colorbar_test()
     #spind_tester()
-    gradientmaster_test()
+    #gradientmaster_test()
+    barstacked_test()
     #test_waterfall()
     #histo_test()
     #doublebarrel_barberpole()
