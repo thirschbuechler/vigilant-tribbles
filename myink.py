@@ -62,6 +62,32 @@ else:
 
     #testing=False
 
+class gradientmaster(object):
+
+    def __init__(self, datalen = None, cmap = plt.cm.turbo, gradientplot=True, monocolor=False):
+        #n = len(datas)
+        if not datalen:
+            raise Exception("gradientmaster needs datalen!")
+
+        if gradientplot:
+            import matplotlib.pyplot as plt
+            # 0.1-0.9 to avoid dark brown/black edges with look the same
+            colors = cmap(np.linspace(0.1,0.9,datalen)) 
+        elif monocolor:
+            colors =  ["black" for i in range(0,datalen)]
+        else:
+            #colors = None
+            colors = []
+            pass
+
+        self.colors = (colors)
+
+    def cycle(self, i):
+        if len(self.colors):
+            return self.colors[i]
+        else:
+            return None
+
 
 ## thing to make matplotlib access easier ###
 class myinkc(hoppy.hopper): 
@@ -1786,6 +1812,8 @@ def tester():
         boxplottest()
         calibrate_corr_mx_label()
         myinkc().bug()
+        gradientmaster_test()
+
 
 
 def oldtest():    
@@ -2278,12 +2306,29 @@ def get_maximum_gui_plot_figsize():
     print(fig.get_size_inches())
 
 
+def gradientmaster_test():
+    # testdata
+    datas = [i+np.arange(0,10) for i in range(0,20)]
+    x = np.arange(0,10)
+    # g obj
+    g = gradientmaster(len(datas))
+    # plot ele
+    pe = myinkc()
+    i=0
+    for item in datas: 
+        pe.plot(x, item, color=g.cycle(i), label=i)
+        i+=1
+    pe.legend()
+    pe.show()
+
+
 #-#-# module test #-#-#
 if testing:#call if selected, after defined, explanation see above
     #tester() # better - call myink_demos.ipynb
     #legend_scrollbar_test()
     #narrow_colorbar_test()
-    spind_tester()
+    #spind_tester()
+    gradientmaster_test()
     #test_waterfall()
     #histo_test()
     #doublebarrel_barberpole()
