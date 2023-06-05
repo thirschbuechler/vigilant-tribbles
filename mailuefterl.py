@@ -23,14 +23,45 @@ def sample_var(*args, **kwargs):
     return np.nanvar(*args, **kwargs)
 
 
-def bin_to_xaxis(bins):
+def bin_to_xaxis(bin_edges):
     """
-    takes a histo bin array and returns the corresponding x-axis
+    takes a histo bin_edges array and returns the corresponding x-axis (bin_centers)
+    
     >>> bin_to_xaxis([0,1,2])
     [0.5, 1.5]
+    
+    >>> bin_to_xaxis([0,1,2,3,4])
+    [0.5, 1.5, 2.5, 3.5]
     """
-    xaxis = [bins[i]+(bins[i+1]-bins[i])/2 for i in range(0,len(bins)-1)]
-    return xaxis
+    bin_centers = [bin_edges[i]+(bin_edges[i+1]-bin_edges[i])/2 for i in range(0,len(bin_edges)-1)]
+    return bin_centers
+
+
+def xaxis_to_bins(xaxis):
+    """ turn a x-axis into bins, inversion of bins_to_xaxis
+    
+    >>> xaxis_to_bins(bin_to_xaxis([0,1,2,3,4]))
+    [0.0, 1.0, 2.0, 3.0, 4.0]
+    
+    >>> xaxis_to_bins(bin_to_xaxis([0,1,2]))
+    [0.0, 1.0, 2.0]
+    """
+    # calc edges
+    left_edges = [xaxis[i]-(xaxis[i+1]-xaxis[i])/2 for i in range(0,len(xaxis)-1)]
+    right_edges = [xaxis[i+1]+(xaxis[i+1]-xaxis[i])/2 for i in range(0,len(xaxis)-1)]
+
+    # add almost rightest edge to results
+    if len(xaxis) > 2:
+        # general case
+        left_edges.append(right_edges[-2])
+    else:
+        # special case
+        left_edges.append(xaxis[0]+(xaxis[1]-xaxis[0])/2)
+    
+    # general - add rightest edge to results
+    left_edges.append(right_edges[-1])
+    # return results
+    return left_edges
 
 
 def count_non_nan(data):
