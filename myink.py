@@ -134,6 +134,11 @@ class myinkc(hoppy.hopper):
                 self.canvas_params(fontsize=fontsizes[key],figsize=figsizes[key])
                 kwargs.pop(key)
 
+        # sometimes canvassize is only closed after plotting once,
+        # so open and close a sacraficial dummy plot
+        self.plot()
+        self.close()
+
         return kwargs
 
 
