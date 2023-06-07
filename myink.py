@@ -1022,8 +1022,9 @@ class myinkc(hoppy.hopper):
         self.enginerd_xaxis(**kwargs)
         if grid:
             #ax.grid("on")
-            ax.grid(b=True, which='major', color='grey', linestyle='-', alpha=0.5)
-            ax.grid(b=True, which='minor', color='grey', linestyle=':', alpha=0.5)
+            # kw b=True got renamed to visible=True, since mpl3.7 depreciated
+            ax.grid(visible=True, which='major', color='grey', linestyle='-', alpha=0.5)
+            ax.grid(visible=True, which='minor', color='grey', linestyle=':', alpha=0.5)
 
 
     def hidey(self):
