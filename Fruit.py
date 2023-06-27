@@ -46,7 +46,7 @@ sys.path.pop(len(sys.path)-1)
 class Fruit(object):
     #__metaclass__ = GetAttr
     def __init__(self, ID=None, root=None, 
-                    data=[], data_x=[], bins=[], metadata={},
+                    data=[], data_x=None, bins=[], metadata={},
                     **kwargs):
         
         super().__init__(**kwargs) # (*args, **kwargs) # superclass inits
@@ -99,7 +99,7 @@ class Fruit(object):
         self.data = data
         self.bins = bins
         # direct or indirect assignment
-        if np.any(data_x):
+        if type(data_x)!=type(None):
             self.data_x = data_x
         elif np.any(bins):
             self.data_x = bin_to_xaxis(bins)
