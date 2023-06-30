@@ -496,6 +496,67 @@ def tuple_concat(*args):
     # concatenate into matrix
     return np.concatenate(tuples)
 
+
+#https://stackoverflow.com/questions/51960857/how-can-i-get-a-list-shape-without-using-numpy
+from collections.abc import Sequence, Iterator
+from itertools import tee, chain
+
+def is_shape_consistent(lst: Iterator):
+    """
+    check if all the elements of a nested list have the same
+    shape.
+
+    first check the 'top level' of the given lst, then flatten
+    it by one level and recursively check that.
+
+    :param lst:
+    :return:
+    """
+
+    lst0, lst1 = tee(lst, 2)
+
+    try:
+        item0 = next(lst0)
+    except StopIteration:
+        return True
+    is_seq = isinstance(item0, Sequence)
+
+    if not all(is_seq == isinstance(item, Sequence) for item in lst0):
+        return False
+
+    if not is_seq:
+        return True
+
+    return is_shape_consistent(chain(*lst1))
+
+def get_shape(lst, shape=()):
+    """
+    returns the shape of nested lists similarly to numpy's shape.
+
+    :param lst: the nested list
+    :param shape: the shape up to the current recursion depth
+    :return: the shape including the current depth
+            (finally this will be the full depth)
+    """
+
+    if not isinstance(lst, Sequence):
+        # base case
+        return shape
+
+    # peek ahead and assure all lists in the next depth
+    # have the same length
+    if isinstance(lst[0], Sequence):
+        l = len(lst[0])
+        if not all(len(item) == l for item in lst):
+            msg = 'not all lists have the same length'
+            raise ValueError(msg)
+
+    shape += (len(lst), )
+    
+    # recurse
+    shape = get_shape(lst[0], shape)
+
+    return shape
 '''
 def availability(data, thresh=-90, plot_test=False):
     """
