@@ -1657,7 +1657,9 @@ class myinkc(hoppy.hopper):
     def ecke(self, hidesmallframes=False): # inspired by mpl official doc
         """
         make a subplot with a corner in left bot, 5 plots around
-        - return
+        
+        ! loops for population have to start with self.ax_onward() !
+        (ax_i set to -1, cannot plot first plot at -1)
         """
         fig, axs = plt.subplots(ncols=3, nrows=3)
         gs = axs[1, 2].get_gridspec()
@@ -1684,7 +1686,7 @@ class myinkc(hoppy.hopper):
         self.axs = np.delete(self.axs, [3,4,6,7])
 
         self.ecke_axs = axs
-        self.ax_i = -1 # HACK, to have plotting-loop start w. self.onward() and get 0 in first iteration
+        self.ax_i = -1 # dirty solution to have plotting-loop start w. self.onward() and get 0 in first iteration
 
 
 # https://stackoverflow.com/questions/17212722/matplotlib-imshow-how-to-animate

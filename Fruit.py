@@ -127,7 +127,7 @@ class Fruit(object):
         return iter(self.fruits.values()) # fruits is ID:obj, so return objs
 
     def mod(self, dict={}):
-        """ hack - to quickly add/mod dict items, aka class variables"""
+        """ dirty - to experimentally add/mod dict items, aka class methods, variables, .."""
         self.__dict__.update(dict)
 
     def sprout(self, *args, **kwargs):

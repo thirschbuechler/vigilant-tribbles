@@ -253,13 +253,14 @@ def integritycheck():
     print("attempted==succeeded, if no fails\n")
 
 
-# HACK all runtime warnings of one fct ignored
-# ToDo only ignore zeromean nan slice ones
 def babysit(eval, *args, **kwargs):
     """ numpy nan-operation silencer
     
         nan-matrices shall be allowed to have means over nans or zeros without giving a warning,
         expect to see RuntimeWarnings otherwise
+
+        note: all runtime warnings of one fct ignored
+        maybe to do only ignore zeromean nan slice ones
     """
 
     with warnings.catch_warnings():
