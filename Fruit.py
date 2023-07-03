@@ -33,12 +33,12 @@ import sys, os
 import numpy as np
 import logging
 
-# tmp import hack to import modules if in parent directory
+# import modules if in parent directory via path tmp
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from vigilant_tribbles.mailuefterl import bin_to_xaxis
 
-# undo tmp import hack
+# undo path tmp import
 sys.path.pop(len(sys.path)-1)
 
 
