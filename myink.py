@@ -1508,6 +1508,7 @@ class myinkc(hoppy.hopper):
         mymin = np.nanmin
         mymax = np.nanmax
         
+        # setting the extent -- axes' xticks xticklabels
         if np.size(yticks)>0: # np.size(yticks)): # bool-list cast is alternative to a.any()
             # app-specific auto-subsample example, add as route-through via inheritence and super()
             # subsample yticks from 151 to 16 if needed, overwrite orig arg
@@ -1523,8 +1524,41 @@ class myinkc(hoppy.hopper):
             # no yticks given
             extent = (mymin(x_axis), mymax(x_axis), mx.shape[0], 0)
         
+        if "aspect" not in kwargs:
+            kwargs["aspect"] = "auto" # aspect makes it rect etc #aspect auto enables arbitrary axis limits
+            square = False
+        else:
+            if kwargs["aspect"] == "square":
+                square = True
+                ydatalen = mx.shape[0]
+                xdatalen = mx.shape[1]
+                
+                # aspect ratio dependent on data size,
+                aspect = xdatalen / ydatalen
+                # correct for different x or y axis scaling
+                aspect = aspect * ((extent[1]-extent[0])/(extent[2]-extent[3])) # last two inverted as upside-down
+                print(aspect)
+                
+                kwargs["aspect"] = aspect
+
+                # scale factor for pixels
+                #   derived from fontsize 22
+                #   division over 72: pt to inch
+                #   scaled arbitrarily
+
+                fa = 22 / 72 * 1
+                xfig = xdatalen * fa
+                yfig = ydatalen * fa
+
+                # HACK
+                # close open figure, if any
+                plt.close()
+                # create a small figure
+                plt.figure(figsize=(xfig,yfig))
+
+
         # main plot
-        self.imshow(mx, **kwargs, aspect="auto", extent=extent)#aspect makes it rect etc #aspect auto enables arbitrary axis limits
+        self.imshow(mx, **kwargs, extent=extent)
         if y_minor_grid:
             self.get_ax().yaxis.set_minor_locator(MultipleLocator(y_minor_grid))
         # colorbar options
@@ -1541,7 +1575,10 @@ class myinkc(hoppy.hopper):
         self.title(title)
         if places>0:
             self.enginerd_xaxis(places=places)
-        self.rotate_xticks(45)
+        if square:
+            self.rotate_xticks(90)
+        else:
+            self.rotate_xticks(45)
 
         # return matrix, for legacy reasons
         return np.matrix(mx) 
@@ -1832,6 +1869,7 @@ def tester():
         mycanvassize_test()
         myinkc().mycanvassize(medfig=True) # reset afterwards via one-time-use myinkc element
         test_waterfall()
+        test_waterfall_size()
         histo_test()
         doublebarrel_barberpole()
         statistics_visu()
@@ -2111,14 +2149,24 @@ def test_waterfall():
     # generate test data
     data = np.random.rand(5,5)
     x_axis = np.arange(1E6, 5E6, 1E6)
-    print(x_axis)
-    print(np.shape(data))
-    print(np.shape(x_axis))
+    print(f"{x_axis=}, {np.shape(x_axis)=}, {np.shape(data)=}")
 
     # plot
     ele=myinkc()
     ele.subplots()
     ele.waterfall(mx=data, title="random waterfall", x_axis=x_axis, cb_label="colorbar_label")
+    ele.show()
+
+
+def test_waterfall_size():
+    # generate test data
+    data = np.random.rand(5,5)
+    x_axis = np.arange(1E6, 5E6, 1E6)
+    print(f"{x_axis=}, {np.shape(x_axis)=}, {np.shape(data)=}")
+
+    # plot
+    ele=myinkc()
+    ele.waterfall(mx=data, title="random waterfall", x_axis=x_axis, cb_label="colorbar_label", aspect="square")
     ele.show()
 
 
@@ -2362,8 +2410,11 @@ if testing:#call if selected, after defined, explanation see above
     #narrow_colorbar_test()
     #spind_tester()
     #gradientmaster_test()
-    barstacked_test()
-    #test_waterfall()
+    #barstacked_test()
+    
+    test_waterfall()
+    #test_waterfall_size()
+    
     #histo_test()
     #doublebarrel_barberpole()
     #tex_test()
