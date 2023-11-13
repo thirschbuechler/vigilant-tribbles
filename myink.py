@@ -2164,9 +2164,11 @@ def test_waterfall_size():
     x_axis = np.arange(1E6, 5E6, 1E6)
     print(f"{x_axis=}, {np.shape(x_axis)=}, {np.shape(data)=}")
 
+    alpha = 0.85
+
     # plot
     ele=myinkc()
-    ele.waterfall(mx=data, title="random waterfall", x_axis=x_axis, cb_label="colorbar_label", aspect="square")
+    ele.waterfall(mx=data, title=f"random waterfall, smaller, {alpha=}", x_axis=x_axis, cb_label="colorbar_label", aspect="square", alpha=alpha)
     ele.show()
 
 
