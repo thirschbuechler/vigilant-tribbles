@@ -1097,8 +1097,102 @@ class myinkc(hoppy.hopper):
         return ret
 
 
-    def imshow(self,*args,**kwargs):
-        """ forward to mpl imshow"""
+    def imshowpro(self, mx=None, x_axis=None, y_axis=None, y_label_inverted=False, pixelscale=1, **kwargs):
+        """ souped-up mpl imshow api"""
+
+        # # import conditioning # #
+        # data matrix
+        if not np.any(mx):
+            raise Exception("imshowpro mx: required")
+        elif len(np.shape(mx)) >2:
+            raise Exception(f"imshowpro mx: too many dims ({len(np.shape(mx))=}, {np.shape(mx)=})")
+
+        # rows then columns
+        ydatalen = mx.shape[0]
+        xdatalen = mx.shape[1]
+    
+
+        # # imshow "extent" doc
+        #   - needed to set ticks and grid correctly (not shifted into centers)
+        #   - can also label
+        #   - (0,0) is upper left of imshow but extent is flipped on y IF y_label_inverted via waterfall
+        #   - extent = (0+m, xdatalen+m, ydatalen+n, 0+n)# n,m freely chosen
+        #   - print(extent)# with testdata: 0 1001 3 0
+        
+        # # minima maxima
+        # babysitted versions - not needed atm
+        #mymin = ml.nanmin
+        #mymax = ml.nanmax
+        # not babysitted - possible warning spam in stdout
+        mymin = np.nanmin
+        mymax = np.nanmax
+        
+        if ml.my_any(x_axis):
+            # setting the extent -- axes' xticks xticklabels
+            if ml.my_any(y_axis):
+                # app-specific auto-subsample example, add as route-through via inheritence and super()
+                # subsample y_axis from 151 to 16 if needed, overwrite orig arg
+                #if len(y_axis)>17 and (ydatalen==16):
+                #    y_axis=y_axis[0::10]
+
+                if ((np.size(y_axis)) == ydatalen):
+                    # inverted for waterfall
+                    extent = (mymin(x_axis), mymax(x_axis),mymin(y_axis), mymax(y_axis))
+                else:
+                    extent = (mymin(x_axis), mymax(x_axis), 0, ydatalen)
+                    print(f"FORBIDDEN y_axis extent forbidden in imshowpro, {mx.shape=} vs {y_axis.shape=}")
+            else:
+                # no y_axis given
+                extent = (mymin(x_axis), mymax(x_axis), 0, ydatalen)
+        else:
+            # no x axis give
+            extent = [0,ydatalen,0,xdatalen]
+        
+        if "aspect" not in kwargs:
+            kwargs["aspect"] = "auto" # aspect makes it rect etc #aspect auto enables arbitrary axis limits
+        else:
+            if kwargs["aspect"] == "square":
+
+                
+                # aspect ratio dependent on data size,
+                aspect = xdatalen / ydatalen
+                # correct for different x or y axis scaling
+                aspect = aspect * ((extent[1]-extent[0])/(extent[3]-extent[2]))
+                aspect = abs(aspect)
+                #print(aspect)
+                
+                kwargs["aspect"] = aspect
+
+                # scale factor for pixels
+                #   derived from fontsize 22
+                #   division over 72: pt to inch
+                #   scaled arbitrarily
+
+                fa = 22 / 72 * pixelscale
+                xfig = xdatalen * fa
+                yfig = ydatalen * fa
+
+                # HACK
+                # close open figure, if any
+                plt.close()
+                # create a small figure
+                plt.figure(figsize=(xfig,yfig))
+
+        if y_label_inverted:
+            #tmp = extent[3]
+            #extent[3] = extent[2]
+            #extent[2] = tmp
+            extent[2], extent[3] = extent[3],extent[2]
+
+        kwargs["extent"]=extent
+        self.imshow(mx, **kwargs)
+
+
+    def imshow(self, *args, **kwargs):
+        """ basic forward to mpl imshow,
+            plotting an image (png, jpg) or mx    ,
+            NOT IMSHOWPRO
+        """
         
         im = self.get_ax().imshow(*args,**kwargs)
         # remember handle for colorbar-stuff, eg. common_cb_lims
@@ -1372,6 +1466,9 @@ class myinkc(hoppy.hopper):
         #pe.mycanvassize(bigfig=1) # works but sticks and also changes fontsize
         self.canvas_params(figsize=[15,10])#cm
         self.rc_autoreset = 0 # to not reset temporarily, if already set
+
+
+        
         self.subplots(nrows=2, ncols=1)
         #pe.mycanvassize(deffig=1)
         #pe.canvas_params_reset() NOT HERE IT MESSES UP FONTS ON CURRENT
@@ -1390,7 +1487,7 @@ class myinkc(hoppy.hopper):
             # print(mse)
         
         # plot imshow pixely - don't mush it up with interpolation
-        imim = self.imshow(mx, interpolation="none", cmap=cmap, **kwargs)
+        imim = self.imshowpro(mx=mx, interpolation="none", cmap=cmap, **kwargs)
         
         # show all ticks
         if np.size(xlabels):
@@ -1489,76 +1586,18 @@ class myinkc(hoppy.hopper):
         if np.size(mx)<2 or np.size(x_axis)<2:
             raise Exception(f"matrix and x_axis input required!, { np.size(mx)}, {np.size(x_axis)}")
 
+        # square pixels
+        square = False
+        if "aspect" in kwargs:
+            if kwargs["aspect"] == "square":
+                square = True
         
         # # # plotting # # #
         # legacy axis setting
         ax = self.get_ax(ax)#
 
-        # # imshow "extent" doc
-        #   - needed to set ticks and grid correctly (not shifted into centers)
-        #   - can also label
-        #   - (0,0) is upper left of imshow but extent is flipped on y
-        #   - extent = (0+m, mx.shape[1]+m, mx.shape[0]+n, 0+n)# n,m freely chosen
-        #   - print(extent)# with testdata: 0 1001 3 0
-        # # minima maxima
-        # babysitted versions - not needed atm
-        #mymin = ml.nanmin
-        #mymax = ml.nanmax
-        # not babysitted with warning spam in stdout
-        mymin = np.nanmin
-        mymax = np.nanmax
-        
-        # setting the extent -- axes' xticks xticklabels
-        if np.size(yticks)>0: # np.size(yticks)): # bool-list cast is alternative to a.any()
-            # app-specific auto-subsample example, add as route-through via inheritence and super()
-            # subsample yticks from 151 to 16 if needed, overwrite orig arg
-            #if len(yticks)>17 and (mx.shape[0]==16):
-            #    yticks=yticks[0::10]
-            if ((np.size(yticks)) == mx.shape[0]):
-                extent = (mymin(x_axis), mymax(x_axis),mymax(yticks), mymin(yticks))
-                #print(f"yticks extent permitted, {mx.shape=} vs {yticks.shape=}")
-            else:
-                extent = (mymin(x_axis), mymax(x_axis), mx.shape[0], 0)
-                print(f"FORBIDDEN yticks extent forbidden in waterfall, {mx.shape=} vs {yticks.shape=}")
-        else:
-            # no yticks given
-            extent = (mymin(x_axis), mymax(x_axis), mx.shape[0], 0)
-        
-        if "aspect" not in kwargs:
-            kwargs["aspect"] = "auto" # aspect makes it rect etc #aspect auto enables arbitrary axis limits
-            square = False
-        else:
-            if kwargs["aspect"] == "square":
-                square = True
-                ydatalen = mx.shape[0]
-                xdatalen = mx.shape[1]
-                
-                # aspect ratio dependent on data size,
-                aspect = xdatalen / ydatalen
-                # correct for different x or y axis scaling
-                aspect = aspect * ((extent[1]-extent[0])/(extent[2]-extent[3])) # last two inverted as upside-down
-                print(aspect)
-                
-                kwargs["aspect"] = aspect
-
-                # scale factor for pixels
-                #   derived from fontsize 22
-                #   division over 72: pt to inch
-                #   scaled arbitrarily
-
-                fa = 22 / 72 * 1
-                xfig = xdatalen * fa
-                yfig = ydatalen * fa
-
-                # HACK
-                # close open figure, if any
-                plt.close()
-                # create a small figure
-                plt.figure(figsize=(xfig,yfig))
-
-
         # main plot
-        self.imshow(mx, **kwargs, extent=extent)
+        self.imshowpro(mx=mx, y_label_inverted=True, **kwargs)
         if y_minor_grid:
             self.get_ax().yaxis.set_minor_locator(MultipleLocator(y_minor_grid))
         # colorbar options
@@ -1571,7 +1610,7 @@ class myinkc(hoppy.hopper):
         elif colorbar == 1:
             cb = self.colorbar(cb_label)
 
-        # postprocessing
+        # postprocessing        
         self.title(title)
         if places>0:
             self.enginerd_xaxis(places=places)
@@ -2155,6 +2194,18 @@ def test_waterfall():
     ele=myinkc()
     ele.subplots()
     ele.waterfall(mx=data, title="random waterfall", x_axis=x_axis, cb_label="colorbar_label")
+    ele.show()
+
+
+    # generate test data
+    data = np.diag([1,2,3,4,5])
+    x_axis = np.arange(1E6, 5E6, 1E6)
+    print(f"{x_axis=}, {np.shape(x_axis)=}, {np.shape(data)=}")
+
+    # plot
+    ele=myinkc()
+    ele.subplots()
+    ele.waterfall(mx=data, title="ascending waterfall", x_axis=x_axis, cb_label="colorbar_label")
     ele.show()
 
 

@@ -558,6 +558,79 @@ def get_shape(lst, shape=()):
     shape = get_shape(lst[0], shape)
 
     return shape
+
+
+def my_any(thing):
+    """
+    
+    # a.any(thing) warning fix, for evaluating bool(list([1,2,3])) or bool(list([0,0,0])), bool(list([[],[],[]])) etc.
+    # np.size(thing)>0: # np.size(y_axis)): # bool-list cast is alternative to a.any()
+
+    # # empty # #
+    # none
+    >>> my_any(None)
+    False
+
+    # empty list
+    >>> my_any([])
+    False
+
+    # empty dict
+    >>> my_any({})
+    False
+
+    # empty array
+    >>> my_any(np.array([]))
+    False
+
+    # empty matrix array
+    >>> my_any(np.array([[], []]))
+    False
+
+
+    # # full # #
+    # str
+    >>> my_any("bla")
+    True
+
+    # int
+    >>> my_any(3)
+    True
+
+    # float
+    >>> my_any(123.456)
+    True
+
+    # str dict
+    >>> my_any({"key1":"value1"})
+    True
+
+    # mixed dict
+    >>> my_any({"key1":"value1", "key2":2, "key3": [], "key4": [1,2,3]})
+    True
+
+    # str list
+    >>> my_any(["12", "34"])
+    True
+
+    # float list
+    >>> my_any([12.34, 56.78])
+    True
+    
+    # array
+    >>> my_any(np.array([12.34, 56.78]))
+    True
+
+    # empty matrix array
+    >>> my_any(np.array([[12.34, 56.78], [12.34, 56.78]]))
+    True
+
+    """
+
+    return bool(np.any(np.array(thing, dtype=object)))
+
+
+
 '''
 def availability(data, thresh=-90, plot_test=False):
     """
