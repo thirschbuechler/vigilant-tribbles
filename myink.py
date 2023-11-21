@@ -136,8 +136,10 @@ class myinkc(hoppy.hopper):
 
         # sometimes canvassize is only closed after plotting once,
         # so open and close a sacraficial dummy plot
+        fig, ax = self.subplots()
         self.plot()
-        self.close()
+        self.close(fig)
+        #self.close("")# == self.close("all") # nuked waterfall etc.
 
         return kwargs
 
