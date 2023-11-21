@@ -1489,6 +1489,7 @@ class myinkc(hoppy.hopper):
         if "square" in kwargs:
             kwargs_fig = dict(nrows=2, ncols=1)
         else:
+            kwargs_fig = {}
             self.subplots(nrows=2, ncols=1)
         #pe.mycanvassize(deffig=1)
         #pe.canvas_params_reset() NOT HERE IT MESSES UP FONTS ON CURRENT
