@@ -208,7 +208,7 @@ class myinkc(hoppy.hopper):
                     plt.figure(fig)
                     self.save_lastgraph(fn)
             else:
-                raise Exception(f"len(fns):{len(fns)} != len(figs):{len(figs)}")
+                raise Exception(f"figure savenames:{len(fns)} != available figures:{len(figs)}")
         
         # case no filenames - take titles, suptitles or whatever
         else:
@@ -268,10 +268,22 @@ class myinkc(hoppy.hopper):
     
     
     def close(self, st="all"):
-        """close old plots
-        CAVEAT: unless new console for each call (i.e. in vscode)
+        """ close plots
+        - default: all
+        - "": close last one
+        - "empty": close current plot if ax empty
+
+        CAVEAT: only works on current session (jupyter-section, terminal, ..)
         """
-        plt.close(st)
+        if st=="empty":
+            ax = self.get_ax()
+            if ax:
+                if not(ax.lines or ax.collections):
+                    fig = self.get_fig()
+                    print(f"closing \' {ax.get_title()}\'")
+                    plt.close(fig)
+        else:
+            plt.close(st)
     
     def show(self):
         """ show last plots - for non-spyder IDEs which need manual trigger """
@@ -1097,7 +1109,7 @@ class myinkc(hoppy.hopper):
         return ret
 
 
-    def imshowpro(self, mx=None, x_axis=None, y_axis=None, y_label_inverted=False, pixelscale=1, **kwargs):
+    def imshowpro(self, mx=None, x_axis=None, y_axis=None, y_label_inverted=False, pixelscale=1, kwargs_fig={}, **kwargs):
         """ souped-up mpl imshow api"""
 
         # # import conditioning # #
@@ -1152,6 +1164,8 @@ class myinkc(hoppy.hopper):
             kwargs["aspect"] = "auto" # aspect makes it rect etc #aspect auto enables arbitrary axis limits
         else:
             if kwargs["aspect"] == "square":
+                if "figsize" in kwargs_fig:
+                    raise Exception("figsize in square mode not settable\nI'm afraid Dave, I cannot let you do that.")
 
                 
                 # aspect ratio dependent on data size,
@@ -1172,11 +1186,13 @@ class myinkc(hoppy.hopper):
                 xfig = xdatalen * fa
                 yfig = ydatalen * fa
 
-                # HACK
-                # close open figure, if any
-                plt.close()
+                # close current open figure, if empty ax
+                self.close("empty")
+
                 # create a small figure
-                plt.figure(figsize=(xfig,yfig))
+                #plt.figure(figsize=(xfig,yfig))#, **kwargs_fig)
+                #self.subplots(**kwargs_fig)
+                self.subplots(figsize=(xfig,yfig), **kwargs_fig)
 
         if y_label_inverted:
             #tmp = extent[3]
@@ -1185,7 +1201,7 @@ class myinkc(hoppy.hopper):
             extent[2], extent[3] = extent[3],extent[2]
 
         kwargs["extent"]=extent
-        self.imshow(mx, **kwargs)
+        return self.imshow(mx, **kwargs)
 
 
     def imshow(self, *args, **kwargs):
@@ -1468,8 +1484,10 @@ class myinkc(hoppy.hopper):
         self.rc_autoreset = 0 # to not reset temporarily, if already set
 
 
-        
-        self.subplots(nrows=2, ncols=1)
+        if "square" in kwargs:
+            kwargs_fig = dict(nrows=2, ncols=1)
+        else:
+            self.subplots(nrows=2, ncols=1)
         #pe.mycanvassize(deffig=1)
         #pe.canvas_params_reset() NOT HERE IT MESSES UP FONTS ON CURRENT
 
@@ -1487,7 +1505,7 @@ class myinkc(hoppy.hopper):
             # print(mse)
         
         # plot imshow pixely - don't mush it up with interpolation
-        imim = self.imshowpro(mx=mx, interpolation="none", cmap=cmap, **kwargs)
+        imim = self.imshowpro(mx=mx, interpolation="none", cmap=cmap, kwargs_fig=kwargs_fig, **kwargs)
         
         # show all ticks
         if np.size(xlabels):
@@ -2465,8 +2483,8 @@ if testing:#call if selected, after defined, explanation see above
     #gradientmaster_test()
     #barstacked_test()
     
-    test_waterfall()
-    #test_waterfall_size()
+    #test_waterfall()
+    test_waterfall_size()
     
     #histo_test()
     #doublebarrel_barberpole()
