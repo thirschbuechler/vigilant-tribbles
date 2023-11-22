@@ -1197,10 +1197,9 @@ class myinkc(hoppy.hopper):
                 self.subplots(figsize=(xfig,yfig), **kwargs_fig)
 
         if y_label_inverted:
-            #tmp = extent[3]
-            #extent[3] = extent[2]
-            #extent[2] = tmp
-            extent[2], extent[3] = extent[3],extent[2]
+            # swap list elements
+            extent = list(extent)
+            extent[2], extent[3] = extent[3], extent[2]
 
         kwargs["extent"]=extent
         return self.imshow(mx, **kwargs)
@@ -1618,7 +1617,7 @@ class myinkc(hoppy.hopper):
         ax = self.get_ax(ax)#
 
         # main plot
-        self.imshowpro(mx=mx, y_label_inverted=True, **kwargs)
+        self.imshowpro(mx=mx, x_axis=x_axis, y_axis=yticks, y_label_inverted=True, **kwargs)
         if y_minor_grid:
             self.get_ax().yaxis.set_minor_locator(MultipleLocator(y_minor_grid))
         # colorbar options
