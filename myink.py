@@ -273,11 +273,11 @@ class myinkc(hoppy.hopper):
         """ close plots
         - default: all
         - "": close last one
-        - "empty": close current plot if ax empty
+        - "emptyax": close current plot if ax empty
 
         CAVEAT: only works on current session (jupyter-section, terminal, ..)
         """
-        if st=="empty":
+        if st=="emptyax":
             ax = self.get_ax()
             if ax:
                 if not(ax.lines or ax.collections):
@@ -1168,33 +1168,33 @@ class myinkc(hoppy.hopper):
             if kwargs["aspect"] == "square":
                 if "figsize" in kwargs_fig:
                     raise Exception("figsize in square mode not settable\nI'm afraid Dave, I cannot let you do that.")
+                else:
+                    # aspect ratio dependent on data size,
+                    aspect = xdatalen / ydatalen
+                    # correct for different x or y axis scaling
+                    aspect = aspect * ((extent[1]-extent[0])/(extent[3]-extent[2]))
+                    aspect = abs(aspect)
+                    #print(aspect)
+                    
+                    kwargs["aspect"] = aspect
 
-                
-                # aspect ratio dependent on data size,
-                aspect = xdatalen / ydatalen
-                # correct for different x or y axis scaling
-                aspect = aspect * ((extent[1]-extent[0])/(extent[3]-extent[2]))
-                aspect = abs(aspect)
-                #print(aspect)
-                
-                kwargs["aspect"] = aspect
+                    # scale factor for pixels
+                    #   derived from fontsize 22
+                    #   division over 72: pt to inch
+                    #   scaled arbitrarily
 
-                # scale factor for pixels
-                #   derived from fontsize 22
-                #   division over 72: pt to inch
-                #   scaled arbitrarily
+                    fa = 22 / 72 * pixelscale
+                    xfig = xdatalen * fa
+                    yfig = ydatalen * fa
 
-                fa = 22 / 72 * pixelscale
-                xfig = xdatalen * fa
-                yfig = ydatalen * fa
+                    # close current open figure, if empty ax
+                    self.close("emptyax")
 
-                # close current open figure, if empty ax
-                self.close("empty")
-
-                # create a small figure
-                #plt.figure(figsize=(xfig,yfig))#, **kwargs_fig)
-                #self.subplots(**kwargs_fig)
-                self.subplots(figsize=(xfig,yfig), **kwargs_fig)
+                    # create a small figure
+                    self.subplots(figsize=(xfig,yfig), **kwargs_fig)
+                    
+            else: #not square
+                pass # keep figure, subplot if open, or whatever nothing to do
 
         if y_label_inverted:
             # swap list elements
@@ -1484,12 +1484,20 @@ class myinkc(hoppy.hopper):
         self.canvas_params(figsize=[15,10])#cm
         self.rc_autoreset = 0 # to not reset temporarily, if already set
 
-
-        if "square" in kwargs:
+        # is aspect square?
+        if "aspect" in kwargs:
+            square_aspect = (kwargs["aspect"] == "square")
+        else:
+            square_aspect = False
+        
+        # if yes, route through fig generation
+        if square_aspect:
             kwargs_fig = dict(nrows=2, ncols=1)
+        # else do it yourself
         else:
             kwargs_fig = {}
             self.subplots(nrows=2, ncols=1)
+
         #pe.mycanvassize(deffig=1)
         #pe.canvas_params_reset() NOT HERE IT MESSES UP FONTS ON CURRENT
 
