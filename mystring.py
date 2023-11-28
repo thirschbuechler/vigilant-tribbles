@@ -130,6 +130,28 @@ def dictlist_intersection(mydictlist):
     return commons
 
 
+def dict_a_fully_in_b(dict_a={}, dict_b={}):
+    """ is dict_a fully contained in dict_b?
+
+    
+    >>> dict_a_fully_in_b({1:2, 2:3}, {1:2, 2:3})
+    True
+
+    >>> dict_a_fully_in_b({1:3, 2:3}, {1:2, 2:3})
+    False
+
+    >>> dict_a_fully_in_b({1:2, 2:3}, {1:2, 2:3, 3:4})
+    True
+
+    >>> dict_a_fully_in_b({1:2}, {1:3, 2:3})
+    False
+
+        
+    """
+    return (len(dictlist_intersection([dict_b, dict_a]))==len(dict_a))
+
+
+
 #https://stackoverflow.com/questions/5967500/how-to-correctly-sort-a-string-with-a-number-inside
 def atoi(text):
     return int(text) if text.isdigit() else text
