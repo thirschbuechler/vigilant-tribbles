@@ -1140,6 +1140,10 @@ class myinkc(hoppy.hopper):
         # not babysitted - possible warning spam in stdout
         mymin = np.nanmin
         mymax = np.nanmax
+
+        if np.average(x_axis) == x_axis[0]:
+            self.log.warning(f"identical x_axis values in imshowpro - ignoring array of ({x_axis[0]=})..")
+            x_axis = []
         
         if ml.my_any(x_axis):
             # setting the extent -- axes' xticks xticklabels
