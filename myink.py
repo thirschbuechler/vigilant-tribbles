@@ -1188,8 +1188,15 @@ class myinkc(hoppy.hopper):
                     #   division over 72: pt to inch
                     #   scaled arbitrarily
 
-                    fa = 22 / 72 * pixelscale *0.66
-                    xfig = xdatalen * fa * 1.5 # to fit still when colorbar is there
+                    # note: about 3 datasets give 6 characters to write for straigth label on a plot,
+                    # so to fit the label the stripe-size has to be a multiple of it
+                    stripewidth = int(np.ceil(ydatalen/6))
+                    outerlen=stripewidth*3
+                    print(f"{stripewidth=}, {outerlen=}")
+
+                    fa = 22 / 72 * pixelscale 
+                    xfig = xdatalen * fa
+                    xfig = np.max([1.2, xfig]) # to fit still when colorbar is there and not be too small
                     yfig = ydatalen * fa
                     
             else: #not square
@@ -1203,7 +1210,9 @@ class myinkc(hoppy.hopper):
             # create a small figure
             #self.subplots(figsize=(xfig,yfig), **kwargs_fig)
             #self.spinds(cols_def=[1,3], rows_def=[3,1], **kwargs_fig) # spinds dont have big corner
-            self.ecke(type="ru", hidesmallframes=True, figsize=(xfig,yfig)) # HACK ignore kwargs for now
+            #self.ecke(type="ru", hidesmallframes=True, figsize=(xfig,yfig)) # HACK ignore kwargs for now
+            self.ecke_ru_only(figsize=(xfig,yfig), stripewidth=stripewidth, outerlen=outerlen)
+            self.ax_i = -1
 
 
         if y_label_inverted:
@@ -1213,7 +1222,7 @@ class myinkc(hoppy.hopper):
 
         kwargs["extent"]=extent
         s = self.imshow(mx, **kwargs)
-        self.autoscale_fig()
+        #self.autoscale_fig()
         return s
 
 
@@ -1563,7 +1572,7 @@ class myinkc(hoppy.hopper):
 
         # dress it up #
         self.ax_onward()
-        self.hide_frame()
+        #self.hide_frame()
         self.subplots_adjust(top=0.8,#dirty canvas centering fix - exported gui settings after playaround
             bottom=0.0,
             left=0.0,
@@ -1823,16 +1832,6 @@ class myinkc(hoppy.hopper):
         make a subplot with a big corner in right upper corner, 5 plots around
         
         (this is not a docstring, look at table layout in code)
-        ll
-        ----------------
-        |    |    |    |
-        ----------------
-        |         |    |
-        |         |----|
-        |         |    |
-        ----------------
-
-        ru
         ----------------
         |    |         |
         |----|         |
@@ -1872,9 +1871,56 @@ class myinkc(hoppy.hopper):
         self.ax_i = -1 # dirty solution to have plotting-loop start w. self.onward() and get 0 in first iteration
 
 
+    def ecke_ru_only(self, outerlen=3, stripewidth=1, hidesmallframes=True, **kwargs):
+        """
+        make a subplot with a big corner in right upper corner, no plots around only space
+        
+        options: (count of virtual plots, not px)
+        - outerlen: how large is figuresize in total 
+        - stripewidth: how large is stripe in relation to bigplot
+        
+        (this is not a docstring, look at table layout in code)
+        ----------------
+        |    |         |
+        |----|         |
+        |    |         |
+        ----------------
+        |    |    |    |
+        ----------------
+
+        ! loops for population have to start with self.ax_onward() !
+        (ax_i set to -1, cannot plot first plot at -1)
+        """
+        fig, axs = plt.subplots(ncols=outerlen, nrows=outerlen, **kwargs)
+        gs = axs[1, 2].get_gridspec()
+        
+        # remove the underlying axes
+        for axsi in axs[:outerlen-stripewidth, stripewidth:]: # format [row-slice,column-slice]
+            for ax in axsi:
+                ax.remove()
+
+        # generate big one
+        axbig = fig.add_subplot(gs[:outerlen-stripewidth, stripewidth:]) # format [row-slice,column-slice]
+        
+        if hidesmallframes:
+            for axsi in axs:
+                for ax in axsi:
+                    self.blank(ax)
+
+        fig.tight_layout() # ensure square subplots
+
+        # put axs inside
+        self.ax = axbig
+        self.axs = [self.ax]
+
+        self.ecke_axs = axs
+        # remove for single-use
+        #self.ax_i = -1 # dirty solution to have plotting-loop start w. self.onward() and get 0 in first iteration
+
+
     def ecke(self, type="ll", **kwargs):
         """
-        make a subplot with a big corner plot
+        make a subplot with a big corner plot (based on mpl gridspec doc official)
 
         
         (this is not a docstring, look at table layout in code)
@@ -2230,6 +2276,15 @@ def ecke_tester(type="ll"):
     # https://i.stack.imgur.com/Za66N.png
 
     # finally, show
+    ele.show()
+
+
+def ecke_tester_ru_only():
+    ele=myinkc()
+    
+    ele.ecke_ru_only(outerlen=4, stripewidth=1)
+    ele.ecke_ru_only(outerlen=4, stripewidth=2)
+    
     ele.show()
 
 
@@ -2620,8 +2675,10 @@ if testing:#call if selected, after defined, explanation see above
     #test_waterfall_size()
     
     calibrate_corr_mx_label(aspect="square", labellen=8, pixelscale=1)
+
     #ecke_tester()
     #ecke_tester(type="ru")
+    #ecke_tester_ru_only()
 
     #histo_test()
     #doublebarrel_barberpole()
