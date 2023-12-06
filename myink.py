@@ -1768,10 +1768,11 @@ class myinkc(hoppy.hopper):
         self.ax_i = 0
 
 
-    def ecke(self, hidesmallframes=False): # inspired by mpl official doc
+    def ecke_ll(self, hidesmallframes=False):
         """
-        make a subplot with a corner in left bot, 5 plots around
+        make a subplot with a big corner in left bot, 5 plots around
         
+        (this is not a docstring, look at table layout in code)
         ----------------
         |    |    |    |
         ----------------
@@ -1779,7 +1780,7 @@ class myinkc(hoppy.hopper):
         |         |----|
         |         |    |
         ----------------
-        
+
         ! loops for population have to start with self.ax_onward() !
         (ax_i set to -1, cannot plot first plot at -1)
         """
@@ -1787,12 +1788,12 @@ class myinkc(hoppy.hopper):
         gs = axs[1, 2].get_gridspec()
         
         # remove the underlying axes
-        for axsi in axs[1:, :2]:
+        for axsi in axs[1:, :2]: # format [row-slice,column-slice]
             for ax in axsi:
                 ax.remove()
 
         # generate big one
-        axbig = fig.add_subplot(gs[1:, :2])  # format [row-slice,column-slice]
+        axbig = fig.add_subplot(gs[1:, :2]) # format [row-slice,column-slice]
         
         if hidesmallframes:
             for axsi in axs:
@@ -1810,6 +1811,96 @@ class myinkc(hoppy.hopper):
         self.ecke_axs = axs
         self.ax_i = -1 # dirty solution to have plotting-loop start w. self.onward() and get 0 in first iteration
 
+
+    def ecke_ru(self, hidesmallframes=False):
+        """
+        make a subplot with a big corner in right upper corner, 5 plots around
+        
+        (this is not a docstring, look at table layout in code)
+        ll
+        ----------------
+        |    |    |    |
+        ----------------
+        |         |    |
+        |         |----|
+        |         |    |
+        ----------------
+
+        ru
+        ----------------
+        |    |         |
+        |----|         |
+        |    |         |
+        ----------------
+        |    |    |    |
+        ----------------
+
+        ! loops for population have to start with self.ax_onward() !
+        (ax_i set to -1, cannot plot first plot at -1)
+        """
+        fig, axs = plt.subplots(ncols=3, nrows=3)
+        gs = axs[1, 2].get_gridspec()
+        
+        # remove the underlying axes
+        for axsi in axs[:2, 1:]: # format [row-slice,column-slice]
+            for ax in axsi:
+                ax.remove()
+
+        # generate big one
+        axbig = fig.add_subplot(gs[:2, 1:]) # format [row-slice,column-slice]
+        
+        if hidesmallframes:
+            for axsi in axs:
+                for ax in axsi:
+                    self.blank(ax)
+
+        fig.tight_layout() # ensure square subplots
+
+        # put axs inside
+        self.ax = axbig
+        self.axs = axs
+
+        self.axs = np.delete(self.axs, [1,2,4,5])
+
+        self.ecke_axs = axs
+        self.ax_i = -1 # dirty solution to have plotting-loop start w. self.onward() and get 0 in first iteration
+
+
+    def ecke(self, type="ll", **kwargs):
+        """
+        make a subplot with a big corner plot
+
+        
+        (this is not a docstring, look at table layout in code)
+
+        types:
+            
+            - ll
+            ----------------
+            |    |    |    |
+            ----------------
+            |         |    |
+            |         |----|
+            |         |    |
+            ----------------
+
+            - ru
+            ----------------
+            |    |         |
+            |----|         |
+            |    |         |
+            ----------------
+            |    |    |    |
+            ----------------
+
+        """
+        if type=="ll":
+            self.ecke_ll(**kwargs)
+        elif type=="ru":
+            self.ecke_ru(**kwargs)
+        else:
+            raise Exception(f" ecke {type=} not implemented")
+        
 
 # https://stackoverflow.com/questions/17212722/matplotlib-imshow-how-to-animate
     def make_im_gif(self, data, fn='test_anim.gif', fps=1, sec=4):
@@ -2104,10 +2195,11 @@ def weigh_scatter():
     ele.show()
 
 
-def ecke_tester():
+def ecke_tester(type="ll"):
+
     # basic
     ele=myinkc()
-    ele.ecke()
+    ele.ecke(type=type)
     ele.scatter([1,2,3,4],[1,2,1,0])
 
     for i in range(0,5):
@@ -2116,7 +2208,7 @@ def ecke_tester():
 
     # images
     ele=myinkc()
-    ele.ecke(hidesmallframes=True)
+    ele.ecke(hidesmallframes=True, type=type)
     ele.scatter([1,2,3,4],[1,2,1,0])
 
     pics = get_pics()
@@ -2186,7 +2278,8 @@ def get_pics():
 
     # using PIL
     pics.append(Image.open("myfigures/stinkbug.webp")) # plt / PIL demo pic
-    pics.append(Image.open("myfigures/pic.png"))
+    pics.append(Image.open("myfigures/stinkbug.webp")) # plt / PIL demo pic
+    #pics.append(Image.open("myfigures/pic.png")) # rm ugly mspaint demopic
 
     # import matplotlib.image as mpimg
     import matplotlib.cbook as cbook
@@ -2518,8 +2611,11 @@ if testing:#call if selected, after defined, explanation see above
     
     #test_waterfall()
     #test_waterfall_size()
-    calibrate_corr_mx_label(aspect="square", labellen=8)
     
+    #calibrate_corr_mx_label(aspect="square", labellen=8)
+    ecke_tester()
+    ecke_tester(type="ru")
+
     #histo_test()
     #doublebarrel_barberpole()
     #tex_test()
