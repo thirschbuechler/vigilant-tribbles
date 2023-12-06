@@ -1141,11 +1141,12 @@ class myinkc(hoppy.hopper):
         mymin = np.nanmin
         mymax = np.nanmax
 
-        if np.average(x_axis) == x_axis[0]:
-            self.log.warning(f"identical x_axis values in imshowpro - ignoring array of ({x_axis[0]=})..")
-            x_axis = []
-        
+
         if ml.my_any(x_axis):
+            if np.average(x_axis) == x_axis[0]:
+                self.log.warning(f"identical x_axis values in imshowpro - ignoring array of ({x_axis[0]=})..")
+                x_axis = []
+        
             # setting the extent -- axes' xticks xticklabels
             if ml.my_any(y_axis):
                 # app-specific auto-subsample example, add as route-through via inheritence and super()
@@ -1470,7 +1471,7 @@ class myinkc(hoppy.hopper):
         self.scatter(x,y)            
 
 
-    def plot_corr_mx(self, mx, xlabels=[],ylabels=[], clims=[], lowlim=None, cb_label="", optlabel="", **kwargs):
+    def plot_corr_mx(self, mx, xlabels=[],ylabels=[], clims=[], lowlim=None, cb_label="", optlabel="", pixelscale=1, **kwargs):
         """
         make subplot correlation matrix with imshow
 
@@ -1502,6 +1503,7 @@ class myinkc(hoppy.hopper):
             kwargs_fig = {}
             self.subplots(nrows=2, ncols=1)
 
+
         #pe.mycanvassize(deffig=1)
         #pe.canvas_params_reset() NOT HERE IT MESSES UP FONTS ON CURRENT
 
@@ -1519,7 +1521,7 @@ class myinkc(hoppy.hopper):
             # print(mse)
         
         # plot imshow pixely - don't mush it up with interpolation
-        imim = self.imshowpro(mx=mx, interpolation="none", cmap=cmap, kwargs_fig=kwargs_fig, **kwargs)
+        imim = self.imshowpro(mx=mx, interpolation="none", cmap=cmap, kwargs_fig=kwargs_fig, pixelscale=pixelscale, **kwargs)
         
         # show all ticks
         if np.size(xlabels):
@@ -1619,10 +1621,10 @@ class myinkc(hoppy.hopper):
             raise Exception(f"matrix and x_axis input required!, { np.size(mx)}, {np.size(x_axis)}")
 
         # square pixels
-        square = False
+        square_aspect = False
         if "aspect" in kwargs:
             if kwargs["aspect"] == "square":
-                square = True
+                square_aspect = True
         
         # # # plotting # # #
         # legacy axis setting
@@ -1646,7 +1648,7 @@ class myinkc(hoppy.hopper):
         self.title(title)
         if places>0:
             self.enginerd_xaxis(places=places)
-        if square:
+        if square_aspect:
             self.rotate_xticks(90)
         else:
             self.rotate_xticks(45)
@@ -2438,7 +2440,7 @@ def boxplottest():
     pe.show()
 
 
-def calibrate_corr_mx_label(ns = range(3,10)):
+def calibrate_corr_mx_label(ns = range(3,10), labellen=1, **kwargs):
     pe = myinkc()
     clims = []
     
@@ -2446,10 +2448,15 @@ def calibrate_corr_mx_label(ns = range(3,10)):
         #mx = np.random.random(size=(n,n))
         #folderlabels = ["" for i in range(0,n)]
         folderlabels = np.arange(0,n, dtype=np.int8)
+
+        # elongate labels?
+        folderlabels = ["".join([str(flabel) for _ in range(0,labellen)]) for flabel in folderlabels]
+
         vec = np.random.random(size=(n))
         mx = np.diag(vec)
         mx[mx==0] = np.nan
-        pe.plot_corr_mx(mx=mx,xlabels=folderlabels, ylabels=folderlabels, clims=clims, optlabel=f"{ns=}", cb_label="1E")
+        pe.plot_corr_mx(mx=mx,xlabels=folderlabels, ylabels=folderlabels, clims=clims, optlabel=f"{ns=}", cb_label="1E", **kwargs)
+        #pe.autoscale_fig()
         pe.show()
 
 
@@ -2498,7 +2505,8 @@ if testing:#call if selected, after defined, explanation see above
     #barstacked_test()
     
     #test_waterfall()
-    test_waterfall_size()
+    #test_waterfall_size()
+    calibrate_corr_mx_label(aspect="square", labellen=8)
     
     #histo_test()
     #doublebarrel_barberpole()
