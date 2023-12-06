@@ -1191,15 +1191,19 @@ class myinkc(hoppy.hopper):
                     fa = 22 / 72 * pixelscale
                     xfig = xdatalen * fa
                     yfig = ydatalen * fa
-
-                    # close current open figure, if empty ax
-                    self.close("emptyax")
-
-                    # create a small figure
-                    self.subplots(figsize=(xfig,yfig), **kwargs_fig)
                     
             else: #not square
                 pass # keep figure, subplot if open, or whatever nothing to do
+
+        # in case a figure is requested
+        if kwargs_fig:
+            # close current open figure, if empty ax
+            self.close("emptyax")
+
+            # create a small figure
+            #self.subplots(figsize=(xfig,yfig), **kwargs_fig)
+            self.spinds(cols_def=[1,3], rows_def=[3,1], **kwargs_fig)
+
 
         if y_label_inverted:
             # swap list elements
@@ -1689,7 +1693,7 @@ class myinkc(hoppy.hopper):
         return self.spinds(cols_def=mylist)
     
 
-    def spinds(self, cols_def=[1,1,3,1], rows_def=[1]):
+    def spinds(self, cols_def=[1,1,3,1], rows_def=[1], **kwargs):
         """ 
         make n column axes
         - cols_def: array of widths of columns
@@ -1704,7 +1708,7 @@ class myinkc(hoppy.hopper):
         nrows = sum(rows_def)
         
         # generate plot, get gridspec
-        fig, axs_mx = plt.subplots(ncols=ncols, nrows=nrows)
+        fig, axs_mx = plt.subplots(ncols=ncols, nrows=nrows, **kwargs)
         if nrows==1:
             axs_mx = [axs_mx] # enable loop also for single line
         
@@ -1767,6 +1771,14 @@ class myinkc(hoppy.hopper):
     def ecke(self, hidesmallframes=False): # inspired by mpl official doc
         """
         make a subplot with a corner in left bot, 5 plots around
+        
+        ----------------
+        |    |    |    |
+        ----------------
+        |         |    |
+        |         |----|
+        |         |    |
+        ----------------
         
         ! loops for population have to start with self.ax_onward() !
         (ax_i set to -1, cannot plot first plot at -1)
