@@ -2040,6 +2040,7 @@ def tester():
         stemmy()
         weigh_scatter()
         ecke_tester()
+        ecke_tester(type="ru")
         spind_tester()
         test_make_im_gif()
         mycanvassize_test()
