@@ -1188,8 +1188,8 @@ class myinkc(hoppy.hopper):
                     #   division over 72: pt to inch
                     #   scaled arbitrarily
 
-                    fa = 22 / 72 * pixelscale
-                    xfig = xdatalen * fa
+                    fa = 22 / 72 * pixelscale *0.66
+                    xfig = xdatalen * fa * 1.5 # to fit still when colorbar is there
                     yfig = ydatalen * fa
                     
             else: #not square
@@ -1202,7 +1202,8 @@ class myinkc(hoppy.hopper):
 
             # create a small figure
             #self.subplots(figsize=(xfig,yfig), **kwargs_fig)
-            self.spinds(cols_def=[1,3], rows_def=[3,1], **kwargs_fig)
+            #self.spinds(cols_def=[1,3], rows_def=[3,1], **kwargs_fig) # spinds dont have big corner
+            self.ecke(type="ru", hidesmallframes=True, figsize=(xfig,yfig)) # HACK ignore kwargs for now
 
 
         if y_label_inverted:
@@ -1211,7 +1212,9 @@ class myinkc(hoppy.hopper):
             extent[2], extent[3] = extent[3], extent[2]
 
         kwargs["extent"]=extent
-        return self.imshow(mx, **kwargs)
+        s = self.imshow(mx, **kwargs)
+        self.autoscale_fig()
+        return s
 
 
     def imshow(self, *args, **kwargs):
@@ -1632,12 +1635,15 @@ class myinkc(hoppy.hopper):
         
         # # # plotting # # #
         # legacy axis setting
-        ax = self.get_ax(ax)#
+        ax = self.get_ax(ax)
 
         # main plot
         self.imshowpro(mx=mx, x_axis=x_axis, y_axis=yticks, y_label_inverted=True, **kwargs)
+        
+        # grid option
         if y_minor_grid:
             self.get_ax().yaxis.set_minor_locator(MultipleLocator(y_minor_grid))
+        
         # colorbar options
         #cb = self.colorbar(cb_label)
         #if not colorbar: # colors wrong even though cmap is in kwargs
@@ -1768,7 +1774,7 @@ class myinkc(hoppy.hopper):
         self.ax_i = 0
 
 
-    def ecke_ll(self, hidesmallframes=False):
+    def ecke_ll(self, hidesmallframes=False, **kwargs):
         """
         make a subplot with a big corner in left bot, 5 plots around
         
@@ -1812,7 +1818,7 @@ class myinkc(hoppy.hopper):
         self.ax_i = -1 # dirty solution to have plotting-loop start w. self.onward() and get 0 in first iteration
 
 
-    def ecke_ru(self, hidesmallframes=False):
+    def ecke_ru(self, hidesmallframes=False, **kwargs):
         """
         make a subplot with a big corner in right upper corner, 5 plots around
         
@@ -1838,7 +1844,7 @@ class myinkc(hoppy.hopper):
         ! loops for population have to start with self.ax_onward() !
         (ax_i set to -1, cannot plot first plot at -1)
         """
-        fig, axs = plt.subplots(ncols=3, nrows=3)
+        fig, axs = plt.subplots(ncols=3, nrows=3, **kwargs)
         gs = axs[1, 2].get_gridspec()
         
         # remove the underlying axes
@@ -2613,9 +2619,9 @@ if testing:#call if selected, after defined, explanation see above
     #test_waterfall()
     #test_waterfall_size()
     
-    #calibrate_corr_mx_label(aspect="square", labellen=8)
-    ecke_tester()
-    ecke_tester(type="ru")
+    calibrate_corr_mx_label(aspect="square", labellen=8, pixelscale=1)
+    #ecke_tester()
+    #ecke_tester(type="ru")
 
     #histo_test()
     #doublebarrel_barberpole()
