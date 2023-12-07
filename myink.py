@@ -1141,12 +1141,14 @@ class myinkc(hoppy.hopper):
         mymin = np.nanmin
         mymax = np.nanmax
 
-
+        # check before switch
         if ml.my_any(x_axis):
             if np.average(x_axis) == x_axis[0]:
                 self.log.warning(f"identical x_axis values in imshowpro - ignoring array of ({x_axis[0]=})..")
                 x_axis = []
-        
+
+        # switch x y axes present
+        if ml.my_any(x_axis):
             # setting the extent -- axes' xticks xticklabels
             if ml.my_any(y_axis):
                 # app-specific auto-subsample example, add as route-through via inheritence and super()
