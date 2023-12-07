@@ -1293,13 +1293,34 @@ class myinkc(hoppy.hopper):
         return markers, stemlines, baseline
 
 
-    def autoscale_fig(self):
+    def autoscale_fig(self, halt_if_failed=False):
         """
         try to fit most text of axis ticks, labels, titles w.o. overlapping
         - usually works, only GUI panel might overlap still
         - alternatively, use subplots.adjust wspace hspace bottom top
         """
-        plt.tight_layout()
+        if halt_if_failed:
+            # elevate warnings to be errors
+            # https://stackoverflow.com/questions/5644836/in-python-how-does-one-catch-warnings-as-if-they-were-exceptions
+            import warnings
+            warnings.filterwarnings("error")
+
+            # try to fit everything onto plot
+            try:
+                plt.tight_layout()
+            
+            # catch any Warning if generated
+            # (here - UserWarning https://docs.python.org/3/library/warnings.html)
+            except Warning:
+                raise Exception("autoscale fig (plt.tight_layout) failed - plot overflows")
+            
+            # reset warnings to be warnings-only again
+            finally:
+                warnings.resetwarnings()
+
+        else:
+            # might generate ignorable warning
+            plt.tight_layout()
 
 
     # https://matplotlib.org/stable/gallery/lines_bars_and_markers/bar_stacked.html
@@ -1575,13 +1596,14 @@ class myinkc(hoppy.hopper):
         # dress it up #
         self.ax_onward()
         #self.hide_frame()
+        '''
         self.subplots_adjust(top=0.8,#dirty canvas centering fix - exported gui settings after playaround
             bottom=0.0,
             left=0.0,
             right=0.8,
             hspace=0.0,
             wspace=0.15)
-
+        '''
         # optlabel annotation, floating in lower left corner
         self.ax_backtrack()
         n = np.shape(mx)[0] #nxn
@@ -1597,9 +1619,12 @@ class myinkc(hoppy.hopper):
         xpos = 0.14*n-0.87
 
         self.get_ax().text(xpos, ypos, optlabel,
-        bbox={'facecolor':'white','alpha':1,'edgecolor':'none','pad':1},
-        ha='left', va='center') 
+            bbox={'facecolor':'white','alpha':1,'edgecolor':'none','pad':1},
+            ha='left', va='center') 
         self.ax_onward()
+
+        # fit everything (plot, cbar, labels) onto figure but error out if it overflows
+        self.autoscale_fig(halt_if_failed=True)
 
 
     # experienced kwargs error - if **kwargs used AND cmap="turbo_r" -> both are ignored
@@ -2625,7 +2650,7 @@ def calibrate_corr_mx_label(ns = range(3,10), labellen=1, **kwargs):
         mx = np.diag(vec)
         mx[mx==0] = np.nan
         pe.plot_corr_mx(mx=mx,xlabels=folderlabels, ylabels=folderlabels, clims=clims, optlabel=f"{ns=}", cb_label="1E", **kwargs)
-        #pe.autoscale_fig()
+
         pe.show()
 
 
