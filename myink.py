@@ -1190,15 +1190,32 @@ class myinkc(hoppy.hopper):
                     #   division over 72: pt to inch
                     #   scaled arbitrarily
 
-                    # note: about 3 datasets give 6 characters to write for straigth label on a plot,
-                    # so to fit the label the stripe-size has to be a multiple of it
-                    stripewidth = int(np.ceil(ydatalen/6))
-                    outerlen=stripewidth*3
-                    print(f"{stripewidth=}, {outerlen=}")
+                    # empirical old: about 3 datasets give space for 6 characters to be visible across plot
+                    #chars_per_dataunit = 6/3
+                    #chars_pro_mx_plot = chars_per_dataunit * xdatalen
 
+                    # ydatalen == xdatalen probalby
+                    max_xlabellen = kwargs_fig["max_xlabellen"]
+                    max_ylabellen = kwargs_fig["max_ylabellen"]
+                    max_chars = max(max_xlabellen, max_ylabellen)
+
+                    # define
+                    #mx_plot_width = xdatalen +1 #+2 for ticks and cbar
+
+                    # calc
+                    #stripewidth = int(np.ceil(mx_plot_width * chars_pro_mx_plot/max_chars  ) )   
+                    #outerlen= mx_plot_width + stripewidth
+                    #print(f"{stripewidth=}, {outerlen=}")
+                    # sidenote - results in 2 characters per dataset
+
+                    pixelscale = 2 # HACK debug override
+                    #pixelscale = 1.7 # HACK debug override - cb label clips
+                    #pixelscale = 1.5 # zero plot area, all labels ontopeach other - no error !?
+                    #pixelscale = 1 # produces clipping warning error
                     fa = 22 / 72 * pixelscale 
-                    xfig = xdatalen * fa
-                    xfig = np.max([1.2, xfig]) # to fit still when colorbar is there and not be too small
+                    xfig = xdatalen * fa 
+                    #xfig = np.max([1.2, xfig]) # to fit still when colorbar is there and not be too small
+                    #xfig = xfig + stripewidth
                     yfig = ydatalen * fa
                     
             else: #not square
@@ -1213,7 +1230,10 @@ class myinkc(hoppy.hopper):
             #self.subplots(figsize=(xfig,yfig), **kwargs_fig)
             #self.spinds(cols_def=[1,3], rows_def=[3,1], **kwargs_fig) # spinds dont have big corner
             #self.ecke(type="ru", hidesmallframes=True, figsize=(xfig,yfig)) # HACK ignore kwargs for now
-            self.ecke_ru_only(figsize=(xfig,yfig), stripewidth=stripewidth, outerlen=outerlen)
+            # HACK - stripewidth mod alone doesnt work, figure needs to be larger
+            #self.ecke_ru_only(figsize=(xfig,yfig), stripewidth=stripewidth, outerlen=outerlen)
+            #self.ax_i = -1
+            self.subplots(figsize=(xfig,yfig))
             self.ax_i = -1
 
 
@@ -1224,7 +1244,7 @@ class myinkc(hoppy.hopper):
 
         kwargs["extent"]=extent
         s = self.imshow(mx, **kwargs)
-        #self.autoscale_fig()
+        #self.autoscale_fig() # call after labels? so outside
         return s
 
 
@@ -1559,7 +1579,13 @@ class myinkc(hoppy.hopper):
             mx = np.ma.masked_where(mx < lowlim, mx)
             # print(mse)
         
-        # plot imshow pixely - don't mush it up with interpolation
+
+        max_xlabellen = np.max([len(label) for label in xlabels])
+        max_ylabellen = np.max([len(label) for label in ylabels])
+        kwargs_fig = {"max_xlabellen":max_xlabellen, "max_ylabellen":max_ylabellen}
+
+        # # plot
+        #  imshow pixely - don't mush it up with interpolation
         imim = self.imshowpro(mx=mx, interpolation="none", cmap=cmap, kwargs_fig=kwargs_fig, pixelscale=pixelscale, **kwargs)
         
         # show all ticks
@@ -2701,7 +2727,8 @@ if testing:#call if selected, after defined, explanation see above
     #test_waterfall()
     #test_waterfall_size()
     
-    calibrate_corr_mx_label(aspect="square", labellen=8, pixelscale=1)
+    #calibrate_corr_mx_label(aspect="square", labellen=8, pixelscale=1)
+    calibrate_corr_mx_label(aspect="square", labellen=20, pixelscale=0.5) # len 20 for 5 datasets is smallest use atm
 
     #ecke_tester()
     #ecke_tester(type="ru")
