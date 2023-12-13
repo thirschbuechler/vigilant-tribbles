@@ -43,7 +43,6 @@ def manshow_graph(**kwargs):
 
         def ok(self, event):
             results.append("ok")
-            #print(event)# button_release_event: xy=(536, 45) xydata=(0.2749999999999986, 0.5833333333333334) button=1 dblclick=False inaxes=Axes(0.81,0.05;0.1x0.075)
             pe.close()
 
         def bad(self, event):
@@ -56,7 +55,7 @@ def manshow_graph(**kwargs):
     # testparams
     datalens = range(3,8)
     plens = [0.1,0.5,0.8, 1, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8, 1.9, 2]
-    labellen = 20
+    labellen = 20 # good for most, for datalen=40 however labellen=2 needed
     clims=[]
 
     paramlist = []
@@ -243,12 +242,59 @@ if __name__ == '__main__': # test if called as executable, not as library
     # hand over
     #plot_txt(evaluations, pixelscales=pixelscales, datalens=datalens)
 
-    datalens = [3,4,5,6,7]
+    datalens = np.array([3,4,5,6,7])
     pixelscales =  np.array(list(range(1,20,1)))/10
     #plot_txt(dataset1, pixelscales=pixelscales, datalens=datalens)
 
 
+    # labellen == 20 here
+    dataset1_ok = [
+    ({"datalen": 3, 'pixelscale': 1.8}, 'ok'),
+    ({"datalen": 3, 'pixelscale': 1.9}, 'ok'),
+    ({"datalen": 3, 'pixelscale': 2}, 'ok'),
 
+    ({"datalen": 4, 'pixelscale': 1.5}, 'ok'),
+    ({"datalen": 4, 'pixelscale': 1.6}, 'ok'),
+    ({"datalen": 4, 'pixelscale': 1.7}, 'ok'),
+
+    ({"datalen": 5, 'pixelscale': 1.2}, 'ok'),
+    ({"datalen": 5, 'pixelscale': 1.3}, 'ok'),
+    ({"datalen": 5, 'pixelscale': 1.4}, 'ok'),
+
+    ({"datalen": 6, 'pixelscale': 1.1}, 'ok'),
+    ({"datalen": 6, 'pixelscale': 1.2}, 'ok'),
+    ({"datalen": 6, 'pixelscale': 1.3}, 'ok'),
+
+    ({"datalen": 7, 'pixelscale': 1}, 'ok'),
+    ({"datalen": 7, 'pixelscale': 1.1}, 'ok'),
+    ({"datalen": 7, 'pixelscale': 1.2}, 'ok'),
+    ({"datalen": 7, 'pixelscale': 1.3}, 'ok')
+    ]
+
+    y = [item[0]["pixelscale"] for item in dataset1_ok]
+    x = [item[0]["datalen"] for item in dataset1_ok]
+
+    pe = mi.myinkc()
+    k,d = pe.LSQ(x,y)
+
+    print(k,d) #-0.18444444444444447 2.357777777777778
+
+    
+    pixelscales = datalens*k + d
+
+    pe.subplots()
+    pe.plot(datalens, pixelscales, label="optimal")
+    pe.scatter(x, y, label="samples", color="orange")
+    pe.ylabel("pixelscale")
+    pe.xlabel("datalen")
+    pe.title("pixelscale via datalen and fixed labellen=20")
+
+    pe.show()
+
+
+
+
+"""
     dataset1_ok = [
     ({"datalen": 3, 'pixelscale': 1.8}, 'ok'),
     ({"datalen": 3, 'pixelscale': 1.9}, 'ok'),
@@ -276,18 +322,6 @@ if __name__ == '__main__': # test if called as executable, not as library
     y = [item[0]["datalen"] for item in dataset1_ok]
 
     pe = mi.myinkc()
-    #k,d = LSQ(x,y)
     k,d = pe.LSQ(x,y)
 
-    print(k,d) # -4.454382826475851 11.416815742397139 for dataset1_ok
-
-    #pixelscales = # use from above
-    dlen_opt = pixelscales*k + d
-
-    pe.subplots()
-    pe.plot(pixelscales, dlen_opt, label="optimal")
-    pe.scatter(x, y, label="samples", color="orange")
-    pe.xlabel("pixelscale")
-    pe.ylabel("datalen")
-
-    pe.show()
+    print(k,d) # -4.454382826475851 11.416815742397139 for dataset1_ok"""
