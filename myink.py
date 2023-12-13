@@ -111,6 +111,8 @@ class myinkc(hoppy.hopper):
         self.printimg=True # shall images be printed
         self.yright=None # var to be inspected on plot cleanup and reset
 
+        self.log=None # HACK
+
         kwargs = self.mycanvassize(**kwargs)
         
         super().__init__(*args, **kwargs) # superclass init, in case there is any
@@ -277,16 +279,29 @@ class myinkc(hoppy.hopper):
 
         CAVEAT: only works on current session (jupyter-section, terminal, ..)
         """
+        
+        # define log thingy # HACK shouldnt be here
+        if self.log:
+            out=self.log.trail
+        else:
+            out=print
+
+        # get and try to close
         if st=="emptyax":
             ax = self.get_ax()
             if ax:
                 if not(ax.lines or ax.collections):
                     fig = self.get_fig()
-                    print(f"closing \' {ax.get_title()}\'")
+                    
+                    title = ax.get_title()
+                    if not title:
+                        title = "(empty figure title)"
+                    out(f"closing \' {title}\'")
                     plt.close(fig)
         else:
             plt.close(st)
     
+
     def show(self):
         """ show last plots - for non-spyder IDEs which need manual trigger """
         if self.outputformat=="tikz": # if enabled
@@ -1208,8 +1223,8 @@ class myinkc(hoppy.hopper):
                     #print(f"{stripewidth=}, {outerlen=}")
                     # sidenote - results in 2 characters per dataset
 
-                    pixelscale = 2 # HACK debug override
-                    #pixelscale = 1.7 # HACK debug override - cb label clips
+                    #pixelscale = 2 # debug override
+                    #pixelscale = 1.7 # debug override - cb label clips
                     #pixelscale = 1.5 # zero plot area, all labels ontopeach other - no error !?
                     #pixelscale = 1 # produces clipping warning error
                     fa = 22 / 72 * pixelscale 
@@ -1579,10 +1594,14 @@ class myinkc(hoppy.hopper):
             mx = np.ma.masked_where(mx < lowlim, mx)
             # print(mse)
         
-
-        max_xlabellen = np.max([len(label) for label in xlabels])
-        max_ylabellen = np.max([len(label) for label in ylabels])
-        kwargs_fig = {"max_xlabellen":max_xlabellen, "max_ylabellen":max_ylabellen}
+        if ml.my_any(xlabels) and ml.my_any(ylabels):
+            max_xlabellen = np.max([len(label) for label in xlabels])
+            max_ylabellen = np.max([len(label) for label in ylabels])
+            kwargs_fig = {"max_xlabellen":max_xlabellen, "max_ylabellen":max_ylabellen}
+        else:
+            # assume something
+            max_xlabellen = 2
+            max_ylabellen = 2
 
         # # plot
         #  imshow pixely - don't mush it up with interpolation
