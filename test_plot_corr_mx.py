@@ -32,7 +32,7 @@ except:
         print("failed to import module directly or via submodule -  mind adding them with underscores not operators (minuses aka dashes, etc.)")
 
 
-def manshow_graph(**kwargs):
+def manshow_graph(datalens=[], pixelscales=[], labellen=[], **kwargs):
     pe = mi.myinkc()
 
     # prep button insert
@@ -52,16 +52,13 @@ def manshow_graph(**kwargs):
     # generate instance
     callback = Index()
 
-    # testparams
-    datalens = range(3,8)
-    plens = [0.1,0.5,0.8, 1, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8, 1.9, 2]
-    labellen = 20 # good for most, for datalen=40 however labellen=2 needed
+
     clims=[]
 
     paramlist = []
     # loop
     for datalen in datalens:
-        for pixelscale in plens:
+        for pixelscale in pixelscales:
     
             paramlist.append({"datalen":datalen, "pixelscale":pixelscale})
 
@@ -155,84 +152,44 @@ def plot_txt(txt, pixelscales=[], datalens=[]):
     pe.show()
 
 
-dataset1 = [({"datalen": 3, 'pixelscale': 0.1}, 'autobad: autoscale fig (plt.tight_layout) failed - plot overflows'),
-({"datalen": 3, 'pixelscale': 0.5}, 'autobad: autoscale fig (plt.tight_layout) failed - plot overflows'),
-({"datalen": 3, 'pixelscale': 0.8}, 'autobad: autoscale fig (plt.tight_layout) failed - plot overflows'),
-({"datalen": 3, 'pixelscale': 1}, 'autobad: autoscale fig (plt.tight_layout) failed - plot overflows'),
-({"datalen": 3, 'pixelscale': 1.1}, 'autobad: autoscale fig (plt.tight_layout) failed - plot overflows'),
-({"datalen": 3, 'pixelscale': 1.2}, 'autobad: autoscale fig (plt.tight_layout) failed - plot overflows'),
-({"datalen": 3, 'pixelscale': 1.3}, 'autobad: autoscale fig (plt.tight_layout) failed - plot overflows'),
-({"datalen": 3, 'pixelscale': 1.4}, 'autobad: autoscale fig (plt.tight_layout) failed - plot overflows'),
-({"datalen": 3, 'pixelscale': 1.5}, 'bad'),
-({"datalen": 3, 'pixelscale': 1.6}, 'bad'),
-({"datalen": 3, 'pixelscale': 1.7}, 'bad'),
-({"datalen": 3, 'pixelscale': 1.8}, 'ok'),
-({"datalen": 3, 'pixelscale': 1.9}, 'ok'),
-({"datalen": 3, 'pixelscale': 2}, 'ok'),
-({"datalen": 4, 'pixelscale': 0.1}, 'autobad: autoscale fig (plt.tight_layout) failed - plot overflows'),
-({"datalen": 4, 'pixelscale': 0.5}, 'autobad: autoscale fig (plt.tight_layout) failed - plot overflows'),
-({"datalen": 4, 'pixelscale': 0.8}, 'autobad: autoscale fig (plt.tight_layout) failed - plot overflows'),
-({"datalen": 4, 'pixelscale': 1}, 'autobad: autoscale fig (plt.tight_layout) failed - plot overflows'),
-({"datalen": 4, 'pixelscale': 1.1}, 'autobad: autoscale fig (plt.tight_layout) failed - plot overflows'),
-({"datalen": 4, 'pixelscale': 1.2}, 'bad'),
-({"datalen": 4, 'pixelscale': 1.3}, 'bad'),
-({"datalen": 4, 'pixelscale': 1.4}, 'bad'),
-({"datalen": 4, 'pixelscale': 1.5}, 'ok'),
-({"datalen": 4, 'pixelscale': 1.6}, 'ok'),
-({"datalen": 4, 'pixelscale': 1.7}, 'ok'),
-({"datalen": 4, 'pixelscale': 1.8}, 'bad'),
-({"datalen": 4, 'pixelscale': 1.9}, 'bad'),
-({"datalen": 4, 'pixelscale': 2}, 'bad'),
-({"datalen": 5, 'pixelscale': 0.1}, 'autobad: autoscale fig (plt.tight_layout) failed - plot overflows'),
-({"datalen": 5, 'pixelscale': 0.5}, 'autobad: autoscale fig (plt.tight_layout) failed - plot overflows'),
-({"datalen": 5, 'pixelscale': 0.8}, 'autobad: autoscale fig (plt.tight_layout) failed - plot overflows'),
-({"datalen": 5, 'pixelscale': 1}, 'bad'),
-({"datalen": 5, 'pixelscale': 1.1}, 'bad'),
-({"datalen": 5, 'pixelscale': 1.2}, 'ok'),
-({"datalen": 5, 'pixelscale': 1.3}, 'ok'),
-({"datalen": 5, 'pixelscale': 1.4}, 'ok'),
-({"datalen": 5, 'pixelscale': 1.5}, 'bad'),
-({"datalen": 5, 'pixelscale': 1.6}, 'bad'),
-({"datalen": 5, 'pixelscale': 1.7}, 'bad'),
-({"datalen": 5, 'pixelscale': 1.8}, 'bad'),
-({"datalen": 5, 'pixelscale': 1.9}, 'bad'),
-({"datalen": 5, 'pixelscale': 2}, 'bad'),
-({"datalen": 6, 'pixelscale': 0.1}, 'autobad: autoscale fig (plt.tight_layout) failed - plot overflows'),
-({"datalen": 6, 'pixelscale': 0.5}, 'autobad: autoscale fig (plt.tight_layout) failed - plot overflows'),
-({"datalen": 6, 'pixelscale': 0.8}, 'bad'),
-({"datalen": 6, 'pixelscale': 1}, 'bad'),
-({"datalen": 6, 'pixelscale': 1.1}, 'ok'),
-({"datalen": 6, 'pixelscale': 1.2}, 'ok'),
-({"datalen": 6, 'pixelscale': 1.3}, 'ok'),
-({"datalen": 6, 'pixelscale': 1.4}, 'bad'),
-({"datalen": 6, 'pixelscale': 1.5}, 'bad'),
-({"datalen": 6, 'pixelscale': 1.6}, 'bad'),
-({"datalen": 6, 'pixelscale': 1.7}, 'bad'),
-({"datalen": 6, 'pixelscale': 1.8}, 'bad'),
-({"datalen": 6, 'pixelscale': 1.9}, 'bad'),
-({"datalen": 6, 'pixelscale': 2}, 'bad'),
-({"datalen": 7, 'pixelscale': 0.1}, 'autobad: autoscale fig (plt.tight_layout) failed - plot overflows'),
-({"datalen": 7, 'pixelscale': 0.5}, 'autobad: autoscale fig (plt.tight_layout) failed - plot overflows'),
-({"datalen": 7, 'pixelscale': 0.8}, 'bad'),
-({"datalen": 7, 'pixelscale': 1}, 'ok'),
-({"datalen": 7, 'pixelscale': 1.1}, 'ok'),
-({"datalen": 7, 'pixelscale': 1.2}, 'ok'),
-({"datalen": 7, 'pixelscale': 1.3}, 'ok'),
-({"datalen": 7, 'pixelscale': 1.4}, 'bad'),
-({"datalen": 7, 'pixelscale': 1.5}, 'bad'),
-({"datalen": 7, 'pixelscale': 1.6}, 'bad'),
-({"datalen": 7, 'pixelscale': 1.7}, 'bad'),
-({"datalen": 7, 'pixelscale': 1.8}, 'bad'),
-({"datalen": 7, 'pixelscale': 1.9}, 'bad'),
-({"datalen": 7, 'pixelscale': 2}, 'bad')]
+def get_lsq(dataset = [], pixelscales=[], datalens=[], labellen=[]):
+    
+
+    y = [item[0]["pixelscale"] for item in dataset]
+    x = [item[0]["datalen"] for item in dataset]
+
+    pe = mi.myinkc()
+    k,d = pe.LSQ(x,y)
+
+    print(k,d) #-0.18444444444444447 2.357777777777778
+
+    
+    pixelscales = datalens*k + d
+
+    pe.subplots()
+    pe.plot(datalens, pixelscales, label="optimal")
+    pe.scatter(x, y, label="samples", color="orange")
+    pe.ylabel("pixelscale")
+    pe.xlabel("datalen")
+    pe.title(f"pixelscale via datalen and fixed {labellen=}")
+
+    pe.show()
+
+
 
 if __name__ == '__main__': # test if called as executable, not as library
-    #txt = manshow_graph()
-    #for line in txt:
-    #    print(line)
+    
+    # testparams
+    datalens = range(3,8)
+    
+    k, d = -0.18444444444444447, 2.357777777777778
+    pixelscales = datalens*k + d
 
+    labellen = 20 # good for most, for datalen=40 however labellen=2 needed
 
-    # make dummydata
+    txt = manshow_graph(datalens=datalens, pixelscales=pixelscales, labellen=labellen)
+
+# make dummydata
     paramlist = [{"datalen":1, "pixelscale":2},{"datalen":3, "pixelscale":5}, {"datalen":1, "pixelscale":1}]
     results = ["OK", "Bad", "autobad"]
     pixelscales=[1,2,3,4,5]
@@ -271,57 +228,6 @@ if __name__ == '__main__': # test if called as executable, not as library
     ({"datalen": 7, 'pixelscale': 1.3}, 'ok')
     ]
 
-    y = [item[0]["pixelscale"] for item in dataset1_ok]
-    x = [item[0]["datalen"] for item in dataset1_ok]
 
-    pe = mi.myinkc()
-    k,d = pe.LSQ(x,y)
+    get_lsq(dataset=dataset1_ok, pixelscales=pixelscales, datalens=datalens, labellen=labellen)
 
-    print(k,d) #-0.18444444444444447 2.357777777777778
-
-    
-    pixelscales = datalens*k + d
-
-    pe.subplots()
-    pe.plot(datalens, pixelscales, label="optimal")
-    pe.scatter(x, y, label="samples", color="orange")
-    pe.ylabel("pixelscale")
-    pe.xlabel("datalen")
-    pe.title("pixelscale via datalen and fixed labellen=20")
-
-    pe.show()
-
-
-
-
-"""
-    dataset1_ok = [
-    ({"datalen": 3, 'pixelscale': 1.8}, 'ok'),
-    ({"datalen": 3, 'pixelscale': 1.9}, 'ok'),
-    ({"datalen": 3, 'pixelscale': 2}, 'ok'),
-
-    ({"datalen": 4, 'pixelscale': 1.5}, 'ok'),
-    ({"datalen": 4, 'pixelscale': 1.6}, 'ok'),
-    ({"datalen": 4, 'pixelscale': 1.7}, 'ok'),
-
-    ({"datalen": 5, 'pixelscale': 1.2}, 'ok'),
-    ({"datalen": 5, 'pixelscale': 1.3}, 'ok'),
-    ({"datalen": 5, 'pixelscale': 1.4}, 'ok'),
-
-    ({"datalen": 6, 'pixelscale': 1.1}, 'ok'),
-    ({"datalen": 6, 'pixelscale': 1.2}, 'ok'),
-    ({"datalen": 6, 'pixelscale': 1.3}, 'ok'),
-
-    ({"datalen": 7, 'pixelscale': 1}, 'ok'),
-    ({"datalen": 7, 'pixelscale': 1.1}, 'ok'),
-    ({"datalen": 7, 'pixelscale': 1.2}, 'ok'),
-    ({"datalen": 7, 'pixelscale': 1.3}, 'ok')
-    ]
-
-    x = [item[0]["pixelscale"] for item in dataset1_ok]
-    y = [item[0]["datalen"] for item in dataset1_ok]
-
-    pe = mi.myinkc()
-    k,d = pe.LSQ(x,y)
-
-    print(k,d) # -4.454382826475851 11.416815742397139 for dataset1_ok"""
