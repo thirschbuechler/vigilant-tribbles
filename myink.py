@@ -1214,22 +1214,16 @@ class myinkc(hoppy.hopper):
                     max_ylabellen = kwargs_fig["max_ylabellen"]
                     max_chars = max(max_xlabellen, max_ylabellen)
 
-                    # define
-                    #mx_plot_width = xdatalen +1 #+2 for ticks and cbar
+                    # from playing w test_plot_corr_mx
+                    #pixelscale = -0.1 *xdatalen + 2
+                    
+                    # fix size at x=3 but decrease slope, aka add
+                    slopecorr = 0.05
+                    pixelscale *= (-0.1 -slopecorr)*xdatalen + 2 +slopecorr*3
 
-                    # calc
-                    #stripewidth = int(np.ceil(mx_plot_width * chars_pro_mx_plot/max_chars  ) )   
-                    #outerlen= mx_plot_width + stripewidth
-                    #print(f"{stripewidth=}, {outerlen=}")
-                    # sidenote - results in 2 characters per dataset
-
-                    #pixelscale = 2 # debug override
-                    #pixelscale = 1.7 # debug override - cb label clips
-                    #pixelscale = 1.5 # zero plot area, all labels ontopeach other - no error !?
-                    #pixelscale = 1 # produces clipping warning error
                     fa = 22 / 72 * pixelscale 
-                    xfig = xdatalen * fa 
-                    #xfig = np.max([1.2, xfig]) # to fit still when colorbar is there and not be too small
+                    xfig = xdatalen * fa * (1+ max_chars/100)
+                    
                     #xfig = xfig + stripewidth
                     yfig = ydatalen * fa
                     
@@ -1248,8 +1242,18 @@ class myinkc(hoppy.hopper):
             # HACK - stripewidth mod alone doesnt work, figure needs to be larger
             #self.ecke_ru_only(figsize=(xfig,yfig), stripewidth=stripewidth, outerlen=outerlen)
             #self.ax_i = -1
-            self.subplots(figsize=(xfig,yfig))
-            self.ax_i = -1
+
+            # # cb fix # # 
+            # to fit still when colorbar is there and not be too small
+            xfig = np.max([1.2, xfig]) 
+            # add "resting" space below
+            nrows=2
+
+            self.subplots(figsize=(xfig,yfig), nrows=nrows)
+            self.ax_onward()# go to row 2
+            self.blank() # remove axis lines
+            self.ax_backtrack()
+            self.ax_i = -1 # put into expected location to start w ax_onward() in a loop
 
 
         if y_label_inverted:

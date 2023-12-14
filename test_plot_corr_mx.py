@@ -155,10 +155,19 @@ def get_lsq_from_df(df):
 if __name__ == '__main__': # test if called as executable, not as library
     
     # testparams
-    datalens = np.array(range(3,8))
+    datalens = np.arange(3,8)
     
-    k, d = -0.18444444444444447, 2.357777777777778
-    pixelscales = datalens*k + d
+    #k, d = -0.18444444444444447, 2.357777777777778
+    #pixelscales = datalens*k + d
+    #k,d = 0.06916666666666654, 1.3663888888888895
+    #pixelscales = pixelscales*k + d
+    #pixelscales = datalens*k + d
+
+    #pixelscales = np.ones(len(datalens)) * 1.7
+    #pixelscales = [1]
+    
+    
+    pixelscales = np.arange(0.9,1.1,0.05)
 
     labellen = 20 # good for most, for datalen=40 however labellen=2 needed
 
