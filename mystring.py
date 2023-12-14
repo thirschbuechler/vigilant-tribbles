@@ -72,6 +72,7 @@ def str_to_blocktext(input, in_sep, out_sep=" ", maxlen=5):
 
 def dict_to_str(mydict):
     """ turn dictionary into human readable string
+        note: even nicer would be print(pd.DataFrame([mydict]))
     
     >>> dict_to_str({"a":10, "b":20})
     'a: 10, b: 20'
