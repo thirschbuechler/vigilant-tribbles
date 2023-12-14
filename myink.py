@@ -805,7 +805,7 @@ class myinkc(hoppy.hopper):
         plt.close("all") # fun but not needed
     
     
-    def LSQ(self, x, y):
+    def LSQ_line(self, x, y):
         """ THE OLD FASHIONED MOORE PENROSE WAY"""
         # make pinv basis
         A = np.vstack([x, np.ones(len(x))]).T
@@ -2162,7 +2162,7 @@ def tester():
         if not os.path.exists("myfigures/stinkbug.webp"):
             raise Exception("for selftest of myinkc, please go (cd) to vigilant_tribbles and run \"python myink.py\" there")
 
-        oldtest()
+        lsq_line_test()
         test_fontsize()
         tickrot()
         stemmy()
@@ -2175,7 +2175,7 @@ def tester():
         myinkc().mycanvassize(medfig=True) # reset afterwards via one-time-use myinkc element
         test_waterfall()
         test_waterfall_size()
-        histo_test()
+        histo_test_and_modlegend()
         doublebarrel_barberpole()
         statistics_visu()
         boxplottest()
@@ -2185,14 +2185,14 @@ def tester():
 
 
 
-def oldtest():    
+def lsq_line_test():    
     ele = myinkc()
     print(ele.defaultcolorlist())
     
     x = np.array([0, 1, 2, 5])
     y = np.array([-1, 0.2, 0.9, 2.1])
     
-    k, d = ele.LSQ(x,y)
+    k, d = ele.LSQ_line(x,y)
     
     #ele.subplots()
     #ele.plot_mag()#this is in thvsia
@@ -2201,7 +2201,7 @@ def oldtest():
     plt.legend()
     plt.show()
     
-    ele.modlegend("hellO") # take some ax function to test ax property
+    #ele.modlegend("hellO") # take some ax function to test ax property
 
 
 def test_fontsize():
@@ -2226,8 +2226,8 @@ def large_alltext():
     large_title2()
 
 
-def histo_test():
-    """ test the hist fct adaptions - percent, matrix input """
+def histo_test_and_modlegend():
+    """ test the hist fct adaptions - percent, matrix input, and modlegend """
     ele = myinkc()
     #ele.rcparams_update({'font.size': 22})
     

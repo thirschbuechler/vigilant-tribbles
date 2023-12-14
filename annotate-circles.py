@@ -213,7 +213,7 @@ if __name__ == '__main__': # test if called as executable, not as library
     x = np.array([0, 1, 2, 5])
     y = np.array([-1, 0.2, 0.9, 2.1])
 
-    k, d = ele.LSQ(x,y)
+    k, d = ele.LSQ_line(x,y)
 
     #ele.subplots()
     #ele.plot_mag()#this is in thvsia

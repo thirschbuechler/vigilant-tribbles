@@ -133,7 +133,7 @@ def get_lsq_from_df(df):
     
     # get lsq
     pe = mi.myinkc()
-    k,d = pe.LSQ(x,y)
+    k,d = pe.LSQ_line(x,y)
 
     print(k,d) #-0.18444444444444447 2.357777777777778
 
