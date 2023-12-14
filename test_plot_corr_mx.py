@@ -34,17 +34,18 @@ def human_graphrater(datalens=[], pixelscales=[], labellen=[], **kwargs):
     pe = mi.myinkc()
 
     # prep button insert
-    results = []
+    rating = 0 # from 1 to 5 stars
+    df = pd.DataFrame()
     from matplotlib.widgets import Button
 
     class Index:
 
         def ok(self, event):
-            results.append("ok")
+            rating = (5)
             pe.close()
 
         def bad(self, event):
-            results.append("bad")
+            rating = (3)
             pe.close()
 
     # generate instance
@@ -58,7 +59,7 @@ def human_graphrater(datalens=[], pixelscales=[], labellen=[], **kwargs):
     for datalen in datalens:
         for pixelscale in pixelscales:
     
-            paramlist.append({"datalen":datalen, "pixelscale":pixelscale})
+            #paramlist.append({"datalen":datalen, "pixelscale":pixelscale})
 
             # gen labels
             folderlabels = np.arange(0,datalen, dtype=np.int8)
@@ -86,47 +87,23 @@ def human_graphrater(datalens=[], pixelscales=[], labellen=[], **kwargs):
                 
                 pe.show()
             except Exception as e:
-                #results.append(f"autobad: {e}")
-                results.append(f"autobad")
+                rating = (1)
 
-    evaluations = zip(paramlist, results)
+            new_row = {"datalen":datalen, "pixelscale":pixelscale, "labellen":labellen, "rating":rating}
+            df = df.append(new_row, ignore_index=True)
 
-    return (list(evaluations))
-
-
-
-def wf_from_txt(txt, pixelscales=[], datalens=[]):
+    return (df)
 
 
-    
-    data = []
-    for dicto, outcome in txt:
+def wf_from_df(df):
 
-        # convert outcome to int
-        if outcome=="OK" or outcome=="ok":
-            c=10
-        elif outcome=="Bad" or outcome=="bad":
-            c=5
-        elif (outcome=="autobad") or ("autobad" in outcome):
-            c=1
-        else:
-            raise Exception(f"not valid: {outcome=}")
-        
-        # don't try to hold-plot
-        #pe.scatter(dicto["datalen"], dicto["pixelscale"], c=c)
-        
-        # save for later
-        xi,yi,zi = (dicto["datalen"], int(dicto["pixelscale"]*10), c)
-        data.append([xi,yi,zi])
-    
-
-    data = np.array(data)
-    df = pd.DataFrame({"datalen": data[:, 0]-1, 'pixelscale': data[:, 1]-1, 'outcome': data[:, 2]})
+    pixelscales = np.array(df['pixelscales'].unique())
+    datalens = np.array(df['datalen'].unique())
 
     print(df.head(0))
 
     vint = np.vectorize(int)
-    pixelscales = vint(pixelscales*10)
+    pixelscales = vint(pixelscales*10)  #*10 workaround to get int and fit with mx making
         # def make_mx_new(df, d_col="RSSI", t_col = "timestamp", x_col = "CH", xmax = 40, dtype='float16', lintime=True):
     mx = chx.make_mx_new(df, d_col="outcome", t_col="datalen", x_col="pixelscale", xmax=max(pixelscales)+1) # hack lens+1 if issue
     datalens = np.array(datalens)
@@ -135,26 +112,30 @@ def wf_from_txt(txt, pixelscales=[], datalens=[]):
     pe = mi.myinkc()
     pe.subplots()
     pe.waterfall(mx, x_axis=pixelscales, yticks=datalens, cb_label="badness (blue ok, green bad, red autobad)")
-    pe.xlabel("pixelscale*10")
+    pe.xlabel("pixelscale*10") #*10 workaround to get int and fit with mx making
     pe.ylabel("datalen")
 
     pe.show()
 
 
-def get_lsq(dataset = [], pixelscales=[], datalens=[], labellen=[]):
+def get_lsq_from_df(df):
+
+    # select good ratings only
+    df = df[df["rating"]==1]
+
+    y = df["pixelscale"]
+    x = df["datalen"]
     
-
-    y = [item[0]["pixelscale"] for item in dataset]
-    x = [item[0]["datalen"] for item in dataset]
-
+    # get lsq
     pe = mi.myinkc()
     k,d = pe.LSQ(x,y)
 
     print(k,d) #-0.18444444444444447 2.357777777777778
 
-    
+    # calc line
     pixelscales = datalens*k + d
 
+    # plot
     pe.subplots()
     pe.plot(datalens, pixelscales, label="optimal")
     pe.scatter(x, y, label="samples", color="orange")
@@ -176,48 +157,16 @@ if __name__ == '__main__': # test if called as executable, not as library
 
     labellen = 20 # good for most, for datalen=40 however labellen=2 needed
 
-    txt = human_graphrater(datalens=datalens, pixelscales=pixelscales, labellen=labellen)
+    df = human_graphrater(datalens=datalens, pixelscales=pixelscales, labellen=labellen)
 
-    
-    # make dummydata
-    paramlist = [{"datalen":1, "pixelscale":2},{"datalen":3, "pixelscale":5}, {"datalen":1, "pixelscale":1}]
-    results = ["OK", "Bad", "autobad"]
-    pixelscales=[1,2,3,4,5]
-    datalens=[1,2,3]
-    evaluations = list(zip(paramlist, results))
+    # graph test dummydata
+    #results = [1,3,5]
+    #pixelscales=[2,5,1]
+    #datalens=[1,2,3]
 
-    # hand over
-    #plot_txt(evaluations, pixelscales=pixelscales, datalens=datalens)
-
-    datalens = np.array([3,4,5,6,7])
-    pixelscales =  np.array(list(range(1,20,1)))/10
+    #datalens = np.array([3,4,5,6,7])
+    #pixelscales =  np.array(list(range(1,20,1)))/10
     #plot_txt(dataset1, pixelscales=pixelscales, datalens=datalens)
 
-
-    # labellen == 20 here
-    dataset1_ok = [
-    ({"datalen": 3, 'pixelscale': 1.8}, 'ok'),
-    ({"datalen": 3, 'pixelscale': 1.9}, 'ok'),
-    ({"datalen": 3, 'pixelscale': 2}, 'ok'),
-
-    ({"datalen": 4, 'pixelscale': 1.5}, 'ok'),
-    ({"datalen": 4, 'pixelscale': 1.6}, 'ok'),
-    ({"datalen": 4, 'pixelscale': 1.7}, 'ok'),
-
-    ({"datalen": 5, 'pixelscale': 1.2}, 'ok'),
-    ({"datalen": 5, 'pixelscale': 1.3}, 'ok'),
-    ({"datalen": 5, 'pixelscale': 1.4}, 'ok'),
-
-    ({"datalen": 6, 'pixelscale': 1.1}, 'ok'),
-    ({"datalen": 6, 'pixelscale': 1.2}, 'ok'),
-    ({"datalen": 6, 'pixelscale': 1.3}, 'ok'),
-
-    ({"datalen": 7, 'pixelscale': 1}, 'ok'),
-    ({"datalen": 7, 'pixelscale': 1.1}, 'ok'),
-    ({"datalen": 7, 'pixelscale': 1.2}, 'ok'),
-    ({"datalen": 7, 'pixelscale': 1.3}, 'ok')
-    ]
-
-
-    get_lsq(dataset=dataset1_ok, pixelscales=pixelscales, datalens=datalens, labellen=labellen)
+    get_lsq_from_df(df)
 
