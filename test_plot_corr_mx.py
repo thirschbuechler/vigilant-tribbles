@@ -18,12 +18,12 @@ import pandas as pd
 
 try:
     import myink as mi
-    #import mystring as ms
+    import mystring as ms
     import ch_mx_lineartime as chx
 except:
     try:
         from vigilant_tribbles import myink as mi
-        #from vigilant_tribbles import mystring as ms
+        from vigilant_tribbles import mystring as ms
         from vigilant_tribbles import ch_mx_lineartime as chx
 
     except:
@@ -34,18 +34,18 @@ def human_graphrater(datalens=[], pixelscales=[], labellen=[], **kwargs):
     pe = mi.myinkc()
 
     # prep button insert
-    rating = 0 # from 1 to 5 stars
+    rating = [] # "global" list from 1 to 5 stars
     df = pd.DataFrame()
     from matplotlib.widgets import Button
 
     class Index:
 
         def ok(self, event):
-            rating = (5)
+            rating.append(5)
             pe.close()
 
         def bad(self, event):
-            rating = (3)
+            rating.append(3)
             pe.close()
 
     # generate instance
@@ -73,7 +73,9 @@ def human_graphrater(datalens=[], pixelscales=[], labellen=[], **kwargs):
             
             kwargs = {"aspect":"square"} # HACK - doesnt work without
             try:
-                pe.plot_corr_mx(mx=mx,xlabels=folderlabels, ylabels=folderlabels, clims=clims, optlabel=f"{datalens=}", cb_label="1E", pixelscale=pixelscale, **kwargs)
+                optlabel = f"{datalens=}"# always clips on small, does it encourage to clip cb_label?
+                optlabel = "" # nope, cb_label still clips
+                pe.plot_corr_mx(mx=mx,xlabels=folderlabels, ylabels=folderlabels, clims=clims, optlabel=optlabel, cb_label="1E", pixelscale=pixelscale, **kwargs)
 
                 # add controls
                 # https://matplotlib.org/stable/gallery/widgets/buttons.html
@@ -87,10 +89,13 @@ def human_graphrater(datalens=[], pixelscales=[], labellen=[], **kwargs):
                 
                 pe.show()
             except Exception as e:
-                rating = (1)
-
-            new_row = {"datalen":datalen, "pixelscale":pixelscale, "labellen":labellen, "rating":rating}
-            df = df.append(new_row, ignore_index=True)
+                rating.append(1)
+            
+            
+            new_row = pd.DataFrame([{"datalen":datalen, "pixelscale":pixelscale, "labellen":labellen, "rating":rating[0]}])
+            print(new_row)
+            df = pd.concat([df, new_row], ignore_index=True)
+            rating = [] # reset "global" list
 
     return (df)
 
@@ -120,8 +125,8 @@ def wf_from_df(df):
 
 def get_lsq_from_df(df):
 
-    # select good ratings only
-    df = df[df["rating"]==1]
+    # select best ratings only
+    df = df[df["rating"]==5]
 
     y = df["pixelscale"]
     x = df["datalen"]
