@@ -16,8 +16,6 @@ import numpy as np
 import pandas as pd
 
 
-
-
 try:
     import myink as mi
     #import mystring as ms
@@ -32,7 +30,7 @@ except:
         print("failed to import module directly or via submodule -  mind adding them with underscores not operators (minuses aka dashes, etc.)")
 
 
-def manshow_graph(datalens=[], pixelscales=[], labellen=[], **kwargs):
+def human_graphrater(datalens=[], pixelscales=[], labellen=[], **kwargs):
     pe = mi.myinkc()
 
     # prep button insert
@@ -97,11 +95,8 @@ def manshow_graph(datalens=[], pixelscales=[], labellen=[], **kwargs):
 
 
 
-def plot_txt(txt, pixelscales=[], datalens=[]):
-    pe = mi.myinkc()
-    #import matplotlib.pyplot as plt
-    #fig, ax = plt.subplots()
-    pe.subplots()
+def wf_from_txt(txt, pixelscales=[], datalens=[]):
+
 
     
     data = []
@@ -125,26 +120,20 @@ def plot_txt(txt, pixelscales=[], datalens=[]):
         data.append([xi,yi,zi])
     
 
-    #x,y,z = data
-    #df = pd.DataFrame(columns=["datalen", "pixelscale", "outcome"])
-    #df.append(x,y,z)
     data = np.array(data)
     df = pd.DataFrame({"datalen": data[:, 0]-1, 'pixelscale': data[:, 1]-1, 'outcome': data[:, 2]})
 
-
     print(df.head(0))
-
-    # kinda doesn't work - hey i did solve that w waterfall
-    #pe.scatter(x=x,y=y, c=z)
-    #pe.colorbar(cmap="turbo")
-
-    #def make_mx_new(df, d_col="RSSI", t_col = "timestamp", x_col = "CH", xmax = 40, dtype='float16', lintime=True):
 
     vint = np.vectorize(int)
     pixelscales = vint(pixelscales*10)
-
+        # def make_mx_new(df, d_col="RSSI", t_col = "timestamp", x_col = "CH", xmax = 40, dtype='float16', lintime=True):
     mx = chx.make_mx_new(df, d_col="outcome", t_col="datalen", x_col="pixelscale", xmax=max(pixelscales)+1) # hack lens+1 if issue
     datalens = np.array(datalens)
+
+    # plot
+    pe = mi.myinkc()
+    pe.subplots()
     pe.waterfall(mx, x_axis=pixelscales, yticks=datalens, cb_label="badness (blue ok, green bad, red autobad)")
     pe.xlabel("pixelscale*10")
     pe.ylabel("datalen")
@@ -180,16 +169,17 @@ def get_lsq(dataset = [], pixelscales=[], datalens=[], labellen=[]):
 if __name__ == '__main__': # test if called as executable, not as library
     
     # testparams
-    datalens = range(3,8)
+    datalens = np.array(range(3,8))
     
     k, d = -0.18444444444444447, 2.357777777777778
     pixelscales = datalens*k + d
 
     labellen = 20 # good for most, for datalen=40 however labellen=2 needed
 
-    txt = manshow_graph(datalens=datalens, pixelscales=pixelscales, labellen=labellen)
+    txt = human_graphrater(datalens=datalens, pixelscales=pixelscales, labellen=labellen)
 
-# make dummydata
+    
+    # make dummydata
     paramlist = [{"datalen":1, "pixelscale":2},{"datalen":3, "pixelscale":5}, {"datalen":1, "pixelscale":1}]
     results = ["OK", "Bad", "autobad"]
     pixelscales=[1,2,3,4,5]
