@@ -49,11 +49,12 @@ def make_mx_new(df, d_col="RSSI", t_col = "timestamp", x_col = "CH", xmax = 40, 
     - - float16 - default (has np.nan, less than float64 ram)
     - - uint8 would be better but no np.nan
     - - float64 is default but prohibitively large
+    - lintime: is time (y-axis) linspace-like, aka evenly spaced?
     """
     # ingress
-    RSSIs = np.array(df[d_col], dtype=int)
-    CHs = np.array(df[x_col], dtype=int)
-    timestamps = np.array(df[t_col], dtype=int)
+    RSSIs = np.array(df[d_col], dtype=int) # not a strict requirement
+    CHs = np.array(df[x_col], dtype=int) # needs to be int to be usable as index
+    timestamps = np.array(df[t_col], dtype=int) # needs to be int to be usable as index
 
     if lintime:
         t0 = min(timestamps)
