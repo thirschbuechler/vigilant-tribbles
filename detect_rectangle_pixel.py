@@ -16,46 +16,52 @@ import subprocess
 import skimage
 import imageio.v3 as iio
 
-# Parameters
-in_name =    "Figure_1.png"
-out_name =   "red2.png"
-minsize = 20
-hsvmin, hsvmax = (0, 25, 25), (1, 255,255)
-cmd = f"convert {out_name} -trim +repage {out_name}"
 
 
-# Read
-img = cv2.imread(in_name)
+def detect_colored_area(
+        in_name =    "Figure_1.png",
+        out_name =   "red2.png",
+        minsize = 20,
+        hsvmin = (0, 25, 25), hsvmax = (1, 255,255)):
+    
+    # Read
+    img = cv2.imread(in_name)
 
-# Convert to HSV
-hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
+    # Convert to HSV
+    hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
 
-# Mask dark red
-mask = cv2.inRange(hsv, hsvmin, hsvmax)
+    # Mask dark red
+    mask = cv2.inRange(hsv, hsvmin, hsvmax)
 
-# Slice the mask
-imask = mask>0
-masked = np.zeros_like(img, np.uint8)
-masked[imask] = img[imask]
+    # Slice the mask
+    imask = mask>0
+    masked = np.zeros_like(img, np.uint8)
+    masked[imask] = img[imask]
 
-# Save tmp
-cv2.imwrite(out_name, masked)
+    # Save tmp
+    cv2.imwrite(out_name, masked)
 
-# Open in skimage
-img = iio.imread(out_name)[:,:,0]
+    # Open in skimage
+    img = iio.imread(out_name)[:,:,0]
 
-# Delete non-minimum areas
-out = skimage.morphology.area_opening(img, area_threshold=minsize, connectivity=2)
+    # Delete non-minimum areas
+    out = skimage.morphology.area_opening(img, area_threshold=minsize, connectivity=2)
 
-# Write result
-iio.imwrite(out_name,out)
+    # Write result
+    iio.imwrite(out_name,out)
 
-# Remove remaining background
-proc = subprocess.Popen(cmd, shell=True)
-proc.wait()
+    # Remove remaining background
+    cmd = f"convert {out_name} -trim +repage {out_name}"
+    proc = subprocess.Popen(cmd, shell=True)
+    proc.wait()
 
-# Open result
-img = cv2.imread(out_name)
+    # Open result
+    img = cv2.imread(out_name)
 
-# Print shape
-print(img.shape)
+    # Return shape
+    return(img.shape)
+
+
+
+if __name__ == '__main__': # test if called as executable, not as library, regular prints allowed
+    print(detect_colored_area())
