@@ -11,7 +11,6 @@ supplementing calibrate_corr_mx_label in myink
 Created 08.12.23
 @author: thirschbuechler
 """
-
 import numpy as np
 import pandas as pd
 
@@ -20,17 +19,20 @@ try:
     import myink as mi
     import mystring as ms
     import ch_mx_lineartime as chx
+    import detect_rectangle_pixel as drp
+
 except:
     try:
         from vigilant_tribbles import myink as mi
         from vigilant_tribbles import mystring as ms
         from vigilant_tribbles import ch_mx_lineartime as chx
+        from vigilant_tribbles import detect_rectangle_pixel as drp
 
     except:
         print("failed to import module directly or via submodule -  mind adding them with underscores not operators (minuses aka dashes, etc.)")
 
 
-def human_graphrater(datalens=[], pixelscales=[], labellen=[], **kwargs):
+def human_graphrater(datalens=[], pixelscales=[], labellen=[], human=True, **kwargs):
     pe = mi.myinkc()
 
     # prep button insert
@@ -67,7 +69,11 @@ def human_graphrater(datalens=[], pixelscales=[], labellen=[], **kwargs):
             # elongate labels?
             folderlabels = ["".join([str(flabel) for _ in range(0,labellen)]) for flabel in folderlabels]
 
-            vec = np.random.random(size=datalen)
+            if human: # prettier to look at
+                vec = np.random.random(size=datalen)
+            else: # easier to eval - only have ascending data, ergo one red square                
+                vec = np.array(np.arange(1,datalen-1), dtype=np.float16)
+
             mx = np.diag(vec)
             mx[mx==0] = np.nan
             
@@ -77,18 +83,28 @@ def human_graphrater(datalens=[], pixelscales=[], labellen=[], **kwargs):
                 optlabel = "" # nope, cb_label still clips
                 pe.plot_corr_mx(mx=mx,xlabels=folderlabels, ylabels=folderlabels, clims=clims, optlabel=optlabel, cb_label="1E", pixelscale=pixelscale, **kwargs)
 
-                # add controls
-                # https://matplotlib.org/stable/gallery/widgets/buttons.html
-                fig = pe.get_fig()
-                axbad = fig.add_axes([0.7, 0.05, 0.1, 0.075])
-                axok = fig.add_axes([0.81, 0.05, 0.1, 0.075])
-                bok = Button(axok, 'OK')
-                bok.on_clicked(callback.ok)
-                bbad = Button(axbad, 'Bad')
-                bbad.on_clicked(callback.bad)
-                
-                pe.show()
+                if human:
+                    # add controls
+                    # https://matplotlib.org/stable/gallery/widgets/buttons.html
+                    fig = pe.get_fig()
+                    axbad = fig.add_axes([0.7, 0.05, 0.1, 0.075])
+                    axok = fig.add_axes([0.81, 0.05, 0.1, 0.075])
+                    bok = Button(axok, 'OK')
+                    bok.on_clicked(callback.ok)
+                    bbad = Button(axbad, 'Bad')
+                    bbad.on_clicked(callback.bad)
+                    pe.show()
+                else:
+                    fig_name = "fig.png"
+                    pe.savefig(fname=fig_name, format="png", pad_inches=0)
+                    r = drp.detect_colored_area(fig_name, "fig_tmp.png")
+                    print(r)
+                    frac = (r[0]+r[1])/(2*20)
+                    deviation = abs(frac-1)
+                    rating.append(5-deviation*5)
+                    
             except Exception as e:
+                print(e)
                 rating.append(1)
             
             
@@ -171,7 +187,7 @@ if __name__ == '__main__': # test if called as executable, not as library
 
     labellen = 20 # good for most, for datalen=40 however labellen=2 needed
 
-    df = human_graphrater(datalens=datalens, pixelscales=pixelscales, labellen=labellen)
+    df = human_graphrater(datalens=datalens, pixelscales=pixelscales, labellen=labellen, human=False)
 
     # graph test dummydata
     #results = [1,3,5]

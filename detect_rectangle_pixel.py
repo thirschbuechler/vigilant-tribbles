@@ -11,6 +11,20 @@
 #
 # blob detection: https://stackoverflow.com/questions/42798659/how-to-remove-small-connected-objects-using-opencv
 import cv2
+# fix cv2 import issue (https://forum.qt.io/topic/119109/using-pyqt5-with-opencv-python-cv2-causes-error-could-not-load-qt-platform-plugin-xcb-even-though-it-was-found/20)
+import os, sys
+ci_build_and_not_headless = False
+try:
+    from cv2.version import ci_build, headless
+    ci_and_not_headless = ci_build and not headless
+except:
+    pass
+if sys.platform.startswith("linux") and ci_and_not_headless:
+    os.environ.pop("QT_QPA_PLATFORM_PLUGIN_PATH")
+if sys.platform.startswith("linux") and ci_and_not_headless:
+    os.environ.pop("QT_QPA_FONTDIR")
+
+# proceed importing rest
 import numpy as np
 import subprocess
 import skimage
