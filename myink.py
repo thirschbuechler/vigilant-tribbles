@@ -1221,7 +1221,10 @@ class myinkc(hoppy.hopper):
                     if not square_cal:
                         if aspect != 1:
                             raise Exception("aspect not implemented in lookuptable - also not useful - how did it happen?")
-                        df = pd.read_csv("plot_corr_mx_lookuptable.csv")
+                        # comes from detect_rectangle_pixel.py
+                        #plot_corr_mx_lookuptable = pd.read_csv("plot_corr_mx_lookuptable.csv")
+                        plot_corr_mx_lookuptable = pd.DataFrame({'Unnamed: 0': {0: 0, 1: 1, 2: 2, 3: 3, 4: 4, 5: 5, 6: 6, 7: 7, 8: 8, 9: 9, 10: 10}, 'datalen': {0: 3, 1: 3, 2: 4, 3: 4, 4: 5, 5: 5, 6: 6, 7: 6, 8: 7, 9: 7, 10: 40}, 'pixelscale': {0: 0.6875, 1: 1.0625, 2: 0.671875, 3: 0.96875, 4: 0.6875, 5: 0.953125, 6: 0.75, 7: 0.984375, 8: 0.7875, 9: 1.0546875, 10: -0.19140625}, 'labellen': {0: 2, 1: 20, 2: 2, 3: 20, 4: 2, 5: 20, 6: 2, 7: 20, 8: 2, 9: 20, 10: 2}, 'deviation': {0: 1, 1: 1, 2: 1, 3: 1, 4: 1, 5: 1, 6: 1, 7: 1, 8: 1, 9: 1, 10: 1}})
+                        df = plot_corr_mx_lookuptable # HACK - for file loading the base folder changes so paste it here, atm
                         if max_chars == 2:
                             row = df[ ((df["labellen"] == max_chars) & (df["datalen"] == ydatalen)) ]
                         else:
@@ -1681,6 +1684,9 @@ class myinkc(hoppy.hopper):
             hspace=0.0,
             wspace=0.15)
         '''
+        if optlabel: # HACK
+            self.log.warning(f"erasing optlabel {optlabel} for plot_mse_mx lookup table compatibility ..")
+            optlabel = ""
         # optlabel annotation, floating in lower left corner
         self.ax_backtrack()
         n = np.shape(mx)[0] #nxn
@@ -2781,6 +2787,7 @@ if testing:#call if selected, after defined, explanation see above
     #calibrate_corr_mx_label(aspect="square", labellen=8, pixelscale=1)
     #calibrate_corr_mx_label(ns = [3], aspect="square_cal", labellen=20, pixelscale=1) # len 20 for 5 datasets is smallest use atm
     calibrate_corr_mx_label(ns = [3,4,5,6,7], aspect="square", labellen=20, pixelscale=1) # len 20 for 5 datasets is smallest use atm
+    calibrate_corr_mx_label(ns = [40], aspect="square", labellen=1, pixelscale=1) # len 20 for 5 datasets is smallest use atm
 
     #ecke_tester()
     #ecke_tester(type="ru")

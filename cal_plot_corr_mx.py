@@ -162,6 +162,12 @@ def calibrate(want_width_px, labellens, datalens, px_arr):
 if __name__ == '__main__': # test if called as executable, not as library
     
     #calibrate(want_width_px=30, labellens = [2,20],datalens = np.arange(3,40), px_arr = np.arange(0.5,1.5,0.05))    
-    calibrate(want_width_px=30, labellens = [2,20], datalens = [40], px_arr = np.arange(-0.3,0,0.1))    
+    #calibrate(want_width_px=30, labellens = [2,20], datalens = [40], px_arr = np.arange(-0.3,0,0.1))    
+    #calibrate(want_width_px=30, labellens = [2,20], datalens = [40], px_arr = [-0.5,0.5])    
+
+    df = pd.read_csv("plot_corr_mx_lookuptable.csv")
+    df = df.reset_index(drop=True)
+
+    print((df).to_dict())
 
 
