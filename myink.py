@@ -9,6 +9,7 @@ from logging import exception
 import re
 import os
 import numpy as np
+import pandas as pd
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
@@ -1187,7 +1188,11 @@ class myinkc(hoppy.hopper):
         if "aspect" not in kwargs:
             kwargs["aspect"] = "auto" # aspect makes it rect etc #aspect auto enables arbitrary axis limits
         else:
-            if kwargs["aspect"] == "square":
+            # determine pixelscale auto or manual mode
+            square_operation = kwargs["aspect"] == "square"
+            square_cal = kwargs["aspect"] == "square_cal"
+
+            if square_operation or square_cal:
                 if "figsize" in kwargs_fig:
                     raise Exception("figsize in square mode not settable\nI'm afraid Dave, I cannot let you do that.")
                 else:
@@ -1215,15 +1220,29 @@ class myinkc(hoppy.hopper):
                     max_ylabellen = kwargs_fig["max_ylabellen"]
                     max_chars = max(max_xlabellen, max_ylabellen)
 
-                    # from playing w test_plot_corr_mx
-                    #pixelscale = -0.1 *xdatalen + 2
-                    
-                    # fix size at x=3 but decrease slope, aka add
-                    pixelscale_old = pixelscale
+                    # lookuptable instead
+                    if not square_cal:
+                        if aspect != 1:
+                            raise Exception("aspect not implemented in lookuptable - also not useful - how did it happen?")
+                        df = pd.read_csv("plot_corr_mx_lookuptable.csv")
+                        row = df[ ((df["labellen"] <= max_chars) & (df["datalen"] == ydatalen)) ]
+                        if len(row)!=1:
+                            raise Exception(f"not exactly one match but {len(row)} for {max_chars=}{ydatalen=} in lookuptable: {row}")
+                        else:
+                            pixelscale = row["pixelscale"]
 
+
+                    # # # pixelscale working point, to have input 0.5..1.5
+                    # fix size at x=3 but decrease slope, aka add
+                    slopecorr = 0.05
+                    pixelscale_old = pixelscale
+                    pixelscale *= (-0.1 -slopecorr)*xdatalen + 2 +slopecorr*3
+
+                    # calc scaling factor to font
                     fa = 22 / 72 * pixelscale 
+
+                    # calc figsize
                     xfig = xdatalen * fa * (1+ max_chars/100)
-                    
                     #xfig = xfig + stripewidth
                     yfig = ydatalen * fa
 

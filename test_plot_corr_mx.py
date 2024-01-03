@@ -79,7 +79,7 @@ def graph_examiner(datalens=[], pixelscales=[], labellen=[], human=True, **kwarg
             mx = np.diag(vec)
             mx[mx==0] = np.nan
             
-            kwargs = {"aspect":"square"} # HACK - doesnt work without
+            kwargs = {"aspect":"square"} # switch
             try:
                 optlabel = f"{datalens=}"# always clips on small, does it encourage to clip cb_label?
                 optlabel = "" # nope, cb_label still clips
