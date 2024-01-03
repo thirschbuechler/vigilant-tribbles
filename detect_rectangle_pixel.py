@@ -29,6 +29,7 @@ import numpy as np
 import subprocess
 import skimage
 import imageio.v3 as iio
+import diplib as dip
 
 
 
@@ -59,7 +60,9 @@ def detect_colored_area(
     img = iio.imread(out_name)[:,:,0]
 
     # Delete non-minimum areas (px-size)
-    out = skimage.morphology.area_opening(img, area_threshold=minsize, connectivity=2)
+    # this is like 3-10 times faster than skimage, especially on medium and images
+    out = dip.AreaOpening(img, filterSize=minsize, connectivity=2)
+    print("opening done")
 
     # Write result
     iio.imwrite(out_name,out)
