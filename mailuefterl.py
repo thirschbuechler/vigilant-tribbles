@@ -630,6 +630,64 @@ def my_any(thing):
     return bool(np.any(np.array(thing, dtype=object)))
 
 
+def bintreesearch(evalfct, maxdeviate, left, right, echo=False, aborter=None):
+    """ find the acceptable maxdeviate on a monotonic fct in a given interval [left, right]
+    
+    # trivial test - find y close to 0.5 on slope y=x-0.1 from x 0.5 to 1.5
+    >>> bintreesearch(evalfct=(lambda x: x-0.1), maxdeviate=0.5, left=0.5, right=1.5 )
+    0.5625
+
+    # failure mode test - cannot reach value outside bounds
+    >>> bintreesearch(evalfct=(lambda x: x-0.1), maxdeviate=0.2, left=0.5, right=1.5 )
+    Traceback (most recent call last):
+    Exception: no convergence, left==right==0.5 with maxdeviate=0.2
+    """
+    # fence edges: left, center, right
+    center = (left+right)/2
+
+    # check for failure
+    if left == right:
+        raise Exception(f"no convergence, left==right=={left} with {maxdeviate=}")
+
+    # paths inbetween
+    leftpath = (left+center)/2
+    rightpath = (right+center)/2
+
+    # evaluate
+    testvalues = [leftpath, rightpath]
+    evals = [evalfct(item) for item in testvalues]
+
+    # check for failure
+    if evals[0] == evals[1]:
+        raise Exception(f"no convergence, evals are same {evals[0]} with {maxdeviate=}")
+
+    # check further abort condition if given
+    if aborter:
+        aborter(evals)
+
+    # find minimum valid value of both
+    min_dev_res = np.nanmin(evals)
+
+    # is it left or right?
+    minpos = evals.index(min_dev_res)
+
+    # input val to achieve min
+    argmin = testvalues[minpos]
+    
+    # echo
+    if echo:
+        print(f"inputs {left}{right} caused {evals}")
+
+    # return if found
+    if min_dev_res <= maxdeviate:
+        return argmin
+    # or go on
+    # (till RecursionError or left==right Exception above)
+    else:
+        if minpos < 1:
+            return bintreesearch(evalfct=evalfct, maxdeviate=maxdeviate, left=left, right=center, echo=echo)
+        else:
+            return bintreesearch(evalfct=evalfct, maxdeviate=maxdeviate, left=center, right=right, echo=echo)
 
 '''
 def availability(data, thresh=-90, plot_test=False):
