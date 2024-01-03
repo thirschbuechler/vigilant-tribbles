@@ -1193,6 +1193,7 @@ class myinkc(hoppy.hopper):
                 else:
                     # aspect ratio dependent on data size,
                     aspect = xdatalen / ydatalen
+
                     # correct for different x or y axis scaling
                     aspect = aspect * ((extent[1]-extent[0])/(extent[3]-extent[2]))
                     aspect = abs(aspect)
@@ -1218,14 +1219,16 @@ class myinkc(hoppy.hopper):
                     #pixelscale = -0.1 *xdatalen + 2
                     
                     # fix size at x=3 but decrease slope, aka add
-                    slopecorr = 0.05
-                    pixelscale *= (-0.1 -slopecorr)*xdatalen + 2 +slopecorr*3
+                    pixelscale_old = pixelscale
 
                     fa = 22 / 72 * pixelscale 
                     xfig = xdatalen * fa * (1+ max_chars/100)
                     
                     #xfig = xfig + stripewidth
                     yfig = ydatalen * fa
+
+                    if xfig <0 or yfig<0:
+                        raise Exception(f"{xfig=}, {yfig=} at {xdatalen=} with {pixelscale=}, {pixelscale_old=} and {max_chars=}")
                     
             else: #not square
                 pass # keep figure, subplot if open, or whatever nothing to do
@@ -1599,8 +1602,8 @@ class myinkc(hoppy.hopper):
             # print(mse)
         
         if ml.my_any(xlabels) and ml.my_any(ylabels):
-            max_xlabellen = np.max([len(label) for label in xlabels])
-            max_ylabellen = np.max([len(label) for label in ylabels])
+            max_xlabellen = np.max([len(str(label)) for label in xlabels])
+            max_ylabellen = np.max([len(str(label)) for label in ylabels])
             kwargs_fig = {"max_xlabellen":max_xlabellen, "max_ylabellen":max_ylabellen}
         else:
             # assume something
