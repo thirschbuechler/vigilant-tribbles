@@ -230,8 +230,10 @@ class myinkc(hoppy.hopper):
         import subprocess
         with hoppy.hopper(self.figs_dir):
             # todo - stdout=PIPE or sth to get useful return value
-            subprocess.Popen(cmd, shell=True)
-
+            self.log.trail("postprocessing..")
+            proc = subprocess.Popen(cmd, shell=True)
+            proc.wait() # ensure it's done before continuing
+            self.log.trail("postprocessing done!")
         
     def subplots(self, *args, **kwargs):
         """ make subplot axes (plt.subplots(..)) and save axs for iterating via fct
