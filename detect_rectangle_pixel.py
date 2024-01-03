@@ -58,7 +58,7 @@ def detect_colored_area(
     # Open in skimage
     img = iio.imread(out_name)[:,:,0]
 
-    # Delete non-minimum areas
+    # Delete non-minimum areas (px-size)
     out = skimage.morphology.area_opening(img, area_threshold=minsize, connectivity=2)
 
     # Write result
