@@ -301,7 +301,7 @@ class myinkc(hoppy.hopper):
                     plt.close(fig)
         else:
             plt.close(st)
-    
+
 
     def show(self):
         """ show last plots - for non-spyder IDEs which need manual trigger """
@@ -1211,11 +1211,8 @@ class myinkc(hoppy.hopper):
                     #   division over 72: pt to inch
                     #   scaled arbitrarily
 
-                    # empirical old: about 3 datasets give space for 6 characters to be visible across plot
-                    #chars_per_dataunit = 6/3
-                    #chars_pro_mx_plot = chars_per_dataunit * xdatalen
 
-                    # ydatalen == xdatalen probalby
+                    # ydatalen == xdatalen probably
                     max_xlabellen = kwargs_fig["max_xlabellen"]
                     max_ylabellen = kwargs_fig["max_ylabellen"]
                     max_chars = max(max_xlabellen, max_ylabellen)
@@ -1225,11 +1222,20 @@ class myinkc(hoppy.hopper):
                         if aspect != 1:
                             raise Exception("aspect not implemented in lookuptable - also not useful - how did it happen?")
                         df = pd.read_csv("plot_corr_mx_lookuptable.csv")
-                        row = df[ ((df["labellen"] <= max_chars) & (df["datalen"] == ydatalen)) ]
+                        if max_chars == 2:
+                            row = df[ ((df["labellen"] == max_chars) & (df["datalen"] == ydatalen)) ]
+                        else:
+                            # exclude maxchars == 2  case with ">2"
+                            row = df[ ((df["labellen"] > 2) & (df["datalen"] == ydatalen)) ]
+                        
+                        
+                        print(row)
                         if len(row)!=1:
                             raise Exception(f"not exactly one match but {len(row)} for {max_chars=}{ydatalen=} in lookuptable: {row}")
                         else:
-                            pixelscale = row["pixelscale"]
+                            pixelscale = float(row["pixelscale"])
+                        
+                        print(max_chars)
 
 
                     # # # pixelscale working point, to have input 0.5..1.5
@@ -1237,7 +1243,7 @@ class myinkc(hoppy.hopper):
                     slopecorr = 0.05
                     pixelscale_old = pixelscale
                     pixelscale *= (-0.1 -slopecorr)*xdatalen + 2 +slopecorr*3
-
+                    #print(f"{pixelscale=}")
                     # calc scaling factor to font
                     fa = 22 / 72 * pixelscale 
 
@@ -2720,7 +2726,7 @@ def calibrate_corr_mx_label(ns = range(3,10), labellen=1, **kwargs):
         vec = np.random.random(size=(n))
         mx = np.diag(vec)
         mx[mx==0] = np.nan
-        pe.plot_corr_mx(mx=mx,xlabels=folderlabels, ylabels=folderlabels, clims=clims, optlabel=f"{ns=}", cb_label="1E", **kwargs)
+        pe.plot_corr_mx(mx=mx,xlabels=folderlabels, ylabels=folderlabels, clims=clims, optlabel="", cb_label="1E", **kwargs)
 
         pe.show()
 
@@ -2773,7 +2779,8 @@ if testing:#call if selected, after defined, explanation see above
     #test_waterfall_size()
     
     #calibrate_corr_mx_label(aspect="square", labellen=8, pixelscale=1)
-    calibrate_corr_mx_label(aspect="square", labellen=20, pixelscale=0.5) # len 20 for 5 datasets is smallest use atm
+    #calibrate_corr_mx_label(ns = [3], aspect="square_cal", labellen=20, pixelscale=1) # len 20 for 5 datasets is smallest use atm
+    calibrate_corr_mx_label(ns = [3,4,5,6,7], aspect="square", labellen=20, pixelscale=1) # len 20 for 5 datasets is smallest use atm
 
     #ecke_tester()
     #ecke_tester(type="ru")

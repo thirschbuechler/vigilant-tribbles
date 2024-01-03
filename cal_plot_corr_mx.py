@@ -37,14 +37,27 @@ def plot_and_tell_deviation(pe, want_width_px, datalen, labellen, pixelscale):
     # gen labels
     label_ints = np.arange(0,datalen, dtype=np.int8)
 
-    # elongate labels?
+    # elongate labels
     label_ints = ["".join([str(labeli) for _ in range(0,labellen)]) for labeli in label_ints]
 
-    vec = np.array(np.arange(1,datalen-1), dtype=np.float16)
+    # don't start at 0
+    #   make sure to have at least 2-3 values, otherwise detector cannot work (needs an extrema colored pixel - red)
+    #   also don't go above 7 diff element , then the gradient in plotted pixels doesn't get picked up in detect_rectangle_pixel
+    #vec = np.array(np.arange(1,datalen+1), dtype=np.float16)
+    vec = np.array(np.arange(1,datalen+1), dtype=np.float16)
+    if datalen > 7:
+        vec = np.ones(datalen)
+        vec[-1] = 11
+        vec[0] = 11
+        #print(vec)
 
+    #make data mx
     mx = np.diag(vec)
+    
+    # ignore non-diagonal zeros
     mx[mx==0] = np.nan
     
+    # plot and detection
     try:
         #optlabel = f"{datalens=}"# always clips on small, does it encourage to clip cb_label?
         optlabel = "" # nope, cb_label clips indepentent of this
@@ -64,13 +77,17 @@ def plot_and_tell_deviation(pe, want_width_px, datalen, labellen, pixelscale):
         
         # rm ele
         r = r[:-1] # ignore last element
-        #print(f"### {r=}")
+        print(f"### {r=}")
 
         # assure it's vaguely square
         aspect = max(r)/min(r)
         aspectmax = 1.2
+        print(aspect)
         if aspect < aspectmax:
             pass
+        elif aspect > 7:
+            # assume on very long thing smaller dimension is what we want
+            r = min(r)
         else:
             raise Exception(f"pixeldetect got rect not square - {aspect=} < {aspectmax=}, {r=}")
 
@@ -82,13 +99,13 @@ def plot_and_tell_deviation(pe, want_width_px, datalen, labellen, pixelscale):
         pe.close() # any stray one
 
     except Exception as e:
-        #print(e)
+        print(e)
         deviation = 1 # make it large to cancel iteration
 
     return deviation
 
 
-def calibrate(want_width_px=30, labellens = [2,20],datalens = np.arange(3,8)):
+def calibrate(want_width_px, labellens, datalens, px_arr):
 
     # plot element
     pe = mi.myinkc()
@@ -101,7 +118,9 @@ def calibrate(want_width_px=30, labellens = [2,20],datalens = np.arange(3,8)):
     for datalen in datalens:
         for labellen in labellens:
             
+            # init result var, in case of abort
             deviation = 1
+
             #pixelscales = np.arange(0.5,1.5,0.05)
         
             def evalfct(param):
@@ -115,9 +134,14 @@ def calibrate(want_width_px=30, labellens = [2,20],datalens = np.arange(3,8)):
             #    print(datalen, labellen, pixelscale, a)
             
             pixelscale = None
-            for left in np.arange(0.5,1.5,0.05):
+            
+            px_arr = list(px_arr)
+            
+            #right = px_arr.pop # giving it a fct pointer just dies xD HACK?
+            right = px_arr.pop() 
+            for left in px_arr:
                 try:
-                    pixelscale = ml.bintreesearch(evalfct=evalfct, maxdeviate=maxdeviate, left=left, right=1.5, echo=True)
+                    pixelscale = ml.bintreesearch(evalfct=evalfct, maxdeviate=maxdeviate, left=left, right=right, echo=True)
                     if pixelscale:
                         print("yay")
                         break
@@ -137,7 +161,7 @@ def calibrate(want_width_px=30, labellens = [2,20],datalens = np.arange(3,8)):
 
 if __name__ == '__main__': # test if called as executable, not as library
     
-    calibrate()
-    
+    #calibrate(want_width_px=30, labellens = [2,20],datalens = np.arange(3,40), px_arr = np.arange(0.5,1.5,0.05))    
+    calibrate(want_width_px=30, labellens = [2,20], datalens = [40], px_arr = np.arange(-0.3,0,0.1))    
 
 
