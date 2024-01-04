@@ -1230,8 +1230,8 @@ class myinkc(hoppy.hopper):
                         
                         # plot_corr_mx_lookuptable
                         df = cplm.get_cal()
-                        if max_chars == 2:
-                            row = df[ ((df["labellen"] == max_chars) & (df["datalen"] == ydatalen)) ]
+                        if max_chars <= 2:
+                            row = df[ ((df["labellen"] == 2) & (df["datalen"] == ydatalen)) ]
                         else:
                             # exclude maxchars == 2  case with ">2"
                             row = df[ ((df["labellen"] > 2) & (df["datalen"] == ydatalen)) ]
