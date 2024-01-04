@@ -1223,15 +1223,18 @@ class myinkc(hoppy.hopper):
 
                     pixelscale_old = pixelscale
 
-                    # lookuptable instead
+                    # # lookuptable instead
                     if not square_cal:
                         if aspect != 1:
                             raise Exception("aspect not implemented in lookuptable - also not useful - how did it happen?")
                         
-                        # plot_corr_mx_lookuptable
+                        # fetch table
                         df = cplm.get_cal()
+                        
+                        # case labels are ascending ints
                         if max_chars <= 2:
                             row = df[ ((df["labellen"] == 2) & (df["datalen"] == ydatalen)) ]
+                        # case labels are text of length about 20 - there is only that entry atm - HACK
                         else:
                             # exclude maxchars == 2  case with ">2"
                             row = df[ ((df["labellen"] > 2) & (df["datalen"] == ydatalen)) ]

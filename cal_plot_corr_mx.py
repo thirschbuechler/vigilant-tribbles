@@ -186,8 +186,12 @@ def write_cal(df):
 
 
 if __name__ == '__main__': # test if called as executable, not as library
-    
-    calibrate(want_width_px=30, labellens = [2,22],datalens = np.arange(3,16), px_arr = np.arange(0,5,0.05))    
+    """
+        labellen = 2: case labels are ascending ints
+        labellen = 22: rest - HACK
+        """
+
+    calibrate(want_width_px=30, labellens = [2,22],datalens = np.arange(3,16), px_arr = np.arange(0,5,0.05))        
     
     # saz all40
         # impossible
