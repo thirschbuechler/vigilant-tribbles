@@ -1236,13 +1236,13 @@ class myinkc(hoppy.hopper):
                             # exclude maxchars == 2  case with ">2"
                             row = df[ ((df["labellen"] > 2) & (df["datalen"] == ydatalen)) ]
                         
-                        print(row)
+                        #print(row)
                         if len(row)!=1:
                             raise Exception(f"not exactly one match but {len(row)} for {max_chars=}{ydatalen=} in lookuptable: {row}")
                         else:
                             pixelscale = float(row["pixelscale"])
                         
-                        print(max_chars)
+                        #print(max_chars)
 
                     # # # pixelscale working point, to have input 0.5..1.5
                     # fix size at x=3 but decrease slope, aka add

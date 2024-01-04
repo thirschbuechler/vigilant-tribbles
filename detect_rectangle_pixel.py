@@ -42,6 +42,10 @@ def detect_colored_area(
     # Read
     img = cv2.imread(in_name)
 
+    # Crop the right quarter of image with colorbar
+    height, width, channels = img.shape
+    img = img[0:height, 0:int(width*3/4)]
+
     # Convert to HSV
     hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
 

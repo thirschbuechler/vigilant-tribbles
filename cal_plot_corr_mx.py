@@ -48,14 +48,13 @@ def plot_and_tell_deviation(pe, want_width_px, datalen, labellen, pixelscale):
     # elongate labels
     label_ints = ["".join([str(labeli) for _ in range(0,labellen)]) for labeli in label_ints]
 
-    # don't start at 0
-    #   make sure to have at least 2-3 values, otherwise detector cannot work (needs an extrema colored pixel - red)
-    #   also don't go above 7 diff element , then the gradient in plotted pixels doesn't get picked up in detect_rectangle_pixel
-    #vec = np.array(np.arange(1,datalen+1), dtype=np.float16)
-    #if datalen > 7:
+    # gererate testdata
+    #   - don't start at 0
+    #   - make sure to have at least 2-3 values, otherwise detector cannot work (needs an extrema colored pixel - red)
+    #   - also don't go above 7 diff element , then the gradient in plotted pixels doesn't get picked up in detect_rectangle_pixel
+    #   --> make it simple: all ones, one maxima
     vec = np.ones(datalen)
     vec[0] = 11
-    #print(vec)
 
     #make data mx
     mx = np.diag(vec)
@@ -91,7 +90,7 @@ def plot_and_tell_deviation(pe, want_width_px, datalen, labellen, pixelscale):
         print(aspect)
         if aspect < aspectmax:
             pass
-        elif aspect > 7:
+        elif aspect > 100:
             # assume on very long thing smaller dimension is what we want
             r = min(r)
         else:
@@ -188,7 +187,7 @@ def write_cal(df):
 
 if __name__ == '__main__': # test if called as executable, not as library
     
-    #calibrate(want_width_px=30, labellens = [2,22],datalens = np.arange(3,16), px_arr = np.arange(0,5,0.05))    
+    calibrate(want_width_px=30, labellens = [2,22],datalens = np.arange(3,16), px_arr = np.arange(0,5,0.05))    
     
     # saz all40
         # impossible
