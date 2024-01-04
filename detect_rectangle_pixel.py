@@ -81,4 +81,9 @@ def detect_colored_area(
 
 
 if __name__ == '__main__': # test if called as executable, not as library, regular prints allowed
-    print(detect_colored_area())
+    #print(detect_colored_area())
+    import os
+    ifile = os.path.abspath("/home/thomas/Desktop/40.png")
+    ofile =  os.path.abspath("/home/thomas/Desktop/40_out.png")
+    print(ifile)
+    print(detect_colored_area(in_name=ifile, out_name=ofile, minsize=100))

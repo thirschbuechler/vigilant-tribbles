@@ -23,16 +23,18 @@ try:
     import mystring as ms
     import hopper as hoppy
     import mailuefterl as ml
+    import cal_plot_corr_mx as cplm
 except:
     try:
         import vigilant_tribbles.mystring as ms
         from vigilant_tribbles import hopper as hoppy
         import vigilant_tribbles.mailuefterl as ml
+        import vigilant_tribbles.cal_plot_corr_mx as cplm
 
     except:
         print("failed to import module directly or via submodule -  mind adding them with underscores not operators (minuses aka dashes, etc.)")
 
-modulepath = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+modulepath = (os.path.dirname(os.path.abspath(__file__)))
 
 #from matplotlib.patches import Arc, Circle
 
@@ -1219,20 +1221,20 @@ class myinkc(hoppy.hopper):
                     max_ylabellen = kwargs_fig["max_ylabellen"]
                     max_chars = max(max_xlabellen, max_ylabellen)
 
+                    pixelscale_old = pixelscale
+
                     # lookuptable instead
                     if not square_cal:
                         if aspect != 1:
                             raise Exception("aspect not implemented in lookuptable - also not useful - how did it happen?")
-                        # comes from detect_rectangle_pixel.py
-                        #plot_corr_mx_lookuptable = pd.read_csv("plot_corr_mx_lookuptable.csv")
-                        plot_corr_mx_lookuptable = pd.DataFrame({'Unnamed: 0': {0: 0, 1: 1, 2: 2, 3: 3, 4: 4, 5: 5, 6: 6, 7: 7, 8: 8, 9: 9, 10: 10}, 'datalen': {0: 3, 1: 3, 2: 4, 3: 4, 4: 5, 5: 5, 6: 6, 7: 6, 8: 7, 9: 7, 10: 40}, 'pixelscale': {0: 0.6875, 1: 1.0625, 2: 0.671875, 3: 0.96875, 4: 0.6875, 5: 0.953125, 6: 0.75, 7: 0.984375, 8: 0.7875, 9: 1.0546875, 10: -0.19140625}, 'labellen': {0: 2, 1: 20, 2: 2, 3: 20, 4: 2, 5: 20, 6: 2, 7: 20, 8: 2, 9: 20, 10: 2}, 'deviation': {0: 1, 1: 1, 2: 1, 3: 1, 4: 1, 5: 1, 6: 1, 7: 1, 8: 1, 9: 1, 10: 1}})
-                        df = plot_corr_mx_lookuptable # HACK - for file loading the base folder changes so paste it here, atm
+                        
+                        # plot_corr_mx_lookuptable
+                        df = cplm.get_cal()
                         if max_chars == 2:
                             row = df[ ((df["labellen"] == max_chars) & (df["datalen"] == ydatalen)) ]
                         else:
                             # exclude maxchars == 2  case with ">2"
                             row = df[ ((df["labellen"] > 2) & (df["datalen"] == ydatalen)) ]
-                        
                         
                         print(row)
                         if len(row)!=1:
@@ -1242,12 +1244,11 @@ class myinkc(hoppy.hopper):
                         
                         print(max_chars)
 
-
                     # # # pixelscale working point, to have input 0.5..1.5
                     # fix size at x=3 but decrease slope, aka add
-                    slopecorr = 0.05
-                    pixelscale_old = pixelscale
-                    pixelscale *= (-0.1 -slopecorr)*xdatalen + 2 +slopecorr*3
+                    #slopecorr = 0.05
+                    
+                    #pixelscale *= (-0.1 -slopecorr)*xdatalen + 2 +slopecorr*3
                     #print(f"{pixelscale=}")
                     # calc scaling factor to font
                     fa = 22 / 72 * pixelscale 
@@ -2788,7 +2789,7 @@ if testing:#call if selected, after defined, explanation see above
     
     #calibrate_corr_mx_label(aspect="square", labellen=8, pixelscale=1)
     #calibrate_corr_mx_label(ns = [3], aspect="square_cal", labellen=20, pixelscale=1) # len 20 for 5 datasets is smallest use atm
-    calibrate_corr_mx_label(ns = [3,4,5,6,7], aspect="square", labellen=20, pixelscale=1) # len 20 for 5 datasets is smallest use atm
+    #calibrate_corr_mx_label(ns = [3,4,5,6,7], aspect="square", labellen=20, pixelscale=1) # len 20 for 5 datasets is smallest use atm
     calibrate_corr_mx_label(ns = [40], aspect="square", labellen=1, pixelscale=1) # len 20 for 5 datasets is smallest use atm
 
     #ecke_tester()
