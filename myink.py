@@ -1131,6 +1131,14 @@ class myinkc(hoppy.hopper):
         return ret
 
 
+    def imread(self, *args, **kwargs):
+        """ route through plt.imread"""
+        return plt.imread(*args, **kwargs)
+
+    def text(self, *args, **kwargs):
+        return plt.text(*args, **kwargs)
+
+
     def imshowpro(self, mx=None, x_axis=None, y_axis=None, y_label_inverted=False, pixelscale=1, kwargs_fig={}, **kwargs):
         """ souped-up mpl imshow api"""
 
@@ -2451,6 +2459,7 @@ def legend_scrollbar_test():
 
 
 def get_pics():
+    """ get some demo pics"""
     from PIL import Image
     pics = []
 
