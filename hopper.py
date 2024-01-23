@@ -102,7 +102,7 @@ class hopper(portal):
 
     def mkdir(self, path):
         """ input path to make dir """
-        path = self.sanitize(path)#make windows compatible
+        path = self.sanitize(path)
         os.mkdir(path)     
     
     def cleanup(self): # 
@@ -114,7 +114,11 @@ class hopper(portal):
         self.cd(self.scriptdir)
     
     def sanitize(self, s):
-        return sanitize_filepath(s)
+        """ fix common path and filename character issues """
+        s = sanitize_filepath(s) # most issues solved
+        s = s.replace("/", "") # don't get folders by a desanitzed slash-n
+        s = s.replace(" ","_") # no spaces allowed - to facilitate easier shell processing
+        return s
 
 
     def get_dp(self, subfolder=""):

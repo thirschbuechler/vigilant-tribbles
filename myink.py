@@ -172,7 +172,6 @@ class myinkc(hoppy.hopper):
         
         # filename massaging
         fn = self.sanitize(fn)
-        fn = fn.replace("/", "")# don't get folders by a desanitzed slash-n
         dir = self.figs_dir
         os.makedirs(dir, exist_ok=True)
         fn = os.path.join(dir,fn)
