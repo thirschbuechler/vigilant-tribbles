@@ -1,5 +1,6 @@
 # some general computation bla
 
+import colored_traceback.always # colorize terminal output and errors in terminal and vscode terminal
 import numpy as np
 import pandas as pd
 import warnings # numpy nanzero zeroslice stuff
