@@ -280,12 +280,7 @@ def babysit(eval, *args, **kwargs):
         
 def nanmean(*args, **kwargs):
     """
-    >>> nanmean( np.array([[1,2,3],[3,np.nan],[5]], dtype="object") )
-    array([0.33333333, 0.66666667, 1.        , 1.        ,        nan,
-           1.66666667])
-    >>> nanmean( pd.Series([[1,2,3],[3,np.nan],[5]], dtype="object") )
-    array([0.33333333, 0.66666667, 1.        , 1.        ,        nan,
-           1.66666667])
+    # some hairy cases are at bottom in "main", with scalar and/or nested elements
     """
     return babysit(np.nanmean,*args, **kwargs)
 
@@ -783,4 +778,35 @@ def availability_frac(data, nan_bad=True):
 #-#-# module test #-#-#
 if __name__ == '__main__': # test if called as executable, not as library
     integritycheck()#does not work f class functions?
+
+    # # scalar element present: [5] # # #ToDo put into nanmean doctest as docu maybe
+    #nanmean( np.array([[1,2,3],[3,np.nan],[5]], dtype="object") )
+    
+    #nanmean( pd.Series([[1,2,3],[3,np.nan],[5]]) )
+    #AttributeError: 'list' object has no attribute 'dtype'
+    #ValueError: setting an array element with a sequence. The requested array has an inhomogeneous shape after 1 dimensions. The detected shape was (6,) + inhomogeneous part.
+
+    #nanmean( np.array([[1,2,3],[3,np.nan],[np.array([[1,2,3],[3,np.nan],[5]])]], dtype="object"), dtype="object" )
+    #ValueError: setting an array element with a sequence. The requested array has an inhomogeneous shape after 1 dimensions. The detected shape was (3,) + inhomogeneous part.
+    #nanmean( pd.Series([[1,2,3],[3,np.nan],[pd.Series([[1,2,3],[3,np.nan],[5]])]]) )
+    #AttributeError: 'list' object has no attribute 'dtype'
+    #ValueError: setting an array element with a sequence. The requested array has an inhomogeneous shape after 1 dimensions. The detected shape was (6,) + inhomogeneous part.
+    #ValueError: zero-dimensional arrays cannot be concatenatednanmean( [roadkill(ele, hard=True) for ele in pd.Series([[1,2,3],[3,np.nan],[pd.Series([[1,2,3],[3,np.nan],[5]])]])] )
+    #ValueError: zero-dimensional arrays cannot be concatenated
+
+    # # no scalar element # #
+    #nanmean( np.array([[1,2,3],[3,np.nan],[5,6]], dtype="object") )
+    
+    #nanmean( pd.Series([[1,2,3],[3,np.nan],[5,6]]) )
+    
+    #nanmean( pd.Series([[1,2,3],[3,np.nan],[pd.Series([[1,2,3],[3,np.nan],[5,6]])]]) )
+    #AttributeError: 'list' object has no attribute 'dtype'
+    #ValueError: setting an array element with a sequence. The requested array has an inhomogeneous shape after 1 dimensions. The detected shape was (6,) + inhomogeneous part.
+    
+    #nanmean( [roadkill(ele, hard=True) for ele in pd.Series([[1,2,3],[3,np.nan],[pd.Series([[1,2,3],[3,np.nan],[5,6]], dtype="object")]], dtype="object")] )
+    #ValueError: zero-dimensional arrays cannot be concatenated
+
+    #nanmean( [roadkill(ele) for ele in pd.Series([[1,2,3],[4,5,np.nan],[pd.Series([[1,2,3],[4,5,np.nan],[5,6]], dtype="object")]], dtype="object")] )
+
+    #nanmean( np.array([roadkill(ele) for ele in np.array([[1,2,3],[4,5,np.nan],[np.array([[1,2,3],[4,5,np.nan],[5,6]], dtype="object")]], dtype="object")], dtype="object") )
     
