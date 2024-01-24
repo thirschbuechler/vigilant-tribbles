@@ -1,5 +1,18 @@
-# some general computation bla
 
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Mailüfterl
+
+general computation fcts
+
+- common math
+- nan handling
+- little statistics
+
+Created on Fri Mar 11 19:06:42 2022
+@author: thirschbuechler
+"""
 import colored_traceback.always # colorize terminal output and errors in terminal and vscode terminal
 import numpy as np
 import pandas as pd

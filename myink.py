@@ -2,9 +2,21 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
+Myink
+
+Provide an abstract layer to matplotlib
+
+- Handle cycling through plots and keep track of axes
+- Souped-up plot functions
+- Some image handling
+- Some logging
+- Routed-through bare-metal access
+
+
 Created on Mon May 18 21:26:53 2020
 @author: thirschbuechler
 """
+import colored_traceback.always # colorize terminal output and errors in terminal and vscode terminal
 from logging import exception
 import re
 import os
