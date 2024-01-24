@@ -1,6 +1,7 @@
 # some general computation bla
 
 import numpy as np
+import pandas as pd
 import warnings # numpy nanzero zeroslice stuff
 
 
@@ -277,6 +278,14 @@ def babysit(eval, *args, **kwargs):
         
         
 def nanmean(*args, **kwargs):
+    """
+    >>> nanmean( np.array([[1,2,3],[3,np.nan],[5]], dtype="object") )
+    array([0.33333333, 0.66666667, 1.        , 1.        ,        nan,
+           1.66666667])
+    >>> nanmean( pd.Series([[1,2,3],[3,np.nan],[5]], dtype="object") )
+    array([0.33333333, 0.66666667, 1.        , 1.        ,        nan,
+           1.66666667])
+    """
     return babysit(np.nanmean,*args, **kwargs)
 
 def nanmax(*args, **kwargs):
