@@ -248,7 +248,10 @@ def integritycheck():
     """ better call doctest """
     import doctest
     print(f"doctest called in ({__file__})")
-    res=doctest.testmod() # process doctest methods
+    # process doctest methods
+    #res = doctest.testmod(optionflags=doctest.REPORT_UDIFF) # traceback short  - default anyway
+    res = doctest.testmod()
+
     print(res)
     print("attempted==succeeded, if no fails\n")
 
@@ -640,7 +643,7 @@ def bintreesearch(evalfct, maxdeviate, left, right, echo=False, aborter=None):
     # failure mode test - cannot reach value outside bounds
     >>> bintreesearch(evalfct=(lambda x: x-0.1), maxdeviate=0.2, left=0.5, right=1.5 )
     Traceback (most recent call last):
-    Exception: no convergence, left==right==0.5 with maxdeviate=0.2
+    Exception: no convergence, evals are same 0.4 with maxdeviate=0.2
     """
     # fence edges: left, center, right
     center = (left+right)/2
