@@ -411,14 +411,18 @@ def singledim_mod_testdata(i):
 
     if i==1:
         return [np.array([ 17,  14,  10,  47, 171,  44, 105,  91,  88,  14])]
+    
+    if i==0.5:
+        return np.array([1,2,3,4,5])
 
 def singledim_mod(data):
     """ takes multidimensional array and flattens all but first one - useful for boxplot(), etc.
         aka dimred, dimension reduction, ...
         --> only keep first dimension
         
-        - I/O: np.array()
+        BETTER: roadkill (below)
 
+    # doctest - show contents of singledim_mod_testdata and then apply to function
     >>> np.shape(singledim_mod_testdata(0))
     (2, 2, 2, 2)
     >>> np.shape(singledim_mod(singledim_mod_testdata(0)))
@@ -429,21 +433,30 @@ def singledim_mod(data):
     (1, 10)
 
     """
-    #print(f"{np.shape(data)=}")
     args = []
     args = np.shape(data)
     data = np.reshape(data, newshape=(int(args[0]), int(np.prod(args[1:]))))
-    #if np.shape(data)[0] == 1:
-    #    data = data[0]
-    #if np.shape(data)[0] == 1:
-    #    raise Exception("singledim_mod failed - shape==1")
-    #print(np.shape(data))
+
     return data
 
+def recursive_array(obj):
+    # base case: if obj is not a list or a series, return it as a numpy array
+    if not isinstance(obj, (list, pd.Series)):
+        return np.array(obj)
+    # recursive case: if obj is a list or a series, apply recursive_array to each element and stack them
+    else:
+        return np.stack([recursive_array(x) for x in obj])
+    
 
 def roadkill(thing, hard=False):
         """ flatten if possible - remove any dimensions and make a list 
+
+        hardness:
+            - False: please be flat - squish a little
+            - True: sudo "be_flat!" - deploy the hammer
+            - 2: sneaky "be_flat!" - add a dummy (and remove it again)
         
+        # doctest - show contents of singledim_mod_testdata and then apply to function
         >>> np.shape(singledim_mod_testdata(0))
         (2, 2, 2, 2)
         >>> np.shape(roadkill(singledim_mod_testdata(0)))
@@ -452,7 +465,17 @@ def roadkill(thing, hard=False):
         (1, 10)
         >>> np.shape(roadkill(singledim_mod_testdata(1)))
         (10,)
-        
+        >>> np.shape(singledim_mod_testdata(0.5))
+        (5,)
+        >>> np.shape(roadkill(singledim_mod_testdata(0.5)))
+        (5,)
+        >>> np.shape(roadkill(singledim_mod_testdata(0.5), hard=True))
+        Traceback (most recent call last):
+        ValueError: zero-dimensional arrays cannot be concatenated
+        >>> np.shape(roadkill(singledim_mod_testdata(0.5), hard=2))
+        (10,)
+        >>> np.shape(roadkill(singledim_mod_testdata(0), hard=2))
+        (32,)
         """
         if not (type(thing) == type(np.array([1]))):
                 thing = np.array(thing, dtype="object")
@@ -460,14 +483,30 @@ def roadkill(thing, hard=False):
             return thing # no dimension
         elif (hasattr(thing, "__iter__")):
             
+            # convert in case boolean is used
+            hard = int(hard)
+            
+            # please be flat - squish a little
             if not hard:
-                return(thing.flatten()) # please be flat
-            else:
-                # sudo be_flat
+                return(thing.flatten()) 
+            
+            # sudo "be_flat!" - deploy the hammer
+            elif hard==1:
                 # - join np.arrays in list via conc
                 # - then join lists via ravel)
-                # add a dummy dimension
                 return(np.concatenate(thing).ravel())
+            
+            # sneaky "be_flat!" - add dummy NANs on end - doesn't matter in some cases
+            elif hard==2:
+                # - join np.arrays in list via conc
+                # - then join lists via ravel)
+                # - add a dummy dimension, so it also works with single-dimension arrays
+                a = []
+                #a = np.array([[] for ele in range(0,len(np.shape(thing)))])
+                thing = recursive_array(thing)
+                a = np.full(shape=np.shape(thing),fill_value=np.nan)
+                return(np.concatenate(np.array([thing,a], dtype="object")).ravel())
+                
 
         else:
             return thing

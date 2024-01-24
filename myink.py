@@ -1506,21 +1506,29 @@ class myinkc(hoppy.hopper):
 
         """
 
-        # # data conditioning # # 
-        data = np.array(data, dtype=object) # can be a ragged list instead of mxn matrix - suppress the warning
+        # data conditioning #
+        data = np.array(data, dtype=object) # can be a ragged list instead of mxn matrix
+        
+        # prep collector
         statistics = []
+
+        # loop over data
         for i,item in enumerate(data):
             
-            #item = self.roadkill(item)
-            #item = np.array(item).astype(np.float64)
-            # babysitted numpy nan* evals
+            # fustratingly, roadkill w. hard=2 doesn't work here :O,
+            # before calling boxplot:
+            # data = [ml.roadkill(ele, hard=1) for ele in data]
+            # works :O, sadly not at fct start, before or after np.array
+
+
+            # squish item dimensions down to statistics
             mins = ml.nanmin(item)
             maxes = ml.nanmax(item)
             means = ml.nanmean(item)
             std = np.std(item)
             statistics.append([mins, means, maxes, std])
 
-            # user offset if wished, per loop-item to be compatible w ragged-lists
+            # optional user-offset, per loop-item to be compatible w ragged-lists
             if meanoffset:
                 off=means
                 ylabel+=", means subtracted"
