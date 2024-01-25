@@ -1163,6 +1163,9 @@ class myinkc(hoppy.hopper):
         # rows then columns
         ydatalen = mx.shape[0]
         xdatalen = mx.shape[1]
+
+        # default init
+        xfig = None
     
 
         # # imshow "extent" doc
@@ -1236,8 +1239,17 @@ class myinkc(hoppy.hopper):
 
 
                     # ydatalen == xdatalen probably
-                    max_xlabellen = kwargs_fig["max_xlabellen"]
-                    max_ylabellen = kwargs_fig["max_ylabellen"]
+                    max_xlabellen = 0
+                    max_ylabellen = 0
+                    if max_xlabellen in kwargs_fig:
+                        max_xlabellen = kwargs_fig["max_xlabellen"]
+                    if max_ylabellen in kwargs_fig:
+                        max_ylabellen = kwargs_fig["max_ylabellen"]
+
+                    # some legacy guess
+                    if (not max_xlabellen) or (not max_ylabellen):
+                        max_xlabellen = 15
+
                     max_chars = max(max_xlabellen, max_ylabellen)
 
                     pixelscale_old = pixelscale
@@ -1301,11 +1313,13 @@ class myinkc(hoppy.hopper):
 
             # # cb fix # # 
             # to fit still when colorbar is there and not be too small
-            xfig = np.max([1.2, xfig]) 
-            # add "resting" space below
-            nrows=2
-
-            self.subplots(figsize=(xfig,yfig), nrows=nrows)
+            if xfig:
+                xfig = np.max([1.2, xfig]) 
+                # add "resting" space below
+                nrows=2
+                self.subplots(figsize=(xfig,yfig), nrows=nrows)
+            else:
+                self.subplots()
             self.ax_onward()# go to row 2
             self.blank() # remove axis lines
             self.ax_backtrack()
@@ -2241,12 +2255,12 @@ def tester():
         mycanvassize_test()
         myinkc().mycanvassize(medfig=True) # reset afterwards via one-time-use myinkc element
         test_waterfall()
-        test_waterfall_size()
         histo_test_and_modlegend()
         doublebarrel_barberpole()
         statistics_visu()
         boxplottest()
-        calibrate_corr_mx_label()
+        #calibrate_corr_mx_label()
+        #test_waterfall_size() # not applicable unless calibrated before - HACK: todo (only done for production msr stuff atm)
         myinkc().bug()
         gradientmaster_test()
 
