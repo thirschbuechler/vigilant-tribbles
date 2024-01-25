@@ -49,6 +49,9 @@ class Fruit(object):
                     data=[], data_x=None, bins=[], metadata={},
                     **kwargs):
         
+        # parentclass object doesn't take anything, catch stray kwargs
+        if kwargs:
+            raise Exception(f"{kwargs=} shouldn't exist here - mis-routed kwargs!")
         super().__init__(**kwargs) # (*args, **kwargs) # superclass inits
         
         # # logger setup
