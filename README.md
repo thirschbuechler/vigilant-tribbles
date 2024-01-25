@@ -48,7 +48,8 @@ new graph types built ontop existing ones
 - `pe.ecke()`
     make a subplot with a corner in left bot, 5 plots around, e.g.
     corner-booth style with table=biggest_graph, 5 "people" (smaller graphs/images) around
-
+    
+also see: [myink_demos.ipynb](myink_demos.ipynb)
 ## helper function examples
 - Figure-related
   - figsizes via `pe.mycanvassize()`
