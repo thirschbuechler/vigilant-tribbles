@@ -29,6 +29,7 @@ from matplotlib.ticker import EngFormatter, LogFormatterSciNotation, ScalarForma
 from matplotlib.ticker import (MultipleLocator, FormatStrFormatter) # nicergrid
 from matplotlib.ticker import PercentFormatter # histo percent
 from matplotlib.transforms import Bbox
+from matplotlib.patches import Rectangle
 
 
 try:
@@ -1149,6 +1150,11 @@ class myinkc(hoppy.hopper):
     def text(self, *args, **kwargs):
         return plt.text(*args, **kwargs)
 
+    def rect(self, *args, **kwargs):
+        """ draw a rectangle using Patches-Rectangle """
+        # (x-start y-start) , width, height
+        # eg. (50,100),40,80, edgecolor='red', facecolor='none', lw=4)
+        self.get_ax().add_patch(Rectangle(*args, **kwargs))
 
     def imshowpro(self, mx=None, x_axis=None, y_axis=None, y_label_inverted=False, pixelscale=1, kwargs_fig={}, **kwargs):
         """ souped-up mpl imshow api"""
@@ -2263,7 +2269,28 @@ def tester():
         #test_waterfall_size() # not applicable unless calibrated before - HACK: todo (only done for production msr stuff atm)
         myinkc().bug()
         gradientmaster_test()
+        test_rect()
 
+
+def test_rect():
+    pe = myinkc()
+    pe.subplots(ncols=2)
+    pe.plot([0,100], [0,100])
+    
+    # (x-start y-start) , width, height
+    pe.rect((50,100),40,80,
+                    edgecolor='red',
+                    facecolor='none',
+                    lw=4)
+    
+    pe.ax_onward()
+    pe.plot([0,200], [0,200])
+    
+    pe.rect((50,100),40,80,
+                    edgecolor='red',
+                    facecolor='none',
+                    lw=4)
+    pe.show()
 
 
 def lsq_line_test():    
@@ -2835,7 +2862,9 @@ if testing:#call if selected, after defined, explanation see above
     #calibrate_corr_mx_label(aspect="square", labellen=8, pixelscale=1)
     #calibrate_corr_mx_label(ns = [3], aspect="square_cal", labellen=20, pixelscale=1) # len 20 for 5 datasets is smallest use atm
     #calibrate_corr_mx_label(ns = [3,4,5,6,7], aspect="square", labellen=20, pixelscale=1) # len 20 for 5 datasets is smallest use atm
-    calibrate_corr_mx_label(ns = [40], aspect="square", labellen=1, pixelscale=1) # len 20 for 5 datasets is smallest use atm
+    #calibrate_corr_mx_label(ns = [40], aspect="square", labellen=1, pixelscale=1) # len 20 for 5 datasets is smallest use atm
+
+    test_rect()
 
     #ecke_tester()
     #ecke_tester(type="ru")
