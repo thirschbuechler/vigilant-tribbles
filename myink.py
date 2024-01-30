@@ -1871,26 +1871,43 @@ class myinkc(hoppy.hopper):
         return self.spinds(cols_def=mylist)
     
 
-    def spinds(self, cols_def=[1,1,3,1], rows_def=[1], **kwargs):
+    def spinds(self,
+                cols_def=[1,1,3,1], rows_def=[1], # regular features
+                keep_old_ax=False, ncols=None, nrows=None, # experimental
+                **subplots_kwargs): # passthrough
         """ 
         make n column axes
         - cols_def: array of widths of columns
             - for each column, hava an element
             - the element defines its width
         - rows_def: analog to cols_def with heights
-
-        (orig old spind_rechts: copied and mod from ecke) """
+        - keep_old_ax: keep underlying ax, as (auto-)defined by
+            - ncols
+            - nrows
+        """
         
         # total graph slots, for gridspec basis
-        ncols = sum(cols_def)
-        nrows = sum(rows_def)
+        #   - auto-def makes evenly spaced subplot axs "grid"
+        #   - man-def would allow maybe backdrop-ax w overlay-spinds
+        if not ncols:
+            ncols = sum(cols_def)
+        if not nrows:
+            nrows = sum(rows_def)
         
         # generate plot, get gridspec
-        fig, axs_mx = plt.subplots(ncols=ncols, nrows=nrows, **kwargs)
-        if nrows==1:
-            axs_mx = [axs_mx] # enable loop also for single line
+        fig, axs_mx = plt.subplots(ncols=ncols, nrows=nrows, **subplots_kwargs)
         
+        # enable loop also for single line
+        if nrows==1:
+            axs_mx = [axs_mx] 
+        if ncols==1:
+            axs_mx = [axs_mx] 
+            
+        
+        # prep collectors
+        axold = []
         ax_out = []
+
         # gridspec magic - fetch main pointer
         gs = axs_mx[0][0].get_gridspec()
         
@@ -1910,14 +1927,17 @@ class myinkc(hoppy.hopper):
         
             top = bot # set next loop start
 
-        # after gridspec magic, remove old axs
+        # after gridspec magic, remove or keep old axs
         for axs_row in axs_mx:    
             for ax in axs_row:
                 self.blank(ax) 
-                ax.remove()
+                if not keep_old_ax:
+                    ax.remove()
+                else:
+                    axold.append(ax)
             
         # put into np.array as expected via other fct
-        ax_out = np.array(ax_out)
+        ax_out = np.concatenate([ax_out,axold])
 
         # put axs inside self
         self.ax = ax_out[0]
@@ -2270,6 +2290,8 @@ def tester():
         myinkc().bug()
         gradientmaster_test()
         test_rect()
+        test_spinds_axold()
+        test_spinds_axold_inv()
 
 
 def test_rect():
@@ -2290,6 +2312,50 @@ def test_rect():
                     edgecolor='red',
                     facecolor='none',
                     lw=4)
+    pe.show()
+
+
+def test_spinds_axold():
+    """ go over two spinds and onto third underlying old_ax"""
+    pe = myinkc()
+    pe.spinds([1,1],keep_old_ax=True)
+    colors = ["red","green","blue"]
+    
+    for i in [1,2,3]:
+        pe.blank() # old lower ax can only seen if blank
+        pe.plot([0,100], [0,i*100],color=colors[i-1])
+        
+        # (x-start y-start) , width, height
+        pe.rect((50,i*100),40,80,
+                        edgecolor=colors[i-1],
+                        facecolor='none',
+                        lw=4) # note: zorder can't put front-ax (new) below oldax (below)
+        pe.ax_onward()
+        
+    # finally
+    pe.show()
+
+
+def test_spinds_axold_inv():
+    """ go over one overlay spind and over two underlying old_ax"""
+    pe = myinkc()
+    pe.spinds([1],ncols=2, keep_old_ax=True)
+    colors = ["red","green","blue"]
+    
+    for i in [1,2,3]:
+        pe.blank() # old lower ax can only seen if blank
+        pe.plot([0,100], [0,i*100],color=colors[i-1])
+        #pe.text([0,105], [0,i*105],str(i)) # why text nonfunctional; its not pe.blank
+        
+        # (x-start y-start) , width, height
+        pe.rect((50,i*100),40,80,
+                        edgecolor=colors[i-1],
+                        facecolor='none',
+                        lw=4) # note: zorder can't put front-ax (new) below oldax (below)
+        if i<3:
+            pe.ax_onward()
+        
+    # finally
     pe.show()
 
 
@@ -2864,7 +2930,10 @@ if testing:#call if selected, after defined, explanation see above
     #calibrate_corr_mx_label(ns = [3,4,5,6,7], aspect="square", labellen=20, pixelscale=1) # len 20 for 5 datasets is smallest use atm
     #calibrate_corr_mx_label(ns = [40], aspect="square", labellen=1, pixelscale=1) # len 20 for 5 datasets is smallest use atm
 
-    test_rect()
+    #test_rect()
+    #test_spinds_axold()
+    test_spinds_axold_inv()
+    
 
     #ecke_tester()
     #ecke_tester(type="ru")
@@ -2876,6 +2945,7 @@ if testing:#call if selected, after defined, explanation see above
     #statistics_visu()
     #boxplottest()
     #calibrate_corr_mx_label()
+    pass
 
 
 """ 
