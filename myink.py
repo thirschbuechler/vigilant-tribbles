@@ -737,7 +737,6 @@ class myinkc(hoppy.hopper):
             same params as comradelegend    
         """
         ax = self.get_ax(ax)
-        fig = self.get_fig(fig)#fetch
         kwargs = self.comradekernel(**kwargs)
                 
         # finally we invoke the legend (that you probably would like to customize...)
