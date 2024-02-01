@@ -51,11 +51,8 @@ modulepath = (os.path.dirname(os.path.abspath(__file__)))
 
 #from matplotlib.patches import Arc, Circle
 
-#from PIL import Image # pillow library --> MOVED DOWN TO IMPORT SWITCH
-#import cv2 # python-opencv library - linux:pip install opencv-python --> MOVED DOWN TO IMPORT SWITCH
+from PIL import Image
 
-#from skimage import idata, icolor
-#from skimage.transform import rescale, resize, downscale_local_mean
 
 
 figsizes = {"deffig":[6.4, 4.8], "bigfig":[15,10], "medfig":[10,6.6], "widefig" : [2*6.4, 4.8], "tallfig" : [6.4, 2*4.8], "dwarffig" : [6.4, 4.8/2]}
@@ -793,8 +790,6 @@ class myinkc(hoppy.hopper):
         self.subplots()
         with hoppy.hopper(modulepath):
             if os.path.exists("myfigures/stinkbug.webp"):
-                from PIL import Image
-                # using PIL
                 self.imshow(Image.open("myfigures/stinkbug.webp"))
         self.blank()
         self.title(title)
@@ -921,7 +916,7 @@ class myinkc(hoppy.hopper):
         self.gallery(imgs=[img])
                 
     
-    def picshow_manual(self, imgs=[], engine="cv", *args, **kwargs): # give img list and fig size - get gallery, recommended max. 2x2
+    def picshow_manual(self, imgs=[],*args, **kwargs): # give img list and fig size - get gallery, recommended max. 2x2
         self.picframe(*args, **kwargs)
         self.axs = self.roadkill(self.axs) # remove higher dimensions of nxm array, put all into list
         
@@ -932,21 +927,7 @@ class myinkc(hoppy.hopper):
         for img in imgs:
             self.ax_onward()
             ax=self.get_ax()
-            
-            # matplotlib imshow params, if needed
-            # https://matplotlib.org/api/_as_gen/matplotlib.pyplot.imshow.html
-            if engine=="PIL":
-                # pillow library --> MOVED DOWN TO IMPORT SWITCH
-                from PIL import Image
-                ax.imshow(Image.open(img)) # no rotation, theoretically slower
-            elif engine=="cv":
-                # python-opencv library - linux:pip install opencv-python --> MOVED DOWN TO IMPORT SWITCH
-                # pyright, pylance: ignore import error on module not present
-                import cv2 # type: ignore
-                ax.imshow(cv2.cvtColor(cv2.imread(img), cv2.COLOR_BGR2RGB)) # auto-rotation, slower on older machine i think
-            else:
-                print("programmer you fucked up imshow")
-            #imgs.pop(0)
+            ax.imshow(Image.open(img)) # no rotation, theoretically slower
             
             
     def complete_gallery(self):
@@ -2585,7 +2566,6 @@ def legend_scrollbar_test():
 
 def get_pics():
     """ get some demo pics"""
-    from PIL import Image
     pics = []
 
     # using PIL
