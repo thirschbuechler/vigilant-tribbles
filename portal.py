@@ -3,7 +3,7 @@
 
 """
 portal - enter folder via with-context, cleanup when leaving
-hopper - traverse folders and ease file operations
+hopper (child class) - traverse folders and ease file operations
 
 Created on Mon May 18 21:06:39 2020
 @author: thirschbuechler
