@@ -34,13 +34,13 @@ from matplotlib.patches import Rectangle
 
 try:
     import mystring as ms
-    import hopper as hoppy
     import mailuefterl as ml
     import cal_plot_corr_mx as cplm
+    from portal import hopper
 except:
     try:
         import vigilant_tribbles.mystring as ms
-        from vigilant_tribbles import hopper as hoppy
+        from vigilant_tribbles.portal import hopper
         import vigilant_tribbles.mailuefterl as ml
         import vigilant_tribbles.cal_plot_corr_mx as cplm
 
@@ -103,7 +103,7 @@ class gradientmaster(object):
 
 
 ## thing to make matplotlib access easier ###
-class myinkc(hoppy.hopper): 
+class myinkc(hopper): 
     
     def __init__(self, tikz=False, *args, **kwargs):
         """ init some vars, mostly passing args to superclass """
@@ -239,7 +239,7 @@ class myinkc(hoppy.hopper):
             cmd = "for f in *.png; do convert $f -trim +repage $f; done"
         """
         import subprocess
-        with hoppy.hopper(self.figs_dir):
+        with hopper(self.figs_dir):
             # todo - stdout=PIPE or sth to get useful return value
             self.log.trail("postprocessing..")
             proc = subprocess.Popen(cmd, shell=True)
@@ -788,7 +788,7 @@ class myinkc(hoppy.hopper):
 
     def bug(self,title="bug"):
         self.subplots()
-        with hoppy.hopper(modulepath):
+        with hopper(modulepath):
             if os.path.exists("myfigures/stinkbug.webp"):
                 self.imshow(Image.open("myfigures/stinkbug.webp"))
         self.blank()
@@ -2245,7 +2245,7 @@ class myinkc(hoppy.hopper):
 def tester():
     """module test, superseeds ifdef-main (since used here for import shenanigans)"""
 
-    with hoppy.hopper(modulepath):
+    with hopper(modulepath):
         if not os.path.exists("myfigures/stinkbug.webp"):
             raise Exception("for selftest of myinkc, please go (cd) to vigilant_tribbles and run \"python myink.py\" there")
 
