@@ -1143,8 +1143,8 @@ class myinkc(hoppy.hopper):
         # data matrix
         if not np.any(mx):
             raise Exception("imshowpro mx: required")
-        elif len(np.shape(mx)) >2:
-            raise Exception(f"imshowpro mx: too many dims ({len(np.shape(mx))=}, {np.shape(mx)=})")
+        elif len(np.shape(mx)) !=2:
+            raise Exception(f"imshowpro mx: dim !=2 (dim:{len(np.shape(mx))=}, {np.shape(mx)=})")
 
         # rows then columns
         ydatalen = mx.shape[0]
