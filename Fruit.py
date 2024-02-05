@@ -87,6 +87,7 @@ class Fruit(object):
             # add ch to logger
             self.log.addHandler(ch)
 
+        self.myprint = self.log.info # hack for legay
         # # class props etc setup
         self.root = root # root obj
         self.ID = ID # name of this container
