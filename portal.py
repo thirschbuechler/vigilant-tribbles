@@ -46,28 +46,33 @@ class portal(Fruit.Fruit):
         """
 
     def __init__(self, folder="", myprint=dummy, **kwargs):
-        self.myprint = myprint
+        #self.myprint = myprint # legacy - ignore
         self.__enterdir=self.getpath() # needed for cleanup!
         #self.cd(self.__enterdir) # for some reason, a cd of a sub-loop with a portal would fail (it assumes start from scriptdir) - nope was different rooted obj i think
         self.folder = folder
 
         super().__init__(**kwargs) # (*args, **kwargs) # superclass inits
+        self.myprint = self.log.info # made in __init__ of Fruit class
 
 
     def __del__(self):
-        self.myprint("delete called, session ended")
+        # the garbage collector already started deleting attributes, so no log.info possible
+        #self.log.info("delete called, session ended")
+        print("delete called, session ended")
+        # pass
 
 
     # with-context stuff #
 
     def __enter__(self):
-        self.myprint("with-context entered")
+        self.log.info("with-context entered")
         if self.folder!="":
             self.cd(self.folder) # goto folder
         return self # unless this happens, object dies before reporting
     
     def __exit__(self, exc_type, exc_value, tb):
-        self.myprint("with-context exited")
+        # attributes still available, guaranteed
+        self.log.info("with-context exited")
         self.cd(self.__enterdir)
         self.__del__() # unless this happens, session doesn't get exited
         #return
@@ -99,7 +104,7 @@ class portal(Fruit.Fruit):
             os.chdir(newpath_abs)
         elif (newpath in now):
             #raise Exception("dude you are already there")
-            self.myprint("dude you are already there")
+            self.log.info("dude you are already there")
             #pass
         else:
             raise Exception("neither abs nor relative {} exists, now: {}".format(newpath,now))
@@ -156,7 +161,7 @@ class hopper(portal):
             self.rootdir = newpath
         else:
             self.rootdir = self.getpath()
-        self.myprint("rootdir from {} to {}".format(self.rootdir,newpath))
+        self.log.info("rootdir from {} to {}".format(self.rootdir,newpath))
     
 
     def cdup(self):
