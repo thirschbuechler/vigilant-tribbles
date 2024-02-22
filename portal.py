@@ -241,7 +241,7 @@ class hopper(portal):
             self.listfiles(myprint=print)
 
 
-    def listfiles(self,myprint=ms.dummy): 
+    def listfiles(self,myprint=ms.dummy, emptyerror=True): 
         """ list files and classify them """
         #https://stackoverflow.com/questions/18262293/how-to-open-every-file-in-a-folder
         location = self.getpath()
@@ -259,7 +259,7 @@ class hopper(portal):
         
         # files and directories
         elements = os.listdir(location)
-        if not elements:
+        if not elements and emptyerror:
             raise Exception(f"No files or folders here - empty directory {location}!")
             
         # classify
@@ -294,6 +294,8 @@ class hopper(portal):
             else:
                 raise Exception(f"unknown (impossible?) file/dir type {element=} in {location}!")
 
+        self.fcounter = fcounter
+        self.dcounter = len(self.dirs)
         myprint(f"classified {fcounter-len(otherfiles)}/{fcounter} files and {len(self.dirs)} directories in {location}")
 
 
