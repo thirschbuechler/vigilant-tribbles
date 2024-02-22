@@ -245,40 +245,56 @@ class hopper(portal):
         """ list files and classify them """
         #https://stackoverflow.com/questions/18262293/how-to-open-every-file-in-a-folder
         location = self.getpath()
-        counter = 0 #keep a count of all files found
-        otherfiles = [] #list to keep any other file that do not match the criteria
+        fcounter = 0
+        otherfiles = []
         
         self.images=[]
-        self.layouts=[] # pyweave pmd layout files
+        self.layouts=[] # pyweave pmd layout files - old
         self.touchstone=[]
         self.csv=[]
         self.pti_files=[]
+        self.dirs=[]
+        self.txts=[]
+        self.pyfiles=[]
         
-        for file in os.listdir(location):
-            try:
-                if file.endswith(".png") or file.endswith(".jpg"):
-                    self.images.append(file)
-                    counter +=1
-                elif file.endswith(".pmd"):
-                    self.layouts.append(file)
-                    counter +=1
-                elif file.endswith(".s2p") or file.endswith(".s1p"):
-                    self.touchstone.append(file)
-                    counter +=1
-                elif file.endswith(".csv") or file.endswith(".isd"):
-                    self.pti_files.append(file)
-                    if file.endswith(".csv"):
-                        self.csv.append(file)
-                    counter +=1
+        # files and directories
+        elements = os.listdir(location)
+        if not elements:
+            raise Exception(f"No files or folders here - empty directory {location}!")
+            
+        # classify
+        for element in elements:    
+            if os.path.isfile(element):
+                # assume it's an useful file
+                fcounter +=1
+
+                if element.endswith(".png") or element.endswith(".jpg"):
+                    self.images.append(element)
+                elif element.endswith(".pmd"):
+                    self.layouts.append(element)
+                elif element.endswith(".s2p") or element.endswith(".s1p"):
+                    self.touchstone.append(element)
+                elif element.endswith(".isd"):
+                    self.pti_files.append(element)
+                elif element.endswith(".csv"):
+                    self.pti_files.append(element)
+                    self.csv.append(element)
+                elif element.endswith(".txt"):
+                    self.txts.append(element)
+                elif element.endswith(".py") or element.endswith(".ipynb"):
+                    self.pyfiles.append(element)
                 else:
-                    otherfiles.append(file)
-                    #myprint("not classified: {}".format(file))
-                    counter +=1
-            except Exception as e:
-                print("No files found here!")
-                raise e
-        
-        myprint("classified {}/{} files".format(counter-len(otherfiles),counter))
+                    otherfiles.append(element)
+                    # does not count as useful, remove from counter
+                    fcounter -=1
+                    
+            elif os.path.isdir(element):
+                self.dirs.append(element)
+            
+            else:
+                raise Exception(f"unknown (impossible?) file/dir type {element=} in {location}!")
+
+        myprint(f"classified {fcounter-len(otherfiles)}/{fcounter} files and {len(self.dirs)} directories in {location}")
 
 
     def get_bins(self, folder, fext=""):
@@ -374,10 +390,10 @@ def hoppertests():
     
 #-#-# module test #-#-#
 if __name__ == '__main__': # test if called as executable, not as library    
-    integritycheck() #doctest   
+    #integritycheck() #doctest   
 
-    #portaltests()
-    #hoppertests()
+    portaltests()
+    hoppertests()
     
 
 
