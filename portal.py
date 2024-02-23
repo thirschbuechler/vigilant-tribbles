@@ -256,6 +256,7 @@ class hopper(portal):
         self.dirs=[]
         self.txts=[]
         self.pyfiles=[]
+        self.errterms=[]
         
         # files and directories
         elements = os.listdir(location)
@@ -274,6 +275,8 @@ class hopper(portal):
                     self.layouts.append(element)
                 elif element.endswith(".s2p") or element.endswith(".s1p"):
                     self.touchstone.append(element)
+                elif element.startswith("errterms_"):
+                    self.errterms.append(element)
                 elif element.endswith(".isd"):
                     self.pti_files.append(element)
                 elif element.endswith(".csv"):
