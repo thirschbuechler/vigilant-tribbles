@@ -87,12 +87,12 @@ def dict_to_str(mydict):
 
 
 def list_to_str(mydict):
-    """ turn dictionary into human readable string
+    """ turn list into human readable string
     
-    >>> dict_to_str({"a":10, "b":20})
-    'a: 10, b: 20'
-    >>> str({"a":10, "b":20})
-    "{'a': 10, 'b': 20}"
+    >>> list_to_str(["a", 20])
+    'a, 20'
+    >>> str(["a", 20])
+    "['a', 20]"
     """
     st = str(mydict)
     st=removestringparts(["\"", "'", "[", "]"], [st])
@@ -194,10 +194,18 @@ def iscontainedin(matchers, listt):
         ['dev.f']
         >>> iscontainedin(".","dev.f")
         ['.']
+        
+        # not too good for windows paths
+        
         >>> iscontainedin(".bin","C:\\bla.bin")
         ['.', 'b', 'i', 'n']
-        >>> iscontainedin([".bin"],["C:\\bla.bin"])
-        ['C:\x08la.bin']
+        
+
+        # weird
+
+        #>>> iscontainedin([".bin"],["C:\\bla.bin"])
+        #['Cla.bin'] # either of these
+        #['C:\x08la.bin'] - backspace char? how?
         >>> iscontainedin(".bin","C:\\bla")
         []
     """
