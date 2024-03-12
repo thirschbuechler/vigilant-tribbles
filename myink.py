@@ -1631,9 +1631,26 @@ class myinkc(hopper):
         self.canvas_params(figsize=[15,10])#cm
         self.rc_autoreset = 0 # to not reset temporarily, if already set
 
-        # is aspect square?
+        # generally it doesn't matter
+        halt_on_autoscale_fail = False
+        square_aspect = False
+
+        # is aspect square here however?
         if "aspect" in kwargs:
-            square_aspect = (kwargs["aspect"] == "square")
+            # confirmed valid
+                # old check
+                #square_aspect = (kwargs["aspect"] == "square")
+            # new check
+            if "square" in kwargs["aspect"]:
+                square_aspect = True
+                # guarantee, error if not
+                halt_on_autoscale_fail = True
+                if "ish" in kwargs["aspect"]: # "squareish"
+                    halt_on_autoscale_fail = False
+                    # reset to imshowpro compatible arg
+                    kwargs["aspect"] = "square"
+                    
+        
         else:
             square_aspect = False
         
@@ -1740,7 +1757,7 @@ class myinkc(hopper):
         self.ax_onward()
 
         # fit everything (plot, cbar, labels) onto figure but error out if it overflows
-        self.autoscale_fig(halt_if_failed=True)
+        self.autoscale_fig(halt_if_failed=halt_on_autoscale_fail)
 
 
     # experienced kwargs error - if **kwargs used AND cmap="turbo_r" -> both are ignored
