@@ -86,7 +86,7 @@ def dict_to_str(mydict):
     return st
 
 
-def list_to_str(mydict):
+def list_to_str(mylist):
     """ turn list into human readable string
     
     >>> list_to_str(["a", 20])
@@ -94,7 +94,7 @@ def list_to_str(mydict):
     >>> str(["a", 20])
     "['a', 20]"
     """
-    st = str(mydict)
+    st = str(mylist)
     st=removestringparts(["\"", "'", "[", "]"], [st])
     st="".join(st)
 
