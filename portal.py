@@ -50,31 +50,40 @@ class portal(Fruit.Fruit):
         self.__enterdir=self.getpath() # needed for cleanup!
         #self.cd(self.__enterdir) # for some reason, a cd of a sub-loop with a portal would fail (it assumes start from scriptdir) - nope was different rooted obj i think
         self.folder = folder
+        
+        # with enter-exit, del
+        self.spam = False
 
         super().__init__(**kwargs) # (*args, **kwargs) # superclass inits
         self.myprint = self.log.info # made in __init__ of Fruit class
 
 
-    def __del__(self):
+    # https://stackoverflow.com/questions/1481488/what-is-the-del-method-and-how-do-i-call-it
+    #def __del__(self):
         # the garbage collector already started deleting attributes, so no log.info possible
         #self.log.info("delete called, session ended")
-        print("delete called, session ended")
+        #if self.spam:
+        #    print("delete called, session ended")
         # pass
 
 
     # with-context stuff #
 
     def __enter__(self):
-        self.log.info("with-context entered")
+        if self.spam:
+            self.log.info("with-context entered")
         if self.folder!="":
             self.cd(self.folder) # goto folder
         return self # unless this happens, object dies before reporting
     
     def __exit__(self, exc_type, exc_value, tb):
-        # attributes still available, guaranteed
-        self.log.info("with-context exited")
+        # attributes still available, guaranteed (in __del__: not)
+        if self.spam:
+            self.log.info("with-context exited")
         self.cd(self.__enterdir)
-        self.__del__() # unless this happens, session doesn't get exited
+        # unless del is called manually, instrumented session doesn't get exited
+        # maybe that was an issue with ipython in geany?
+        #self.__del__() # HACK
         #return
 
 
