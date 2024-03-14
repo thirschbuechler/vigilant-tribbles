@@ -1262,20 +1262,11 @@ class myinkc(hopper):
                         else:
                             pixelscale = float(row["pixelscale"])
                         
-                        #print(max_chars)
-
-                    # # # pixelscale working point, to have input 0.5..1.5
-                    # fix size at x=3 but decrease slope, aka add
-                    #slopecorr = 0.05
-                    
-                    #pixelscale *= (-0.1 -slopecorr)*xdatalen + 2 +slopecorr*3
-                    #print(f"{pixelscale=}")
                     # calc scaling factor to font
                     fa = 22 / 72 * pixelscale 
 
                     # calc figsize
                     xfig = xdatalen * fa * (1+ max_chars/100)
-                    #xfig = xfig + stripewidth
                     yfig = ydatalen * fa
 
                     if xfig <0 or yfig<0:
@@ -1288,14 +1279,6 @@ class myinkc(hopper):
         if kwargs_fig:
             # close current open figure, if empty ax
             self.close("emptyax")
-
-            # create a small figure
-            #self.subplots(figsize=(xfig,yfig), **kwargs_fig)
-            #self.spinds(cols_def=[1,3], rows_def=[3,1], **kwargs_fig) # spinds dont have big corner
-            #self.ecke(type="ru", hidesmallframes=True, figsize=(xfig,yfig)) # HACK ignore kwargs for now
-            # HACK - stripewidth mod alone doesnt work, figure needs to be larger
-            #self.ecke_ru_only(figsize=(xfig,yfig), stripewidth=stripewidth, outerlen=outerlen)
-            #self.ax_i = -1
 
             # # cb fix # # 
             # to fit still when colorbar is there and not be too small
@@ -1316,7 +1299,7 @@ class myinkc(hopper):
             # swap list elements
             extent = list(extent)
             extent[2], extent[3] = extent[3], extent[2]
-
+        
         kwargs["extent"]=extent
         s = self.imshow(mx, **kwargs)
         #self.autoscale_fig() # call after labels? so outside
