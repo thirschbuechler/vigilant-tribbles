@@ -1223,20 +1223,29 @@ class myinkc(hopper):
                     #   division over 72: pt to inch
                     #   scaled arbitrarily
 
-
-                    # ydatalen == xdatalen probably
-                    max_xlabellen = 0
-                    max_ylabellen = 0
-                    if max_xlabellen in kwargs_fig:
-                        max_xlabellen = kwargs_fig["max_xlabellen"]
-                    if max_ylabellen in kwargs_fig:
-                        max_ylabellen = kwargs_fig["max_ylabellen"]
-
-                    # some legacy guess
-                    if (not max_xlabellen) or (not max_ylabellen):
-                        max_xlabellen = 15
-
-                    max_chars = max(max_xlabellen, max_ylabellen)
+                    autolabellen = False # HACK, was inadvertenly disabled so leave
+                    if autolabellen:
+                        # ydatalen == xdatalen probably
+                        max_xlabellen = 0
+                        max_ylabellen = 0
+                        if "max_xlabellen" in kwargs_fig: # was "if max_xlabellen in kwargs_fig:" - wtf
+                            max_xlabellen = kwargs_fig["max_xlabellen"]
+                            kwargs_fig.pop("max_xlabellen")
+                        if "max_ylabellen" in kwargs_fig:
+                            max_ylabellen = kwargs_fig["max_ylabellen"]
+                            kwargs_fig.pop("max_ylabellen")
+                        # some legacy guess
+                        if (not max_xlabellen) or (not max_ylabellen):
+                            max_xlabellen = 15
+                        max_chars = max(max_xlabellen, max_ylabellen)
+                    
+                    else:
+                        max_chars = 15
+                        if "max_xlabellen" in kwargs_fig:
+                            kwargs_fig.pop("max_xlabellen")
+                        if "max_ylabellen" in kwargs_fig:
+                            kwargs_fig.pop("max_ylabellen")
+                        # HACK end
 
                     pixelscale_old = pixelscale
 
@@ -1276,24 +1285,25 @@ class myinkc(hopper):
                 pass # keep figure, subplot if open, or whatever nothing to do
 
         # in case a figure is requested
-        if kwargs_fig:
-            # close current open figure, if empty ax
+        #if kwargs_fig:
+        if square_operation or square_cal:
+        # close current open figure, if empty ax
             self.close("emptyax")
-
+            
             # # cb fix # # 
             # to fit still when colorbar is there and not be too small
             if xfig:
                 xfig = np.max([1.2, xfig]) 
-                # add "resting" space below
-                nrows=2
-                self.subplots(figsize=(xfig,yfig), nrows=nrows)
-            else:
-                self.subplots()
+                kwargs_fig.update(dict(figsize=(xfig,yfig)))
+                #self.log.info(f"imshowpro: {xfig=} {yfig=} {pixelscale=}")
+
+            # add "resting" space below via nrows=2
+            self.subplots(nrows=2, **kwargs_fig)
+
             self.ax_onward()# go to row 2
             self.blank() # remove axis lines
             self.ax_backtrack()
-            self.ax_i = -1 # put into expected location to start w ax_onward() in a loop
-
+            self.ax_i = -1 # HACK - put into expected location to start w ax_onward() in a loop
 
         if y_label_inverted:
             # swap list elements
@@ -1596,7 +1606,7 @@ class myinkc(hopper):
         self.scatter(x,y)            
 
 
-    def plot_corr_mx(self, mx, xlabels=[],ylabels=[], clims=[], lowlim=None, cb_label="", optlabel="", pixelscale=1, **kwargs):
+    def plot_corr_mx(self, mx, xlabels=[],ylabels=[], clims=[], lowlim=None, cb_label="", optlabel="", pixelscale=1, kwargs_fig={}, **kwargs):
         """
         make subplot correlation matrix with imshow
 
@@ -1639,10 +1649,12 @@ class myinkc(hopper):
         
         # if yes, route through fig generation
         if square_aspect:
-            kwargs_fig = dict(nrows=2, ncols=1)
+            #kwargs_fig = dict(nrows=2, ncols=1)
+            #kwargs_fig.update(dict(nrows=2, ncols=1))
+            pass
         # else do it yourself
         else:
-            kwargs_fig = {}
+            #kwargs_fig = {}
             self.subplots(nrows=2, ncols=1)
 
 
@@ -1665,7 +1677,7 @@ class myinkc(hopper):
         if ml.my_any(xlabels) and ml.my_any(ylabels):
             max_xlabellen = np.max([len(str(label)) for label in xlabels])
             max_ylabellen = np.max([len(str(label)) for label in ylabels])
-            kwargs_fig = {"max_xlabellen":max_xlabellen, "max_ylabellen":max_ylabellen}
+            kwargs_fig.update({"max_xlabellen":max_xlabellen, "max_ylabellen":max_ylabellen})
         else:
             # assume something
             max_xlabellen = 2
