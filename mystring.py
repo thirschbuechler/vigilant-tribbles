@@ -70,6 +70,15 @@ def str_to_blocktext(input, in_sep, out_sep=" ", maxlen=5):
     return "".join(lines)
 
 
+def mstr(*args):
+    """ babysit str() for weird input, as default execption is not helpful"""
+    try:
+        s = str(*args)
+        return s
+    except Exception as e:
+        raise Exception(f"str failed with {args=}, {e=}")
+
+
 def dict_to_str(mydict):
     """ turn dictionary into human readable string
         note: even nicer would be print(pd.DataFrame([mydict]))
@@ -79,7 +88,7 @@ def dict_to_str(mydict):
     >>> str({"a":10, "b":20})
     "{'a': 10, 'b': 20}"
     """
-    st = str(mydict)
+    st = mstr(mydict)
     st=removestringparts(["\"", "'", "{", "}"], [st])
     st="".join(st)
 
@@ -94,7 +103,7 @@ def list_to_str(mylist):
     >>> str(["a", 20])
     "['a', 20]"
     """
-    st = str(mylist)
+    st = mstr(mylist)
     st=removestringparts(["\"", "'", "[", "]"], [st])
     st="".join(st)
 
