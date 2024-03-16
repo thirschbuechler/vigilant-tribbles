@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Fruitseed_FF.py 
+Fruitseed.py 
 
 A container for data, metadata, histograms, etc.
 
