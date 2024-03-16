@@ -1225,15 +1225,9 @@ class myinkc(hopper):
 
                     autolabellen = False # HACK, was inadvertenly disabled so leave
                     if autolabellen:
-                        # ydatalen == xdatalen probably
-                        max_xlabellen = 0
-                        max_ylabellen = 0
-                        if "max_xlabellen" in kwargs_fig: # was "if max_xlabellen in kwargs_fig:" - wtf
-                            max_xlabellen = kwargs_fig["max_xlabellen"]
-                            kwargs_fig.pop("max_xlabellen")
-                        if "max_ylabellen" in kwargs_fig:
-                            max_ylabellen = kwargs_fig["max_ylabellen"]
-                            kwargs_fig.pop("max_ylabellen")
+                        # ydatalen == xdatalen probably, but..
+                        max_xlabellen = kwargs_fig.pop("max_xlabellen", 0)
+                        max_ylabellen = kwargs_fig.pop("max_ylabellen", 0)
                         # some legacy guess
                         if (not max_xlabellen) or (not max_ylabellen):
                             max_xlabellen = 15
@@ -1241,11 +1235,11 @@ class myinkc(hopper):
                     
                     else:
                         max_chars = 15
-                        if "max_xlabellen" in kwargs_fig:
-                            kwargs_fig.pop("max_xlabellen")
-                        if "max_ylabellen" in kwargs_fig:
-                            kwargs_fig.pop("max_ylabellen")
-                        # HACK end
+                    
+                        kwargs_fig.pop("max_xlabellen", None)
+                    
+                        kwargs_fig.pop("max_ylabellen", None)
+                    # HACK end
 
                     pixelscale_old = pixelscale
 
