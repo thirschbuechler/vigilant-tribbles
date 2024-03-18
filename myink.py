@@ -1152,6 +1152,8 @@ class myinkc(hopper):
 
         # default init
         xfig = None
+        square_cal = False
+        square_operation = False
     
 
         # # imshow "extent" doc
@@ -1261,7 +1263,7 @@ class myinkc(hopper):
                         
                         #print(row)
                         if len(row)!=1:
-                            raise Exception(f"not exactly one match but {len(row)} for {max_chars=}{ydatalen=} in lookuptable: {row}")
+                            raise Exception(f"not exactly one match but {len(row)} for {max_chars=}, {ydatalen=} in lookuptable: {row}")
                         else:
                             pixelscale = float(row["pixelscale"])
                         
@@ -1272,7 +1274,7 @@ class myinkc(hopper):
                     xfig = xdatalen * fa * (1+ max_chars/100)
                     yfig = ydatalen * fa
 
-                    if xfig <0 or yfig<0:
+                    if xfig < 0 or yfig < 0:
                         raise Exception(f"{xfig=}, {yfig=} at {xdatalen=} with {pixelscale=}, {pixelscale_old=} and {max_chars=}")
                     
             else: #not square
