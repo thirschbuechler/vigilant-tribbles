@@ -2919,7 +2919,7 @@ if testing:#call if selected, after defined, explanation see above
 
     #test_rect()
     #test_spinds_axold()
-    test_spinds_axold_inv()
+    #test_spinds_axold_inv()
     
 
     #ecke_tester()
@@ -2931,7 +2931,7 @@ if testing:#call if selected, after defined, explanation see above
     #tex_test()
     #statistics_visu()
     #boxplottest()
-    #calibrate_corr_mx_label()
+    #calibrate_corr_mx_label() # old; new: cal_plot_corr_mx.py
     pass
 
 
