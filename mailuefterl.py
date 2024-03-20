@@ -409,11 +409,17 @@ def singledim_mod_testdata(i):
         data = [data,data]
         return data
 
-    if i==1:
+    elif i==1:
         return [np.array([ 17,  14,  10,  47, 171,  44, 105,  91,  88,  14])]
     
-    if i==0.5:
+    elif i==0.5:
         return np.array([1,2,3,4,5])
+    
+    elif i==2:
+        return np.array([[[1,2],[3,4]],[[5,6],[7,8]]])
+    
+    elif i==3:
+        return np.array([([[[1,2],[3,4]],[[5,6],[7,8]]])], dtype=object)
 
 def singledim_mod(data):
     """ takes multidimensional array and flattens all but first one - useful for boxplot(), etc.
@@ -432,6 +438,11 @@ def singledim_mod(data):
     >>> np.shape(singledim_mod(singledim_mod_testdata(1)))
     (1, 10)
 
+    >>> np.shape(singledim_mod_testdata(3))
+    (1, 2, 2, 2)
+    >>> np.shape(singledim_mod(singledim_mod_testdata(3)))
+    (1, 8)
+
     """
     args = []
     args = np.shape(data)
@@ -448,34 +459,67 @@ def recursive_array(obj):
         return np.stack([recursive_array(x) for x in obj])
     
 
-def roadkill(thing, hard=False):
+def roadkill(thing, hard=False, soft=False):
         """ flatten if possible - remove any dimensions and make a list 
-
-        hardness:
+        
+        soft(ness):
+            - False: no softness, hardness possible
+            - True: np.squeeze, disable hard
+        hard(ness):
             - False: please be flat - squish a little
             - True: sudo "be_flat!" - deploy the hammer
             - 2: sneaky "be_flat!" - add a dummy (and remove it again)
-        
+
         # doctest - show contents of singledim_mod_testdata and then apply to function
+        
         >>> np.shape(singledim_mod_testdata(0))
         (2, 2, 2, 2)
         >>> np.shape(roadkill(singledim_mod_testdata(0)))
         (16,)
+        
         >>> np.shape(singledim_mod_testdata(1))
         (1, 10)
         >>> np.shape(roadkill(singledim_mod_testdata(1)))
         (10,)
+        
         >>> np.shape(singledim_mod_testdata(0.5))
         (5,)
         >>> np.shape(roadkill(singledim_mod_testdata(0.5)))
         (5,)
+        
         >>> np.shape(roadkill(singledim_mod_testdata(0.5), hard=True))
         Traceback (most recent call last):
         ValueError: zero-dimensional arrays cannot be concatenated
         >>> np.shape(roadkill(singledim_mod_testdata(0.5), hard=2))
         (10,)
+        
         >>> np.shape(roadkill(singledim_mod_testdata(0), hard=2))
         (32,)
+        
+        >>> np.shape(singledim_mod_testdata(2))
+        (2, 2, 2)
+        >>> np.shape(roadkill(singledim_mod_testdata(2), soft=True))
+        (2, 2, 2)
+        >>> np.shape(roadkill(singledim_mod_testdata(2), hard=0))
+        (8,)
+        >>> np.shape(roadkill(singledim_mod_testdata(2), hard=1))
+        (8,)
+        >>> np.shape(roadkill(singledim_mod_testdata(2), hard=2))
+        (16,)
+
+
+        >>> np.shape(singledim_mod_testdata(3))
+        (1, 2, 2, 2)
+        >>> np.shape(roadkill(singledim_mod_testdata(3), soft=True))
+        (2, 2, 2)
+        >>> np.shape(roadkill(singledim_mod_testdata(3), hard=0))
+        (8,)
+        >>> np.shape(roadkill(singledim_mod_testdata(3), hard=1))
+        (8,)
+        >>> np.shape(roadkill(singledim_mod_testdata(3), hard=2))
+        (16,)
+
+
         """
         if not (type(thing) == type(np.array([1]))):
                 thing = np.array(thing, dtype="object")
@@ -486,6 +530,10 @@ def roadkill(thing, hard=False):
             # convert in case boolean is used
             hard = int(hard)
             
+            if soft:
+                # skip hardnesses
+                return np.squeeze(thing)
+
             # please be flat - squish a little
             if not hard:
                 return(thing.flatten()) 
