@@ -1785,7 +1785,7 @@ class myinkc(hopper):
             kwargs.remove("cb_label")
         
         if np.size(mx)<2 or np.size(x_axis)<2:
-            raise Exception(f"matrix and x_axis input required!, { np.size(mx)}, {np.size(x_axis)}")
+            raise Exception(f"matrix and x_axis input required!, { np.shape(mx)=}, {np.shape(x_axis)=}")
 
         # square pixels
         square_aspect = False
