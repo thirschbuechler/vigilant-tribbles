@@ -46,7 +46,7 @@ sys.path.pop(len(sys.path)-1)
 class Fruit(object):
     #__metaclass__ = GetAttr
     def __init__(self, ID=None, root=None, 
-                    data=[], data_x=None, bins=[], metadata={},
+                    data=[], data_x=None, bins=[], metadata={}, basiclogger = False,
                     **kwargs):
         
         # parentclass object doesn't take anything, catch stray kwargs
@@ -68,13 +68,12 @@ class Fruit(object):
         DEBUG # spammed by matplotlib
         NOTSET
         """
-        basiclogger = True
         if basiclogger:
             #logging.basicConfig(level=logging.INFO)
             logging.basicConfig(level=logging.TRAIL)
             # then logging.info() etc works
             self.log = logging
-        else:    # doesn't work
+        else:
             self.log = logging.getLogger(__class__.__name__)
             # create console handler and set level to debug
             ch = logging.StreamHandler()
@@ -86,6 +85,11 @@ class Fruit(object):
             ch.setFormatter(formatter)
             # add ch to logger
             self.log.addHandler(ch)
+
+            # to tune the level down, after creation:
+            # pe = Fruit()
+            # for handler in pe.log.handlers:
+            #     handler.setLevel("ERROR")
 
         self.myprint = self.log.info # hack for legay
         # # class props etc setup
