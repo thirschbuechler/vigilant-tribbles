@@ -192,7 +192,7 @@ class myinkc(hopper):
             # pyright, pylance: ignore import error on module not present
             import tikzplotlib # type: ignore
             tikzplotlib.save(fn)
-            print("tikz saved {} in {}".format(fn, self.getpath() ) )
+            self.log.info("tikz saved {} in {}".format(fn, self.getpath() ) )
             #self.subplot_counter+=1 # nope subplots does tha
         #elif self.outputformat=="png":
         else:
@@ -636,18 +636,12 @@ class myinkc(hopper):
             else:
                 mytext=[str(mytext)]#assume int, float, ..
             
-            
             if rmsubstr!=None:
                 mytext=ms.removestringparts(rmsubstr,mytext)
-                print(mytext)
-                
+
             mytext.insert(0,title) # insert as first ele into list
             legendlines=ax.get_lines()[:] # decompose simple_list object, or sth.
             legendlines.insert(0,extra) # insert into regular list
-            
-            
-            #print(mytext)
-            #print()
             
             ax.legend(legendlines, mytext)   
     
@@ -694,8 +688,7 @@ class myinkc(hopper):
                 kwargs1=dict(bbox_to_anchor=kwargs["loc"], loc='center', borderaxespad=0.)
                 
             else:
-                print("programmer, you screwed up.")
-                os.close(0)
+                raise Exception("programmer, you screwed up the loc parameter in comrade-fct!")
             
             # in any case:
             kwargs.update(kwargs1)
@@ -891,9 +884,9 @@ class myinkc(hopper):
     def gallery(self, imgs= []):
         """ takes a list (!) of one or more elements and splits it up into 2x2 max. """
         if np.size(imgs)==0:
-            print("dude, no images in this folder! {}".format(self.getpath()))
+            raise Exception("dude, no images in this folder! {}".format(self.getpath()))
         elif not self.printimg:
-            print("withholding images to speed up output process..")
+            self.log.warning("withholding images to speed up output process..")
         else:
             while(np.size(imgs)>0): # iterate till all done
                 if np.size(imgs)>4:
@@ -1191,7 +1184,7 @@ class myinkc(hopper):
                     extent = (mymin(x_axis), mymax(x_axis),mymin(y_axis), mymax(y_axis))
                 else:
                     extent = (mymin(x_axis), mymax(x_axis), 0, ydatalen)
-                    print(f"FORBIDDEN y_axis extent forbidden in imshowpro, {mx.shape=} vs {y_axis.shape=}")
+                    self.log.warning(f"FORBIDDEN y_axis extent forbidden in imshowpro, {mx.shape=} vs {y_axis.shape=}")
             else:
                 # no y_axis given
                 extent = (mymin(x_axis), mymax(x_axis), 0, ydatalen)
@@ -2152,7 +2145,7 @@ class myinkc(hopper):
 
         #anim.save('test_anim.mp4', fps=fps)# ffmpeg knows, pillow not, extra_args=['-vcodec', 'libx264'])
         anim.save(fn, fps=fps)
-        print("saved {}".format(fn))
+        self.log.info("saved {}".format(fn))
 
     def colorbar(self, label="", ax=None, **kwargs):
         """ make a colorbar for the last imshow plot
