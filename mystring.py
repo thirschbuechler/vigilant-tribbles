@@ -307,6 +307,7 @@ def enginerd(value, unit='', places=2, sep="\N{THIN SPACE}", **kwargs): #u2009 t
 
 
 ###################### testing #############################
+#region testing 
 def integritycheck():
     """ better call doctest """
     import doctest

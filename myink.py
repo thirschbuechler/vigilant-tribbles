@@ -2241,7 +2241,8 @@ class myinkc(hopper):
 
     #</myinkc> - if an indent level is wrong fcts afterwards not defined!
 
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
+# # # # # # # # # # # # # # # # # # # # # # tester # # # # # # # # # # # # # # # # # # # # # # # # # # # 
+#region tester
 
 def tester():
     """module test, superseeds ifdef-main (since used here for import shenanigans)"""

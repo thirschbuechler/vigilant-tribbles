@@ -370,6 +370,7 @@ class hopper(portal):
 
 
 #### testing stuff ####
+#region testing stuff 
 
 def testreader():
     with open("file.txt", "r") as f:
