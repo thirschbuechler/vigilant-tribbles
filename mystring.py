@@ -25,6 +25,13 @@ def find_all(query, string):
     return [m.start() for m in re.finditer(query, string)]
 
 
+def replace_with_range(lst):
+    if lst == list(range(min(lst), max(lst)+1)):
+        return f"range({min(lst)}, {max(lst)+1})"
+    else:
+        return lst
+    
+    
 def str_to_blocktext(input, in_sep, out_sep=" ", maxlen=5):
     """ turns string separated by delimiters into newline-separated str of max(maxlen;maxlen_line)
     out_sep != in_sep
@@ -124,8 +131,16 @@ def dictlist_intersection(mydictlist):
     >>> dictlist_intersection([{"a":3, "b":4, "nestedlist":[1,2,3,"aa"]},{"a":1, "c":4, "d":0},{"d":0, "a":4, "x":0}])
     {}
 
-    #>>> dictlist_intersection([{"a":3, "b":4, "nestedlist":[1,2,3,"aa"]},{"a":1, "c":4, "nestedlist":[1,2,3,"aa"]}])
-    #   TypeError: unhashable type: 'list
+    # same-valued nestedlists screw up
+    >>> dictlist_intersection([{"a":3, "b":4, "nestedlist":[1,2,3,"aa"]},{"a":1, "c":4, "nestedlist":[1,2,3,"aa"]}])
+    Traceback (most recent call last):
+    ...
+    Exception: ['dictlist_intersection', "list nestedlist:[1, 2, 3, 'aa']", "list nestedlist:[1, 2, 3, 'aa']"]
+
+    # differing don't
+    >>> dictlist_intersection([{"a":3, "b":4, "nestedlist":[1,2,3,"aa"]},{"a":1, "c":4, "nestedlist":[1,2,3,"bb"]}])
+    {}
+
     """
     if not (type(mydictlist[0]) == dict):
         raise Exception("not a dict as list element")
@@ -136,7 +151,24 @@ def dictlist_intersection(mydictlist):
             commons = item
         else:
             # intersect with last one
-            commons = dict(commons.items() & item.items()) # dict.items() produces keys+values
+            try:
+                commons = dict(commons.items() & item.items()) # dict.items() produces keys+values
+            
+            # only on error, loop and show issue, don't loop on runtime all the time
+            except TypeError as e:
+                t = []
+                t.append(f"dictlist_intersection")
+
+                for check_dict in [commons, item]: # traverse last loop(s) and currentloops dicts
+                    if hasattr(check_dict,"items"):
+                        for key,val in check_dict.items(): 
+                            if type(val)==list:
+                                t.append(f"list {key}:{val}")
+                # re-raise  
+                if not t:
+                    t = e
+                raise Exception(t) from None # to suppress "during handling of Exeption, .."
+            
     return commons
 
 

@@ -23,6 +23,12 @@ def dummy(*args,**kwargs):
     pass # NOP - do nothing
 
 
+# define lookup dir for eval fct
+eval_fct_str_dict={"np.min":np.min, "np.avg":np.average, "np.max":np.max}
+eval_str_fct_dict={np.min:"np.min", np.average:"np.avg", np.max:"np.max"}
+
+
+
 def sample_var(*args, **kwargs):
     """ sample variance
         "provides an unbiased estimator of the variance of a hypothetical infinite population"

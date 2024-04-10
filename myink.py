@@ -2116,7 +2116,153 @@ class myinkc(hopper):
             self.ecke_ru(**kwargs)
         else:
             raise Exception(f" ecke {type=} not implemented")
+
+
+    def plot_outlines(self, outlines, gradientplot=False, monocolor=False, makecanvas=True, title=True, renormalize=True, do_offset=True, linestyle_dict={}, **kwargs):
+        """ hist plotter
+            - outlines = (hist, bins, metadata)
+            
+            # options
+            makecanvas:
+                - common-meta and subplots()
+                - uncommon metadata in legend
+                - common metadata in title
+            gradientplot
+                - for each hist, select color along spectrum of cm.turbo
+            monocolor
+                - choose all black for outlines
+            """
         
+
+        # keys to delete for plotting
+        meta_del_list = ["filling", "setkeys"]
+
+        if makecanvas:
+            self.subplots()
+
+        n = len(outlines)
+        if not n:
+            raise Exception(f"0 outlines given: {outlines}")
+        else:
+            g = gradientmaster(datalen=n, gradientplot=gradientplot, monocolor=monocolor)
+
+        # find common meta, prep, in case of single-canvas straight-forward no-malarky
+        if makecanvas:
+            
+            # collect metadata
+            metadatas = []
+            for k, (hist, bins, metadata) in enumerate(outlines):
+                # remember result for later
+                metadatas.append(metadata)
+            
+            # remove unwanted metadata
+            #   - to not end up on labels
+            #   - to not kill the dictlist-intersection (eg. key10=[dict(1=2),dict(2=3)] --> unhasable error)
+            for key in meta_del_list:
+                for meta in metadatas:
+                    if key in meta:
+                        meta.pop(key, "")
+            
+            # convert this list
+            for meta in metadatas:
+                sch = meta.get("selected_chs", "")
+                if sch:
+                    sch = ms.replace_with_range(sch)
+                    meta["selected_chs"] = ms.list_to_str(sch)
+
+                che = meta.get("ch_eval", "")
+                if che:    
+                    meta["ch_eval"] = ml.eval_str_fct_dict[che]
+
+
+            # # find out if some keys in metadatadict are same for all series
+            # find keys staying the same
+            common_meta = ms.dictlist_intersection(metadatas)
+            #  remove, as linestyle tells them apart anyway
+            #common_meta.pop("msr") 
+            common_meta = common_meta.copy() # avoid runtimeerror when removing stuff because subinstances didnt get duplicated?
+        else:
+            print("ignoring common_meta, as makecanvas==False")
+            common_meta = {}
+            
+        # plot
+        monoculture_lines = False
+        for k, (hist, bins, metadata) in enumerate(outlines):
+            #print(metadata) # ff data comes here from fusion - ok
+            # # prepare
+
+            #if "avl" in metadata:
+            #    hist *= avl
+
+            # fetch linestyle if msr
+            if "msr" in metadata:
+                linestyle = linestyle_dict[metadata["msr"]]
+                
+                # remove as linestyle tells them apart anyway
+                metadata.pop("msr")
+                if "msr" in common_meta:
+                    common_meta.pop("msr","")
+                    monoculture_lines = False
+                else:
+                    monoculture_lines = True
+                
+            else:
+                linestyle = None
+
+            # remove known common metadata from label/legend
+            for key in common_meta.keys():
+                # unless offset, remove
+                if key != "offset_dB":
+                    metadata.pop(key,"")
+            
+            label = metadata_to_str(metadata)
+                
+            #label = f"${label}$" /u2009 issue
+
+            # # fix overflowing legend-newlines
+            label = ms.str_to_blocktext(label, ", ", " ", 80)
+
+            # plot options
+            pkwargs = dict(label=label, linestyle=linestyle, color=g.cycle(k))
+
+            # process
+            txt = []
+            x = ml.bin_to_xaxis(bins)
+            y = hist
+            if ("offset_dB" in metadata) and do_offset:
+                x+=metadata["offset_dB"]*np.ones(np.shape(x))
+
+            if renormalize:
+                y=y/ml.nanmax(y)
+                txt.append("histogram, normalized outlines")
+            else:
+                txt.append("histogram")
+
+            # plot
+            self.plot(x, y, **pkwargs)
+
+            #print(f"plotted {hist} {metadata}")
+
+        # # finalize graph # #
+        # put title, or don't
+        txt.append(f"common meta: {metadata_to_str(common_meta)}")
+        if not monoculture_lines:
+            txt.append(f"linestyles {metadata_to_str(linestyle_dict)}")
+        txt = "\n".join(txt)
+        if title:
+            self.title(txt)
+        else:
+            print("Title supressed:")
+            print(txt)
+            
+        # print metadata, or make legend
+        #if (not monoculture_lines and n>10) or (monoculture_lines and n>5):
+        if n>10:
+            for k, (hist, bins, metadata) in enumerate(outlines):
+                print(f"{k}: {metadata}")
+        else:
+            self.legend()
+
 
 # https://stackoverflow.com/questions/17212722/matplotlib-imshow-how-to-animate
     def make_im_gif(self, data, fn='test_anim.gif', fps=1, sec=4):
@@ -2241,6 +2387,21 @@ class myinkc(hopper):
 
     #</myinkc> - if an indent level is wrong fcts afterwards not defined!
 
+
+
+def metadata_to_str(metadata):
+    for key in metadata.keys():
+        if (metadata[key]):
+
+            if key=="avl":
+                metadata[key] = f"avl %: {(metadata[key]*100):.2f}"
+            
+            elif isinstance(metadata[key], float):
+                # np.char.isnumeric only works on strings
+                metadata[key] = ms.enginerd(metadata[key], sep=" ")
+
+    label = ms.dict_to_str(metadata)
+    return label
 # # # # # # # # # # # # # # # # # # # # # # tester # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 #region tester
 
