@@ -25,16 +25,6 @@ def find_all(query, string):
     return [m.start() for m in re.finditer(query, string)]
 
 
-def list_to_range(lst):
-    low = int(min(lst))
-    high = int(max(lst))
-
-    if lst == list(range(low, high+1)):
-        return range(low, high+1)
-    else:
-        return lst
-    
-    
 def str_to_blocktext(input, in_sep, out_sep=" ", maxlen=5):
     """ turns string separated by delimiters into newline-separated str of max(maxlen;maxlen_line)
     out_sep != in_sep

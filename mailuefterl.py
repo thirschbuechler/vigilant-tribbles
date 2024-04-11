@@ -885,6 +885,16 @@ def availability_frac(data, nan_bad=True):
 if __name__ == '__main__': # test if called as executable, not as library
     integritycheck()#does not work f class functions?
 
+
+def list_to_range(lst):
+    low = int(min(lst))
+    high = int(max(lst))
+
+    if lst == list(range(low, high+1)):
+        return range(low, high+1)
+    else:
+        return lst
+
     # # scalar element present: [5] # # #ToDo put into nanmean doctest as docu maybe
     #nanmean( np.array([[1,2,3],[3,np.nan],[5]], dtype="object") )
     

@@ -2167,7 +2167,7 @@ class myinkc(hopper):
             for meta in metadatas:
                 sch = meta.get("chs", "")
                 if sch:
-                    sch = ms.list_to_range(sch)
+                    sch = ml.list_to_range(sch)
                     meta["chs"] = ms.list_to_str(sch)
 
                 che = meta.get("ch_eval", "")
