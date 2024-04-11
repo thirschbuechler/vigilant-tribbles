@@ -25,9 +25,12 @@ def find_all(query, string):
     return [m.start() for m in re.finditer(query, string)]
 
 
-def replace_with_range(lst):
-    if lst == list(range(min(lst), max(lst)+1)):
-        return f"range({min(lst)}, {max(lst)+1})"
+def list_to_range(lst):
+    low = int(min(lst))
+    high = int(max(lst))
+
+    if lst == list(range(low, high+1)):
+        return range(low, high+1)
     else:
         return lst
     

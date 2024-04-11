@@ -2165,10 +2165,10 @@ class myinkc(hopper):
             
             # convert this list
             for meta in metadatas:
-                sch = meta.get("selected_chs", "")
+                sch = meta.get("chs", "")
                 if sch:
-                    sch = ms.replace_with_range(sch)
-                    meta["selected_chs"] = ms.list_to_str(sch)
+                    sch = ms.list_to_range(sch)
+                    meta["chs"] = ms.list_to_str(sch)
 
                 che = meta.get("ch_eval", "")
                 if che:    
