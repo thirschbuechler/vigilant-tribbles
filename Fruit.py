@@ -75,16 +75,19 @@ class Fruit(object):
             self.log = logging
         else:
             self.log = logging.getLogger(__class__.__name__)
-            # create console handler and set level to debug
-            ch = logging.StreamHandler()
-            #ch.setLevel(logging.INFO)
-            ch.setLevel(logging.TRAIL)
-            # create formatter
-            formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-            # add formatter to ch
-            ch.setFormatter(formatter)
-            # add ch to logger
-            self.log.addHandler(ch)
+            
+            # prevent console spam by multiple handlers via child-objects
+            if not self.log.handlers:
+                # create console handler and set level to debug
+                ch = logging.StreamHandler()
+                #ch.setLevel(logging.INFO)
+                ch.setLevel(logging.TRAIL)
+                # create formatter
+                formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+                # add formatter to ch
+                ch.setFormatter(formatter)
+                # add ch to logger
+                self.log.addHandler(ch)
 
             # to tune the level down, after creation:
             # pe = Fruit()
