@@ -55,19 +55,11 @@ class Fruit(object):
         super().__init__(**kwargs) # (*args, **kwargs) # superclass inits
         
         # # logger setup
-        levels_now = logging._levelToName.values()
+        #levels_now = logging._levelToName.values()
+        # docu see: def self.setLogLevel()
         addLoggingLevel('TRAIL',  logging.INFO - 2)
         addLoggingLevel('CRUMB', logging.DEBUG + 2)
-        """Levels
-        CRITICAL
-        ERROR
-        WARNING
-        INFO
-        *Trail
-        *Crumb
-        DEBUG # spammed by matplotlib
-        NOTSET
-        """
+
         if basiclogger:
             #logging.basicConfig(level=logging.INFO)
             logging.basicConfig(level=logging.TRAIL)
@@ -89,12 +81,7 @@ class Fruit(object):
                 # add ch to logger
                 self.log.addHandler(ch)
 
-            # to tune the level down, after creation:
-            # pe = Fruit()
-            # for handler in pe.log.handlers:
-            #     handler.setLevel("ERROR")
-
-        self.myprint = self.log.info # hack for legay
+        self.myprint = self.log.info # hack for legay legacy
         # # class props etc setup
         self.root = root # root obj
         self.ID = ID # name of this container
@@ -119,6 +106,21 @@ class Fruit(object):
         # endif, end __init__
         
 
+    def setLogLevel(self, level):
+        """ set loglevel for this object
+
+        Levels: 
+            * CRITICAL
+            * ERROR
+            * WARNING
+            * INFO
+            * *Trail --> debug, shape prints
+            * *Crumb --> data prints, print("here") substitute for function debug pos
+            * DEBUG --> spammed by matplotlib
+            * NOTSET
+        """
+        self.log.setLevel(level)
+    
     def __getitem__(self, obj): # Attribute handler
         return self.__dict__[obj]
     
