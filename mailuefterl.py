@@ -466,104 +466,110 @@ def recursive_array(obj):
     
 
 def roadkill(thing, hard=False, soft=False):
-        """ flatten if possible - remove any dimensions and make a list 
-        
-        soft(ness):
-            - False: no softness, hardness possible
-            - True: np.squeeze, disable hard
-        hard(ness):
+    """Flatten if possible - remove any dimensions and make a list.
+    
+    Args:
+        *thing: The object to flatten.
+        * hard (bool, optional): Determines the level of "hardness". Defaults to False.
             - False: please be flat - squish a little
             - True: sudo "be_flat!" - deploy the hammer
             - 2: sneaky "be_flat!" - add a dummy (and remove it again)
+        * soft (bool, optional): Determines the level of "softness". Defaults to False.
+            - False: no softness, hardness possible
+            - True: np.squeeze, disable hard
 
-        # doctest - show contents of singledim_mod_testdata and then apply to function
-        
-        >>> np.shape(singledim_mod_testdata(0))
-        (2, 2, 2, 2)
-        >>> np.shape(roadkill(singledim_mod_testdata(0)))
-        (16,)
-        
-        >>> np.shape(singledim_mod_testdata(1))
-        (1, 10)
-        >>> np.shape(roadkill(singledim_mod_testdata(1)))
-        (10,)
-        
-        >>> np.shape(singledim_mod_testdata(0.5))
-        (5,)
-        >>> np.shape(roadkill(singledim_mod_testdata(0.5)))
-        (5,)
-        
-        >>> np.shape(roadkill(singledim_mod_testdata(0.5), hard=True))
-        Traceback (most recent call last):
-        ValueError: zero-dimensional arrays cannot be concatenated
-        >>> np.shape(roadkill(singledim_mod_testdata(0.5), hard=2))
-        (10,)
-        
-        >>> np.shape(roadkill(singledim_mod_testdata(0), hard=2))
-        (32,)
-        
-        >>> np.shape(singledim_mod_testdata(2))
-        (2, 2, 2)
-        >>> np.shape(roadkill(singledim_mod_testdata(2), soft=True))
-        (2, 2, 2)
-        >>> np.shape(roadkill(singledim_mod_testdata(2), hard=0))
-        (8,)
-        >>> np.shape(roadkill(singledim_mod_testdata(2), hard=1))
-        (8,)
-        >>> np.shape(roadkill(singledim_mod_testdata(2), hard=2))
-        (16,)
+    Returns:
+        The flattened object.
 
+    (Pylance Linter)
 
-        >>> np.shape(singledim_mod_testdata(3))
-        (1, 2, 2, 2)
-        >>> np.shape(roadkill(singledim_mod_testdata(3), soft=True))
-        (2, 2, 2)
-        >>> np.shape(roadkill(singledim_mod_testdata(3), hard=0))
-        (8,)
-        >>> np.shape(roadkill(singledim_mod_testdata(3), hard=1))
-        (8,)
-        >>> np.shape(roadkill(singledim_mod_testdata(3), hard=2))
-        (16,)
+    
+    >>> np.shape(singledim_mod_testdata(0))
+    (2, 2, 2, 2)
+    >>> np.shape(roadkill(singledim_mod_testdata(0)))
+    (16,)
+    
+    >>> np.shape(singledim_mod_testdata(1))
+    (1, 10)
+    >>> np.shape(roadkill(singledim_mod_testdata(1)))
+    (10,)
+    
+    >>> np.shape(singledim_mod_testdata(0.5))
+    (5,)
+    >>> np.shape(roadkill(singledim_mod_testdata(0.5)))
+    (5,)
+    
+    >>> np.shape(roadkill(singledim_mod_testdata(0.5), hard=True))
+    Traceback (most recent call last):
+    ValueError: zero-dimensional arrays cannot be concatenated
+    >>> np.shape(roadkill(singledim_mod_testdata(0.5), hard=2))
+    (10,)
+    
+    >>> np.shape(roadkill(singledim_mod_testdata(0), hard=2))
+    (32,)
+    
+    >>> np.shape(singledim_mod_testdata(2))
+    (2, 2, 2)
+    >>> np.shape(roadkill(singledim_mod_testdata(2), soft=True))
+    (2, 2, 2)
+    >>> np.shape(roadkill(singledim_mod_testdata(2), hard=0))
+    (8,)
+    >>> np.shape(roadkill(singledim_mod_testdata(2), hard=1))
+    (8,)
+    >>> np.shape(roadkill(singledim_mod_testdata(2), hard=2))
+    (16,)
 
 
-        """
-        if not (type(thing) == type(np.array([1]))):
-                thing = np.array(thing, dtype="object")
-        if np.shape(thing) == np.shape(1): # numpy shape returns warning ragged nested sequences, unless dtype=obj 
-            return thing # no dimension
-        elif (hasattr(thing, "__iter__")):
+    >>> np.shape(singledim_mod_testdata(3))
+    (1, 2, 2, 2)
+    >>> np.shape(roadkill(singledim_mod_testdata(3), soft=True))
+    (2, 2, 2)
+    >>> np.shape(roadkill(singledim_mod_testdata(3), hard=0))
+    (8,)
+    >>> np.shape(roadkill(singledim_mod_testdata(3), hard=1))
+    (8,)
+    >>> np.shape(roadkill(singledim_mod_testdata(3), hard=2))
+    (16,)
+
+
+    """
+    if not (type(thing) == type(np.array([1]))):
+            thing = np.array(thing, dtype="object")
+    if np.shape(thing) == np.shape(1): # numpy shape returns warning ragged nested sequences, unless dtype=obj 
+        return thing # no dimension
+    elif (hasattr(thing, "__iter__")):
+        
+        # convert in case boolean is used
+        hard = int(hard)
+        
+        if soft:
+            # skip hardnesses
+            return np.squeeze(thing)
+
+        # please be flat - squish a little
+        if not hard:
+            return(thing.flatten()) 
+        
+        # sudo "be_flat!" - deploy the hammer
+        elif hard==1:
+            # - join np.arrays in list via conc
+            # - then join lists via ravel)
+            return(np.concatenate(thing).ravel())
+        
+        # sneaky "be_flat!" - add dummy NANs on end - doesn't matter in some cases
+        elif hard==2:
+            # - join np.arrays in list via conc
+            # - then join lists via ravel)
+            # - add a dummy dimension, so it also works with single-dimension arrays
+            a = []
+            #a = np.array([[] for ele in range(0,len(np.shape(thing)))])
+            thing = recursive_array(thing)
+            a = np.full(shape=np.shape(thing),fill_value=np.nan)
+            return(np.concatenate(np.array([thing,a], dtype="object")).ravel())
             
-            # convert in case boolean is used
-            hard = int(hard)
-            
-            if soft:
-                # skip hardnesses
-                return np.squeeze(thing)
 
-            # please be flat - squish a little
-            if not hard:
-                return(thing.flatten()) 
-            
-            # sudo "be_flat!" - deploy the hammer
-            elif hard==1:
-                # - join np.arrays in list via conc
-                # - then join lists via ravel)
-                return(np.concatenate(thing).ravel())
-            
-            # sneaky "be_flat!" - add dummy NANs on end - doesn't matter in some cases
-            elif hard==2:
-                # - join np.arrays in list via conc
-                # - then join lists via ravel)
-                # - add a dummy dimension, so it also works with single-dimension arrays
-                a = []
-                #a = np.array([[] for ele in range(0,len(np.shape(thing)))])
-                thing = recursive_array(thing)
-                a = np.full(shape=np.shape(thing),fill_value=np.nan)
-                return(np.concatenate(np.array([thing,a], dtype="object")).ravel())
-                
-
-        else:
-            return thing
+    else:
+        return thing
 
 
 def tuple_concat(*args):
@@ -803,6 +809,17 @@ def bintreesearch(evalfct, maxdeviate, left, right, echo=False, aborter=None):
         else:
             return bintreesearch(evalfct=evalfct, maxdeviate=maxdeviate, left=center, right=right, echo=echo)
 
+
+def list_to_range(lst):
+    low = int(min(lst))
+    high = int(max(lst))
+
+    if lst == list(range(low, high+1)):
+        return range(low, high+1)
+    else:
+        return lst
+    
+    
 '''
 def availability(data, thresh=-90, plot_test=False):
     """
@@ -886,14 +903,7 @@ if __name__ == '__main__': # test if called as executable, not as library
     integritycheck()#does not work f class functions?
 
 
-def list_to_range(lst):
-    low = int(min(lst))
-    high = int(max(lst))
 
-    if lst == list(range(low, high+1)):
-        return range(low, high+1)
-    else:
-        return lst
 
     # # scalar element present: [5] # # #ToDo put into nanmean doctest as docu maybe
     #nanmean( np.array([[1,2,3],[3,np.nan],[5]], dtype="object") )
