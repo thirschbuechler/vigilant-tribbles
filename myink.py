@@ -233,19 +233,23 @@ class myinkc(hopper):
             self.save_lastgraph()
 
 
-    def postprocess_figs(self, cmd):
+    def postprocess_figs(self, cmd, text=""):
         """ execute shell cmd in self.figs_dir
         
         eg: imagemagick convert to remove borders
             cmd = "for f in *.png; do convert $f -trim +repage $f; done"
         """
+        if text:
+            # add prefix space
+            text += " "
+            
         import subprocess
         with hopper(self.figs_dir):
             # todo - stdout=PIPE or sth to get useful return value
-            self.log.trail("postprocessing..")
+            self.log.trail(text+"postprocessing..")
             proc = subprocess.Popen(cmd, shell=True)
             proc.wait() # ensure it's done before continuing
-            self.log.trail("postprocessing done!")
+            self.log.trail(text+"postprocessing done!")
         
     def subplots(self, *args, **kwargs):
         """ make subplot axes (plt.subplots(..)) and save axs for iterating via fct
