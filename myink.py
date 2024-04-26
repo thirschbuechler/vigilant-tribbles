@@ -530,11 +530,7 @@ class myinkc(hopper):
             else:#places=places, sep=sep, 
                 #return(LogFormatterSciNotation(**kwargs))
                 return(ScalarFormatter(**kwargs)) # eg puts 10E9 on right
-                
-                
-
-
-    
+                    
         
     def enginerd_axis(self, axissub="", **kwargs):
         """ set enginerd formatter for a axis"""
