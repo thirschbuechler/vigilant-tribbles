@@ -1825,6 +1825,86 @@ class myinkc(hopper):
         return np.matrix(mx) 
 
 
+    def persistence_core(self, xaxes=None, mxs=None, # data
+                        pos_avg=True, pos_med=False, weighted=False, # plot options
+                        title="", labels=[], markers=[], # annotations
+                    colors=np.array([["bisque", "sandybrown", "darkorange", "red"], ["lavender", "cornflowerblue", "blue", "purple"]]).T,
+                    export=False, **subpkwargs):
+        """ plot two Sxy plots via magDBs, highlight envelope  and avgs
+
+        - mxs: [A,B]
+        - labels (str)
+        - title (str)
+        - colors = [[bg_colors, ex_colors, avg_colors, med_colors],[..]].T
+        - pos_avg: show avg line per set over positions
+        - pos_med: show median line per set over positions
+        - weighted: factor above 1 for better persistence visibility 
+                - assign each matrix-line (for a given position) a fair 1/n weight, so it would add to 1 if all overlap
+                - True / 1: fairest 1 * 1/n
+                - higher: weighted * 1/n
+        
+        """
+        bg_colors, ex_colors, avg_colors, median_colors = colors
+
+        if not markers:
+            # still needs an empty array of right size
+            markers = ["" for _ in mxs]
+
+        self.subplots(**subpkwargs)
+        for magDBs, x_axis, bg_color, ex_color, marker in zip(mxs, xaxes, bg_colors, ex_colors, markers):
+            s = np.shape(magDBs)
+            self.log.crumb(f"shape in persistence: {s}")
+
+            #mx: row x col --> row = pos
+            max_pos = s[0]
+            s2 = s[1]
+
+            if not (max_pos in [16,151]): # neither a position
+                if not (s2 in [1001,40,4]): # frequency, channels_all or channel_subset
+                    raise Exception(f"persistence shape is unexpected:{s}")
+
+            # collapse axis 0 aka position
+            enve_max = ml.nanmax(magDBs, axis=0)
+            enve_min = ml.nanmin(magDBs, axis=0)
+            
+            # # graphing # #
+            # bg - all position values #
+            colors = [bg_color for i in range(0,max_pos)]
+            # do if requested
+            if weighted:
+                # does it converge towards median?
+                alpha = float(weighted) * 1/max_pos
+                if alpha > 1:
+                    raise Exception(f"{weighted=} results in {alpha=} > 1, which is invalid")
+            else:
+                alpha = 1
+            for pos, color in zip(magDBs, colors):
+                self.plot(x_axis, pos, color=color, alpha=alpha)
+            
+            # envelope extrema #
+            self.plot(x_axis, enve_max, color=ex_color, marker=marker, markevery=100)
+            self.plot(x_axis, enve_min, color=ex_color, marker=marker, markevery=100)
+        # end for-compare
+        
+        avgs = (np.nanmean(mxs,axis=1))
+        #avgs2 = [np.nanmean(mx,axis=0) for mx in mxs] # same
+        medians = (np.nanmedian(mxs,axis=1))
+
+        # plot medians over pos per freq
+        x_axis = xaxes[0]
+        if pos_med:
+            for median, color, label in zip(medians, median_colors, labels):
+                self.plot(x_axis, median, color=color, marker=marker, markevery=100, label=f"{label}, median")
+
+        # plot average over pos per freq
+        if pos_avg:
+            for avg, color, label in zip(avgs, avg_colors, labels):
+                self.plot(x_axis, avg, color=color, label=f"{label}, median")
+                
+        if not export:
+            self.title(title)
+
+
     def spind_rechts(self, mainwidth=2, smallaxes=2):
         """ 
         make n axes, first left "main" bigger, others same size
