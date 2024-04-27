@@ -1126,13 +1126,44 @@ class myinkc(hopper):
         return plt.text(*args, **kwargs)
 
 
-    def add_shieldbadge(self, text):
-        """ add a shield-badge in upper right corner, with Gcode text"""
+    def add_shieldbadge(self, input, front=True):
+        """ add a shield-badge in upper right corner, with Gcode text
         
+            input: textlist - any, list of strings, or list of list of strings;
+            char-width only for 3characters
+        """
+        
+        # # input conditioning
+        # case int, str or sth
+        if type(input) != list:
+            self.log.error(f"shieldbadge - cast {input=} to list")
+            textlist = [str(input)]
+        # case sublist
+        elif type(input[0])==list:
+            # find out if homogenous
+            unique_subelements = set(self.roadkill(input, hard=True))
+            
+            if unique_subelements != set(input[0]):
+                # error
+                textlist = ["ERR"]
+                self.log.error(f"shieldbadge - {input=} not homogenous: {unique_subelements=}")
+            else:
+                # all the same - use the first one
+                textlist = input[0]
+        else:
+            # case list of strings
+            textlist = input
+            
+        # # prep shieldbadge
+        # put it infront of the rest
+        if front:
+            self.reset_coordsys()
+        
+        # get ax
         ax = self.get_ax()
 
         # textlen
-        l = len(text)
+        l = len(textlist)
 
         # minimum shieldsize could accomodate 2 items
         n = max(l,2)-2
@@ -1141,7 +1172,7 @@ class myinkc(hopper):
         # shield-text pos
         t = n/2 - 0.01
 
-        # Define the points of the shield-badge
+        # define the points of the shield-badge
         verts = [
             #  top row
             (0.9, 0.9),  # top right
@@ -1163,21 +1194,21 @@ class myinkc(hopper):
         codes[0] = Path.MOVETO
         codes[-1] = Path.CLOSEPOLY
 
-        # Create the path
+        # create the path
         path = Path(verts, codes)
 
-        # Create the patch
-        shield = patches.PathPatch(path, facecolor='none', edgecolor='black', linewidth=2)
+        # create the patch
+        shield = patches.PathPatch(path, facecolor='white', alpha=0.5, edgecolor='black', linewidth=2,transform=ax.transAxes)
 
-        # Add the patch to the Axes
+        # add the patch to the Axes
         ax.add_patch(shield)
 
-
-        # Add the text
+        # prep textpos
         ypos = 0.825-t
         xpos = 0.85
 
-        ax.text(xpos, ypos, "\n".join(text),
+        # add the text
+        ax.text(xpos, ypos, "\n".join(textlist),
             bbox={'facecolor':'white','alpha':0,'edgecolor':'none','pad':1}, # textbox: no color, bg: alpha=0!
             ha='center', va='center') 
 
@@ -2701,7 +2732,7 @@ def histo_test_and_modlegend():
         if percent==0:
             ele.ax_onward()
     ## fix label clipping ##
-    ele.autoscale_fig()
+    ele.autoscaleautoscale_fig()
     
     # second send is a mx example #
     ## data ##
