@@ -21,7 +21,7 @@ from logging import exception
 import re
 import os
 import numpy as np
-import pandas as pd
+
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
@@ -29,8 +29,8 @@ from matplotlib.ticker import EngFormatter, LogFormatterSciNotation, ScalarForma
 from matplotlib.ticker import (MultipleLocator, FormatStrFormatter) # nicergrid
 from matplotlib.ticker import PercentFormatter # histo percent
 from matplotlib.transforms import Bbox
-from matplotlib.patches import Rectangle
-
+import matplotlib.patches as patches
+from matplotlib.path import Path
 
 try:
     import mystring as ms
@@ -623,7 +623,7 @@ class myinkc(hopper):
             texts = [item._text for item in ll ]
             mylegendtext=texts
             
-            extra = Rectangle((0, 0), 1, 1, fc="w", fill=False, edgecolor='none', linewidth=0) # dummy rect
+            extra = patches.Rectangle((0, 0), 1, 1, fc="w", fill=False, edgecolor='none', linewidth=0) # dummy rect
             
             mytext=mylegendtext
             
@@ -1122,13 +1122,71 @@ class myinkc(hopper):
         return plt.imread(*args, **kwargs)
 
     def text(self, *args, **kwargs):
+        """ forward to plt.text, (not ax.text here)"""
         return plt.text(*args, **kwargs)
+
+
+    def add_shieldbadge(self, text):
+        """ add a shield-badge in upper right corner, with Gcode text"""
+        
+        ax = self.get_ax()
+
+        # textlen
+        l = len(text)
+
+        # minimum shieldsize could accomodate 2 items
+        n = max(l,2)-2
+        n = 0.05*n
+
+        # shield-text pos
+        t = n/2 - 0.01
+
+        # Define the points of the shield-badge
+        verts = [
+            #  top row
+            (0.9, 0.9),  # top right
+            (0.8, 0.9),  # top left
+
+            # middle and lower parts
+            (0.8, 0.8-n),  # left mid
+            (0.85, 0.735-n),  # center bottom
+            (0.9, 0.8-n),  # right mid
+
+            # back to top row
+            (0.9, 0.9),  # top right
+        ]
+
+        # define nodes list
+        codes = [Path.LINETO for _ in verts]
+
+        # start and endpoints
+        codes[0] = Path.MOVETO
+        codes[-1] = Path.CLOSEPOLY
+
+        # Create the path
+        path = Path(verts, codes)
+
+        # Create the patch
+        shield = patches.PathPatch(path, facecolor='none', edgecolor='black', linewidth=2)
+
+        # Add the patch to the Axes
+        ax.add_patch(shield)
+
+
+        # Add the text
+        ypos = 0.825-t
+        xpos = 0.85
+
+        ax.text(xpos, ypos, "\n".join(text),
+            bbox={'facecolor':'white','alpha':0,'edgecolor':'none','pad':1}, # textbox: no color, bg: alpha=0!
+            ha='center', va='center') 
+
 
     def rect(self, *args, **kwargs):
         """ draw a rectangle using Patches-Rectangle """
         # (x-start y-start) , width, height
         # eg. (50,100),40,80, edgecolor='red', facecolor='none', lw=4)
-        self.get_ax().add_patch(Rectangle(*args, **kwargs))
+        self.get_ax().add_patch(patches.Rectangle(*args, **kwargs))
 
     def imshowpro(self, mx=None, x_axis=None, y_axis=None, y_label_inverted=False, pixelscale=1, kwargs_fig={}, **kwargs):
         """ souped-up mpl imshow api"""
@@ -3136,6 +3194,16 @@ def barstacked_test():
     pe.show()
 
 
+def shield_test():
+    pe = myinkc()   
+    
+    for i in [2,3,4,5]:
+        pe.subplots()
+        text = [f"N0{i}" for i in range(0,i)]
+        pe.add_shieldbadge(text)
+        
+    pe.show()
+
 #-#-# module test #-#-#
 if testing:#call if selected, after defined, explanation see above
     #tester() # better - call myink_demos.ipynb
@@ -3168,6 +3236,7 @@ if testing:#call if selected, after defined, explanation see above
     #statistics_visu()
     #boxplottest()
     #calibrate_corr_mx_label() # old; new: cal_plot_corr_mx.py
+    shield_test()
     pass
 
 
