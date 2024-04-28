@@ -1129,30 +1129,23 @@ class myinkc(hopper):
     def add_shieldbadge(self, input, front=True):
         """ add a shield-badge in upper right corner, with Gcode text
         
-            input: textlist - any, list of strings, or list of list of strings;
+            input: stringlines, or list of stringlines to verify to be the same,
             char-width only for 3characters
         """
         
         # # input conditioning
-        # case int, str or sth
-        if type(input) != list:
-            self.log.error(f"shieldbadge - cast {input=} to list")
-            textlist = [str(input)]
-        # case sublist
-        elif type(input[0])==list:
-            # find out if homogenous
-            unique_subelements = set(self.roadkill(input, hard=True))
-            
-            if unique_subelements != set(input[0]):
-                # error
-                textlist = ["ERR"]
-                self.log.error(f"shieldbadge - {input=} not homogenous: {unique_subelements=}")
-            else:
+        if type(input) == str:
+            text = input
+        elif type(input) == list:
+            # find out if homogenous            
+            if len(set(input))==1:
                 # all the same - use the first one
-                textlist = input[0]
-        else:
-            # case list of strings
-            textlist = input
+                text = input[0]
+            else:
+                # error
+                text = ["ERR"] # TODO idea - one colored badge per linecolor of plot
+                self.log.error(f"shieldbadge - {input=} not homogenous: {len(set(input))=}")
+            
             
         # # prep shieldbadge
         # put it infront of the rest
@@ -1162,8 +1155,9 @@ class myinkc(hopper):
         # get ax
         ax = self.get_ax()
 
-        # textlen
-        l = len(textlist)
+        # lines
+        #l = len(textlist)
+        l = text.count("\n")
 
         # minimum shieldsize could accomodate 2 items
         n = max(l,2)-2
@@ -1208,7 +1202,7 @@ class myinkc(hopper):
         xpos = 0.85
 
         # add the text
-        ax.text(xpos, ypos, "\n".join(textlist),
+        ax.text(xpos, ypos, (text),
             bbox={'facecolor':'white','alpha':0,'edgecolor':'none','pad':1}, # textbox: no color, bg: alpha=0!
             ha='center', va='center') 
 
@@ -3231,6 +3225,7 @@ def shield_test():
     for i in [2,3,4,5]:
         pe.subplots()
         text = [f"N0{i}" for i in range(0,i)]
+        text = "\n".join(text)
         pe.add_shieldbadge(text)
         
     pe.show()
