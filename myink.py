@@ -25,6 +25,7 @@ import numpy as np
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
+from matplotlib.transforms import Affine2D # scaling down a path-patch
 from matplotlib.ticker import EngFormatter, LogFormatterSciNotation, ScalarFormatter #enginerd stuff
 from matplotlib.ticker import (MultipleLocator, FormatStrFormatter) # nicergrid
 from matplotlib.ticker import PercentFormatter # histo percent
@@ -1126,7 +1127,7 @@ class myinkc(hopper):
         return plt.text(*args, **kwargs)
 
 
-    def add_shieldbadge(self, input, front=True, shape="hex", dbg=True):
+    def add_shieldbadge(self, input, front=True, shape="hex", dbg=True, targetat4 = 3/4):
         """ add a shield-badge-like shaped textbox in upper right corner, call after plot
         
             input: stringlines, or list of stringlines to verify to be the same,
@@ -1283,11 +1284,38 @@ class myinkc(hopper):
         # create the path
         path = Path(verts, codes)
 
-        # create the patch
-        shield = patches.PathPatch(path, facecolor='white', alpha=0.5, edgecolor='black', linewidth=2,transform=ax.transAxes)
+        # scale acc to textsize
+        fontsize = ax.yaxis.label.get_size()*1
+        # ylabel fontsize is 10 per default and well sized
+        # shall be targetat4 at 4
+        #targetat4 = 3/4 # it correlates but not 1:1, so make it a fct param
+        k = (1-targetat4)/6
+        d = targetat4 - 4*k
+        # correction factor:
+        scale = fontsize*k+d
 
+        # create the patch
+        shield = patches.PathPatch(path, facecolor='white', alpha=0.5, edgecolor='black', linewidth=2*scale,transform=ax.transAxes)
+        
         # add the patch to the Axes
         ax.add_patch(shield)
+
+        # get patch boungs
+        bounds_display = shield.get_extents()
+
+
+        # convert bounds to data coordinates
+        bounds_data = ax.transData.inverted().transform(bounds_display)
+
+        # calculate center
+        center_x = (bounds_data[0, 0] + bounds_data[1, 0]) / 2
+        center_y = (bounds_data[0, 1] + bounds_data[1, 1]) / 2
+
+        # center - scale - uncenter
+        scale_transform = Affine2D().translate(-center_x, -center_y).scale(scale, scale).translate(center_x, center_y)
+
+        # apply
+        shield.set_transform(scale_transform + ax.transData)
 
         # add the text
         ax.text(text_x, text_y, text,
@@ -3309,16 +3337,20 @@ def barstacked_test():
     pe.show()
 
 
-def shield_test():
+def shield_test(shapes=["rect", "hex", "flag"], lens=[2,3,4,5]):
     pe = myinkc()   
     
-    for shape in ["rect", "hex", "flag"]:
-        for i in [2,3,4,5]:
-            pe.subplots()
-            text = [f"N0{i}" for i in range(0,i)]
-            text = "\n".join(text)
-            pe.add_shieldbadge(text, shape=shape)
-            
+    for k in [0,1]:
+        if k==1:
+            pe.mycanvassize(medfig=True) # reset afterwards via one-time-use myinkc element
+
+        for shape in shapes:
+            for i in lens:
+                pe.subplots()
+                text = [f"N0{i}" for i in range(0,i)]
+                text = "\n".join(text)
+                pe.add_shieldbadge(text, shape=shape)
+                
     pe.show()
 
 #-#-# module test #-#-#
@@ -3353,7 +3385,9 @@ if testing:#call if selected, after defined, explanation see above
     #statistics_visu()
     #boxplottest()
     #calibrate_corr_mx_label() # old; new: cal_plot_corr_mx.py
-    shield_test()
+    
+    #shield_test()
+    shield_test(shapes=["hex"], lens=[3])
     pass
 
 
