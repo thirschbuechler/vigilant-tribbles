@@ -1142,9 +1142,16 @@ class myinkc(hopper):
                 # all the same - use the first one
                 text = input[0]
             else:
-                # error
-                text = ["ERR"] # TODO idea - one colored badge per linecolor of plot
-                self.log.error(f"shieldbadge - {input=} not homogenous: {len(set(input))=}")
+                # dissect list if necessary
+                # old: self.log.error(f"shieldbadge - {input=} not homogenous: {len(set(input))=}")
+                
+                # split the input via "\n" into lists
+                inputlist = [part.split("\n") for part in input]
+
+                # find the overlap between the lists
+                settings = set(self.roadkill(inputlist, hard=True))
+
+                text = "\n".join(settings)
             
             
         # # prep shieldbadge
