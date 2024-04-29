@@ -2616,10 +2616,12 @@ class myinkc(hopper):
 
 
     def reset_coordsys(self):
-        """ reset coord sys to absolute - eg clean up previous plot random spacing
+        """ reset coord sys to absolute - eg clean up previous plot random spacing (G53 gcode)
             - e.g. histos have 0,0 on lower left and not 0,0 on upper right per def --> call before and after annotating it w plot 
 
-            NOTE: DANGER - MIGHT KILL x,y ticks
+            NOTE: ! DANGER !
+                - INVALIDATES PREVIOUS AX HANDLES (new get_ax() required)
+                - MIGHT KILL x,y ticks
         """ 
         self.get_ax().margins(0) # AFTER plot - 
         self.twinx() # new axes for both
