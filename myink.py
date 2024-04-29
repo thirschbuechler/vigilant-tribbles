@@ -1126,8 +1126,8 @@ class myinkc(hopper):
         return plt.text(*args, **kwargs)
 
 
-    def add_shieldbadge(self, input, front=True):
-        """ add a shield-badge in upper right corner, with Gcode text
+    def add_shieldbadge(self, input, front=True, shape="rect"):
+        """ add a shield-badge-like shaped textbox in upper right corner, call after plot
         
             input: stringlines, or list of stringlines to verify to be the same,
             char-width only for 3characters
@@ -1155,19 +1155,22 @@ class myinkc(hopper):
         # get ax
         ax = self.get_ax()
 
-        # lines
-        #l = len(textlist)
-        l = text.count("\n")
+        # lines are breaks+1
+        l = text.count("\n")+1
 
         # minimum shieldsize could accomodate 2 items
         n = max(l,2)-2
         n = 0.05*n
 
         # shield-text pos
-        t = n/2 - 0.01
+        text_y = 0.84 - n/2
+        text_x = 0.85
 
-        # define the points of the shield-badge
-        verts = [
+        # define some shapes
+        flag = [
+        # -----
+        # |   |
+        #   -
             #  top row
             (0.9, 0.9),  # top right
             (0.8, 0.9),  # top left
@@ -1180,6 +1183,78 @@ class myinkc(hopper):
             # back to top row
             (0.9, 0.9),  # top right
         ]
+    
+        hexhigh = 0.9
+        hexlow = 0.75-n
+        hexmid = (hexhigh+hexlow)/2
+        hex = [
+        #   --
+        #  /  \
+        #  \  /
+        #   --
+            #  top row
+            (0.9, hexhigh),  # top right
+            (0.8, hexhigh),  # top left
+
+            (0.775, hexmid),  # left mid
+
+            # lower row
+            (0.8, 0.75-n),  # low left
+            (0.9, 0.75-n),  # low right
+
+            (0.925, hexmid),  # right mid
+
+            # back to top row
+            (0.9, hexhigh),  # top right
+        ]
+
+        funnybadge = [
+        #   --
+        #  /  \
+        # \    /
+        #   --
+            #  top row
+            (0.9, 0.9),  # top right
+            (0.8, 0.9),  # top left
+
+            # middle and lower parts
+            (0.75, 0.8-n),  # left mid
+            (0.8, 0.735-n),  # low left
+            (0.9, 0.735-n),  # low right
+            (0.95, 0.8-n),  # right mid
+
+            # back to top row
+            (0.9, 0.9),  # top right
+        ]
+
+        rectmid = (0.9+0.735-n)/2
+        rect = [
+        # -----
+        # |   |
+        # -----
+            #  top row
+            (0.9, 0.9),  # top right
+            (0.8, 0.9),  # top left
+
+            # lower parts
+            (0.8, 0.735-n),  # low left
+            (0.9, 0.735-n),  # low right 
+
+            # back to top row
+            (0.9, 0.9),  # top right
+        ]
+
+        # select shape
+        if shape == "hex":
+            verts = hex
+            text_y = hexmid
+        elif shape == "rect":
+            verts = rect
+            text_y = rectmid
+        elif shape == "flag":
+            verts = flag
+        else:
+            raise Exception(f"shieldbadge - {shape=} not implemented")
 
         # define nodes list
         codes = [Path.LINETO for _ in verts]
@@ -1197,12 +1272,8 @@ class myinkc(hopper):
         # add the patch to the Axes
         ax.add_patch(shield)
 
-        # prep textpos
-        ypos = 0.825-t
-        xpos = 0.85
-
         # add the text
-        ax.text(xpos, ypos, (text),
+        ax.text(text_x, text_y, text,
             bbox={'facecolor':'white','alpha':0,'edgecolor':'none','pad':1}, # textbox: no color, bg: alpha=0!
             ha='center', va='center') 
 
@@ -3222,12 +3293,13 @@ def barstacked_test():
 def shield_test():
     pe = myinkc()   
     
-    for i in [2,3,4,5]:
-        pe.subplots()
-        text = [f"N0{i}" for i in range(0,i)]
-        text = "\n".join(text)
-        pe.add_shieldbadge(text)
-        
+    for shape in ["rect", "hex", "flag"]:
+        for i in [2,3,4,5]:
+            pe.subplots()
+            text = [f"N0{i}" for i in range(0,i)]
+            text = "\n".join(text)
+            pe.add_shieldbadge(text, shape=shape)
+            
     pe.show()
 
 #-#-# module test #-#-#
