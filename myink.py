@@ -1126,7 +1126,7 @@ class myinkc(hopper):
         return plt.text(*args, **kwargs)
 
 
-    def add_shieldbadge(self, input, front=True, shape="hex"):
+    def add_shieldbadge(self, input, front=True, shape="hex", dbg=True):
         """ add a shield-badge-like shaped textbox in upper right corner, call after plot
         
             input: stringlines, or list of stringlines to verify to be the same,
@@ -1153,14 +1153,24 @@ class myinkc(hopper):
 
                 text = "\n".join(settings)
             
-            
-        # # prep shieldbadge
+
+        # get ax
+        ax = self.get_ax()
+
         # put it infront of the rest
         if front:
             self.reset_coordsys()
-        
-        # get ax
+
         ax = self.get_ax()
+
+        oldtext = text
+        # add text size before and after reset coordsys
+        if dbg:
+            ylabel_text_size = ax.yaxis.label.get_size()
+            text += "\n" + f"{ylabel_text_size}"
+            #raise Exception(f"{text=}, {oldtext=}")
+
+        
 
         # lines are breaks+1
         l = text.count("\n")+1
