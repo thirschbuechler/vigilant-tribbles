@@ -1127,11 +1127,16 @@ class myinkc(hopper):
         return plt.text(*args, **kwargs)
 
 
-    def add_shieldbadge(self, input, front=True, shape="hex", dbg=True, targetat4 = 3/4):
+    def add_shieldbadge(self, input, front=True, shape="hex", dbg=True, targetat4 = 3/4, exclude=[]):
         """ add a shield-badge-like shaped textbox in upper right corner, call after plot
         
-            input: stringlines, or list of stringlines to verify to be the same,
+            - input: stringlines, or list of stringlines to verify to be the same,
             char-width only for 3characters
+            - shape: which shape (hex, flag, rect) to use
+            - dbg: debug info?
+            - targetat4: target fontsize at 4 (default 3/4 of ylabel)
+            - exclude: list of strings to exclude if a gcode is contained in them
+        
         """
         
         # # input conditioning
@@ -1153,7 +1158,20 @@ class myinkc(hopper):
                 settings = set(self.roadkill(inputlist, hard=True))
 
                 text = "\n".join(settings)
+
+
+        # handle exclude-list    
+        mylist = text.split("\n")
+
+        tmp = []
+        for item in mylist:
+            # is one of the small gcodes in any exclude-list element?
+            if not any(item in ex for ex in exclude):
+                tmp.append(item)
             
+        mylist = tmp
+        text = "\n".join(mylist)
+
 
         # get ax
         ax = self.get_ax()
@@ -1164,14 +1182,10 @@ class myinkc(hopper):
 
         ax = self.get_ax()
 
-        oldtext = text
         # add text size before and after reset coordsys
         if dbg:
             ylabel_text_size = ax.yaxis.label.get_size()
             text += "\n" + f"{ylabel_text_size}"
-            #raise Exception(f"{text=}, {oldtext=}")
-
-        
 
         # lines are breaks+1
         l = text.count("\n")+1
