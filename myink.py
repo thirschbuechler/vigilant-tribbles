@@ -1210,7 +1210,7 @@ class myinkc(hopper):
 
         # shield-text pos
         text_y = 0.84 - n/2
-        text_x = 0.85
+        text_x = 0.5
 
         # define some shapes
         flag = [
@@ -1218,16 +1218,16 @@ class myinkc(hopper):
         # |   |
         #   -
             #  top row
-            (0.9, 0.9),  # top right
-            (0.8, 0.9),  # top left
+            (text_x+0.05, 0.9),  # top right
+            (text_x-0.05, 0.9),  # top left
 
             # middle and lower parts
-            (0.8, 0.8-n),  # left mid
-            (0.85, 0.735-n),  # center bottom
-            (0.9, 0.8-n),  # right mid
+            (text_x-0.05, 0.8-n),  # left mid
+            (text_x, 0.735-n),  # center bottom
+            (text_x+0.05, 0.8-n),  # right mid
 
             # back to top row
-            (0.9, 0.9),  # top right
+            (text_x+0.05, 0.9),  # top right
         ]
     
         hexhigh = 0.9
@@ -1239,64 +1239,61 @@ class myinkc(hopper):
         #  \  /
         #   --
             #  top row
-            (0.9, hexhigh),  # top right
-            (0.8, hexhigh),  # top left
+            (text_x+0.05, hexhigh),  # top right
+            (text_x-0.05, hexhigh),  # top left
 
-            (0.775, hexmid),  # left mid
+            (text_x-0.075, hexmid),  # left mid
 
             # lower row
-            (0.8, 0.75-n),  # low left
-            (0.9, 0.75-n),  # low right
+            (text_x-0.05, hexlow),  # low left
+            (text_x+0.05, hexlow),  # low right
 
-            (0.925, hexmid),  # right mid
-
-            # back to top row
-            (0.9, hexhigh),  # top right
-        ]
-
-        funnybadge = [
-        #   --
-        #  /  \
-        # \    /
-        #   --
-            #  top row
-            (0.9, 0.9),  # top right
-            (0.8, 0.9),  # top left
-
-            # middle and lower parts
-            (0.75, 0.8-n),  # left mid
-            (0.8, 0.735-n),  # low left
-            (0.9, 0.735-n),  # low right
-            (0.95, 0.8-n),  # right mid
+            (text_x+0.075, hexmid),  # right mid
 
             # back to top row
-            (0.9, 0.9),  # top right
+            (text_x+0.05, hexhigh),  # top right
         ]
 
-        rectmid = (0.9+0.735-n)/2
-        rect = [
-        # -----
-        # |   |
-        # -----
-            #  top row
-            (0.9, 0.9),  # top right
-            (0.8, 0.9),  # top left
+        # nugget - vertical stretched hexagon
+        # dimensions
+        h = 0.25 + n
+        w = 0.1
+        s = h/2.5
 
-            # lower parts
-            (0.8, 0.735-n),  # low left
-            (0.9, 0.735-n),  # low right 
+        # center anchor
+        cx = text_x
+        cy = text_y
+        nugget = [
+        #
+        #  __
+        # /  \
+        # |  |
+        # \__/
+        #  
+            (cx+w/4, cy+h/2),  # top right
+            
+            (cx-w/4, cy+h/2),  # top left
+            
+            (cx-w/2, cy+s),  # topmid left
+            (cx-w/2, cy-s),  # lowmid left
+            
+            (cx-w/4, cy-h/2),  # low left
+            (cx+w/4, cy-h/2),  # low right
 
-            # back to top row
-            (0.9, 0.9),  # top right
+            (cx+w/2, cy-s),  # lowmid right
+            (cx+w/2, cy+s),  # topmid right
+
+            (cx+w/4, cy+h/2),  # top right
         ]
+
 
         # select shape
         if shape == "hex":
             verts = hex
             text_y = hexmid
-        elif shape == "rect":
-            verts = rect
-            text_y = rectmid
+        elif shape == "nugget":
+            verts = nugget
+
         elif shape == "flag":
             verts = flag
         else:
@@ -3381,7 +3378,7 @@ def barstacked_test():
     pe.show()
 
 
-def shield_test(shapes=["rect", "hex", "flag"], lens=[2,3,4,5]):
+def shield_test(shapes=["nugget", "hex", "flag"], lens=[2,3,4,5]):
     pe = myinkc()   
     
     for k in [0,1]:
@@ -3427,10 +3424,12 @@ if testing:#call if selected, after defined, explanation see above
     #doublebarrel_barberpole()
     #tex_test()
     #statistics_visu()
-    boxplottest()
+    
     #calibrate_corr_mx_label() # old; new: cal_plot_corr_mx.py
     
-    #shield_test()
+    #boxplottest()
+
+    shield_test()
     #shield_test(shapes=["hex"], lens=[3], dbg=True)
     pass
 
