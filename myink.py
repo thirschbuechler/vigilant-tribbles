@@ -1805,8 +1805,13 @@ class myinkc(hopper):
         h.insert(0,quartilelegendline)
         l.insert(1,"median")
         h.insert(1,medianlinelegendline)
-        # put 
-        self.legend(handles=h,labels=l)   
+        # location dependent on datalen
+        if len(data)==2:
+            legkwargs = dict(bbox_to_anchor=(0.5, 0.5), loc='center')
+        else:
+            legkwargs = {}
+        # put
+        self.legend(handles=h,labels=l, **legkwargs)   
 
         self.title(title)
         self.autoscale_fig()
