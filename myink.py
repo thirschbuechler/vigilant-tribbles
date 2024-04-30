@@ -21,6 +21,7 @@ from logging import exception
 import re
 import os
 import numpy as np
+import pandas as pd
 
 import matplotlib as mpl
 import matplotlib.pyplot as plt
@@ -1688,7 +1689,7 @@ class myinkc(hopper):
         self.autoscale_fig()
 
 
-    def boxplot(self, data=[], xlabels="", meanoffset=False, ylabel="", title="", mc = "green",
+    def boxplot(self, data=[], xlabels="", meanoffset=False, ylabel="", title="", mc = "green", 
                 availability=False, nan_bad=True, annot=True, **kwargs):
         """
         boxplot
@@ -1714,41 +1715,43 @@ class myinkc(hopper):
             - applied all the time, might result in a numpy-nanmean-nonzero error however
 
         """
-
-        # data conditioning #
-        data = np.array(data, dtype=object) # can be a ragged list instead of mxn matrix
         
-        # prep collector
-        statistics = []
+        
+        # nice and fast but errors out sometimes
+        """
+        if ml.is_ragged(data):
+            # slower list-comparison
+            data = np.array(data, dtype=object)
+            means = [ml.nanmean(item) for item in data]
+            stds = [np.std(item) for item in data]
+        else:
+            # faster
+            data = np.array(data, dtype=float)
+            means = ml.nanmean(data, axis=0)
+            stds = np.std(data, axis=0)
+        """
 
-        # loop over data
+        # always works
+        data = np.array(data, dtype=object) # can be a ragged list instead of mxn matrix
+        statistics = []
         for i,item in enumerate(data):
             
-            # fustratingly, roadkill w. hard=2 doesn't work here :O,
-            # before calling boxplot:
-            # data = [ml.roadkill(ele, hard=1) for ele in data]
-            # works :O, sadly not at fct start, before or after np.array
-
-
             # squish item dimensions down to statistics
             mins = ml.nanmin(item)
             maxes = ml.nanmax(item)
             means = ml.nanmean(item)
-            std = np.std(item)
-            statistics.append([mins, means, maxes, std])
-
-            # optional user-offset, per loop-item to be compatible w ragged-lists
-            if meanoffset:
-                off=means
-                ylabel+=", means subtracted"
-                data[i] = item-off # change loop base data after analysis
-
+            stds = np.std(item)
+            statistics.append([mins, means, maxes, stds])
         # unpack
-        mins, means, maxes, std  = np.array(statistics).astype("float").T
+        mins, means, maxes, stds  = np.array(statistics).astype("float").T
+
+        # optional user-offset, per loop-item to be compatible w ragged-lists
+        if meanoffset:
+            data = data - means
+            ylabel+=", means subtracted"
 
         # consider boxplots are plotted at x-offset of +1 for some reason:
         x=np.arange(len(data))+1
-
 
         data = data.T
         # # plotting # #        
@@ -1756,11 +1759,20 @@ class myinkc(hopper):
         #   - ","==pixel-marker
         flierprops = dict(marker=',', markerfacecolor='black', markersize=12, linestyle='none')
         ax = self.get_ax()
-        ax.boxplot(data, flierprops=flierprops, **kwargs)
+        bp = ax.boxplot(data, flierprops=flierprops, **kwargs)
         if annot:
-            self.scatter(x, means+std, marker="^", c=mc, label="mean+stdev") # triag up
-            self.scatter(x, means, marker="s", c=mc, label="mean") # square
-            self.scatter(x, means-std, marker="v", c=mc, label="mean-stdev") # triag down
+            annotargs = dict(alpha=0.5, c=mc)
+            self.scatter(x, means+stds, marker="^", label="mean+stdev", **annotargs) # triag up
+            self.scatter(x, means, marker="s", label="mean", **annotargs) # square
+            self.scatter(x, means-stds, marker="v", label="mean-stdev", **annotargs) # triag down
+
+        if len(data) < 5:
+            # annotate with mean, median
+            # https://stackoverflow.com/questions/58066009/how-to-display-numeric-mean-and-std-values-next-to-a-box-plot-in-a-series-of-box
+            for i, line in enumerate(bp['medians']):
+                x, y = line.get_xydata()[1]
+                text = ' μ={:.2f}\n σ={:.2f}'.format(means[i], stds[i])
+                ax.annotate(text, xy=(x, y))
 
         if availability:
             if not xlabels:
@@ -3410,11 +3422,11 @@ if testing:#call if selected, after defined, explanation see above
     #doublebarrel_barberpole()
     #tex_test()
     #statistics_visu()
-    #boxplottest()
+    boxplottest()
     #calibrate_corr_mx_label() # old; new: cal_plot_corr_mx.py
     
     #shield_test()
-    shield_test(shapes=["hex"], lens=[3])
+    #shield_test(shapes=["hex"], lens=[3], dbg=True)
     pass
 
 
