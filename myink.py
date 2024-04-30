@@ -1140,6 +1140,7 @@ class myinkc(hopper):
         """
         
         # # input conditioning
+        # typically it's a string separated by \n, as a list class attr has issues upstream somewhere
         if type(input) == str:
             text = input
         elif type(input) == list:
@@ -1160,7 +1161,7 @@ class myinkc(hopper):
                 text = "\n".join(settings)
 
 
-        # handle exclude-list    
+        # # handle exclude-list    
         mylist = text.split("\n")
 
         tmp = []
@@ -1170,6 +1171,18 @@ class myinkc(hopper):
                 tmp.append(item)
             
         mylist = tmp
+
+        # # sort
+        def sorting_key(s):
+            # Define the order of the first letters
+            order = {'M': 0, 'S': 1, 'K': 2}
+            
+            # Use the order of the first letter and the length of the string as the sorting key
+            return (order.get(s[0], 999), len(s), s)
+
+        mylist = sorted(mylist, key=sorting_key)
+
+        # # stick back together
         text = "\n".join(mylist)
 
 
