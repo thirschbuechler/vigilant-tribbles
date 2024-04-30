@@ -1127,7 +1127,7 @@ class myinkc(hopper):
         return plt.text(*args, **kwargs)
 
 
-    def add_shieldbadge(self, input, front=True, shape="hex", dbg=True, targetat4 = 3/4, exclude=[]):
+    def add_shieldbadge(self, input, front=True, shape="hex", dbg=False, targetat4 = 3/4, exclude=[]):
         """ add a shield-badge-like shaped textbox in upper right corner, call after plot
         
             - input: stringlines, or list of stringlines to verify to be the same,
