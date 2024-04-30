@@ -262,8 +262,19 @@ def get_shape(a):
         return None
     return (len(shapes),) + shapes[0]
 
+# thanks copilot
 def is_ragged(a):
-    return get_shape(a) is None
+    if isinstance(a, np.ndarray) and a.dtype != object:
+        # If a is a non-object numpy array, it's not ragged
+        return False
+    if isinstance(a, list):
+        # If a is a list, check if all elements have the same length
+        return len(set(map(len, a))) > 1
+    if isinstance(a, np.ndarray):
+        # If a is an object numpy array, check if all elements have the same shape
+        return len(set(map(np.shape, a))) > 1
+    # If a is not a list or array, it's not ragged
+    return False
 
 def integritycheck():
     """ better call doctest """
@@ -279,6 +290,7 @@ def integritycheck():
 
 def babysit(eval, *args, **kwargs):
     """ numpy nan-operation silencer
+        (but its better use pandas for ragged arrays w. skipna=True per default)
     
         nan-matrices shall be allowed to have means over nans or zeros without giving a warning,
         expect to see RuntimeWarnings otherwise
