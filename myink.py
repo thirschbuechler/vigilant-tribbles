@@ -1128,7 +1128,7 @@ class myinkc(hopper):
         return plt.text(*args, **kwargs)
 
 
-    def add_shieldbadge(self, input, front=True, shape="hex", dbg=False, targetat4 = 3/4, exclude=[]):
+    def add_shieldbadge(self, input, front=True, shape="hex", dbg=False, targetat4 = 3/4, exclude=[], anchor="topright"):
         """ add a shield-badge-like shaped textbox in upper right corner, call after plot
         
             - input: stringlines, or list of stringlines to verify to be the same,
@@ -1209,53 +1209,34 @@ class myinkc(hopper):
         n = 0.05*n
 
         # shield-text pos
-        text_y = 0.84 - n/2
-        text_x = 0.5
+        #text_y = 0.84 - n/2
+        #text_x = 0.5
+        text_x = None
+        text_y = None
 
-        # define some shapes
-        flag = [
-        # _____
-        # |   |
-        # \   /
-        #   -
-        #
-            #  top row
-            (text_x+0.05, 0.9),  # top right
-            (text_x-0.05, 0.9),  # top left
+        # # redefine shield-text pos according to anchor
 
-            # middle and lower parts
-            (text_x-0.05, 0.8-n),  # left mid
-            (text_x, 0.735-n),  # center bottom
-            (text_x+0.05, 0.8-n),  # right mid
+        # first check for center
+        if "center" in anchor:
+            text_x = 0.5
+            text_y = 0.5
+        
+        # right left
+        if "right" in anchor:
+            text_x = 0.85
+            text_y = 0.8
+        elif "left" in anchor:
+            text_x = 0.15
+            text_y = 0.5
 
-            # back to top row
-            (text_x+0.05, 0.9),  # top right
-        ]
-    
-        hexhigh = 0.9
-        hexlow = 0.75-n
-        hexmid = (hexhigh+hexlow)/2
-        hex = [
-        #   --
-        #  /  \
-        #  \  /
-        #   --
-        #
-            #  top row
-            (text_x+0.05, hexhigh),  # top right
-            (text_x-0.05, hexhigh),  # top left
+        # top bottom
+        if "top" in anchor:
+            text_y = 0.85 - n/2
+        elif "bot" in anchor:
+            text_y = 0.15 + n/2
 
-            (text_x-0.075, hexmid),  # left mid
-
-            # lower row
-            (text_x-0.05, hexlow),  # low left
-            (text_x+0.05, hexlow),  # low right
-
-            (text_x+0.075, hexmid),  # right mid
-
-            # back to top row
-            (text_x+0.05, hexhigh),  # top right
-        ]
+        if text_x == None or text_y == None:
+            raise Exception(f"shieldbadge - {anchor=} not parsable or implemented")
 
         # nugget - vertical stretched hexagon
         # dimensions
@@ -1288,17 +1269,7 @@ class myinkc(hopper):
             (cx+w/4, cy+h/2),  # top right
         ]
 
-
-        # select shape
-        if shape == "hex":
-            verts = hex
-            text_y = hexmid
-        elif shape == "nugget":
-            verts = nugget
-        elif shape == "flag":
-            verts = flag
-        else:
-            raise Exception(f"shieldbadge - {shape=} not implemented")
+        verts = nugget
 
         # define nodes list
         codes = [Path.LINETO for _ in verts]
@@ -3380,19 +3351,19 @@ def barstacked_test():
     pe.show()
 
 
-def shield_test(shapes=["nugget", "hex", "flag"], lens=[2,3,4,5]):
+def shield_test(lens=[2,3,4,5]):
     pe = myinkc()   
     
     for k in [0,1]:
         if k==1:
             pe.mycanvassize(medfig=True) # reset afterwards via one-time-use myinkc element
 
-        for shape in shapes:
-            for i in lens:
-                pe.subplots()
-                text = [f"N0{i}" for i in range(0,i)]
-                text = "\n".join(text)
-                pe.add_shieldbadge(text, shape=shape)
+    
+        for i in lens:
+            pe.subplots()
+            text = [f"N0{i}" for i in range(0,i)]
+            text = "\n".join(text)
+            pe.add_shieldbadge(text, anchor="lefttop")
                 
     pe.show()
 
