@@ -1129,7 +1129,7 @@ class myinkc(hopper):
 
 
     def add_shieldbadge(self, input, front=True, shape="hex", dbg=False, targetat4 = 3/4, exclude=[], anchor="topright"):
-        """ add a shield-badge-like shaped textbox in upper right corner, call after plot
+        """ add a shield-badge-like shaped textbox in upper right corner, call after plot AND xlabels etc. done
         
             - input: stringlines, or list of stringlines to verify to be the same,
             char-width only for 3characters
@@ -1160,6 +1160,8 @@ class myinkc(hopper):
                 settings = set(self.roadkill(inputlist, hard=True))
 
                 text = "\n".join(settings)
+        else:
+            raise Exception(f"shieldbadge - {input=} not parsable")
 
 
         # # handle exclude-list    
@@ -1660,7 +1662,7 @@ class myinkc(hopper):
 
 
     def boxplot(self, data=[], xlabels="", meanoffset=False, ylabel="", title="", mc = "green", 
-                availability=False, nan_bad=True, annot=True, **kwargs):
+                availability=False, nan_bad=True, annot=True, badgedata={}, **kwargs):
         """
         boxplot
 
@@ -1777,7 +1779,10 @@ class myinkc(hopper):
         h.insert(1,medianlinelegendline)
         # location dependent on datalen
         if len(data)==2:
-            legkwargs = dict(bbox_to_anchor=(0.5, 0.5), loc='center')
+            loc = "center"
+            legkwargs = dict(bbox_to_anchor=(0.5, 0.25), loc=loc)
+            if badgedata:
+                badgedata["anchor"] = loc+"top"
         else:
             legkwargs = {}
         # put
@@ -1785,6 +1790,9 @@ class myinkc(hopper):
 
         self.title(title)
         self.autoscale_fig()
+
+        if badgedata:
+            self.add_shieldbadge(**badgedata)
 
 
     def stickplot_summary(self, data=[], xlabels=None, ylabel=None, title=None):
