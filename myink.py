@@ -1214,9 +1214,11 @@ class myinkc(hopper):
 
         # define some shapes
         flag = [
-        # -----
+        # _____
         # |   |
+        # \   /
         #   -
+        #
             #  top row
             (text_x+0.05, 0.9),  # top right
             (text_x-0.05, 0.9),  # top left
@@ -1238,6 +1240,7 @@ class myinkc(hopper):
         #  /  \
         #  \  /
         #   --
+        #
             #  top row
             (text_x+0.05, hexhigh),  # top right
             (text_x-0.05, hexhigh),  # top left
@@ -1264,7 +1267,6 @@ class myinkc(hopper):
         cx = text_x
         cy = text_y
         nugget = [
-        #
         #  __
         # /  \
         # |  |
@@ -1293,7 +1295,6 @@ class myinkc(hopper):
             text_y = hexmid
         elif shape == "nugget":
             verts = nugget
-
         elif shape == "flag":
             verts = flag
         else:
@@ -1309,7 +1310,7 @@ class myinkc(hopper):
         # create the path
         path = Path(verts, codes)
 
-        # scale acc to textsize
+        # prep scale (acc to textsize)
         fontsize = ax.yaxis.label.get_size()*1
         # ylabel fontsize is 10 per default and well sized
         # shall be targetat4 at 4
@@ -1325,9 +1326,9 @@ class myinkc(hopper):
         # add the patch to the Axes
         ax.add_patch(shield)
 
+        # # rescale size
         # get patch boungs
         bounds_display = shield.get_extents()
-
 
         # convert bounds to data coordinates
         bounds_data = ax.transData.inverted().transform(bounds_display)
@@ -1339,8 +1340,9 @@ class myinkc(hopper):
         # center - scale - uncenter
         scale_transform = Affine2D().translate(-center_x, -center_y).scale(scale, scale).translate(center_x, center_y)
 
-        # apply
+        # apply transform
         shield.set_transform(scale_transform + ax.transData)
+
 
         # add the text
         ax.text(text_x, text_y, text,
