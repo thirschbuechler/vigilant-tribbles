@@ -463,10 +463,12 @@ class myinkc(hopper):
     def suptitle(self, title=""):
         """ major title/label for figure == "supertitle", to be fig.suptitle compatible 
             alias figlabel
+            (if not self.export)
             """
-        fig = self.get_fig()
-        fig.suptitle(title)
-        self.current_suptitle = title
+        if not self.export:
+            fig = self.get_fig()
+            fig.suptitle(title)
+            self.current_suptitle = title
         
     
     def figlabel(self, title=None):
@@ -477,13 +479,15 @@ class myinkc(hopper):
     
     def title(self, title=None): 
         """ minor title of individual axis
+            (if not export)
             
             (major one - figlabel)
             """
-        ax = self.get_ax()    
-        if title!=None:    
-                ax.set_title(title)
-                self.current_title = title
+        if not self.export:
+            ax = self.get_ax()    
+            if title!=None:    
+                    ax.set_title(title)
+                    self.current_title = title
         
     def axlabel(self, title=None): 
         """  alias title """
