@@ -363,7 +363,7 @@ class myinkc(hopper):
                     facecolor='auto', edgecolor='auto',
                     backend=None, **kwargs)
         """
-        plt.savefig(*args, **kwargs)
+        plt.savefig(*args, dpi=800, **kwargs)
 
 
     def ax_onward(self):
@@ -1764,7 +1764,8 @@ class myinkc(hopper):
             xlabels.insert(0,0)#insert dummy at begin        
         ax.set_xticks(np.arange(len(xlabels)))
         ax.set_xticklabels(xlabels, ha="right")#horizontal alignment
-        self.rotate_xticks(45, autoscale=0)
+        if len(data) > 2:
+            self.rotate_xticks(45, autoscale=0)
         ax.locator_params(axis='x', nbins=10)#, tight=True)
         ax.minorticks_on()
         
