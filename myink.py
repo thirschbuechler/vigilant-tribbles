@@ -1205,18 +1205,14 @@ class myinkc(hopper):
 
         # lines are breaks+1
         l = text.count("\n")+1
-
-        # minimum shieldsize could accomodate 2 items
-        n = max(l,2)-2
+        
+        # scaled till it looked good
+        n = l-4
         n = 0.05*n
 
-        # shield-text pos
-        #text_y = 0.84 - n/2
-        #text_x = 0.5
+        # # shield-text pos according to anchor
         text_x = None
         text_y = None
-
-        # # redefine shield-text pos according to anchor
 
         # first check for center
         if "center" in anchor:
@@ -3359,7 +3355,7 @@ def barstacked_test():
     pe.show()
 
 
-def shield_test(lens=[2,3,4,5]):
+def shield_test(lens=[1,2,2,5]):
     pe = myinkc()   
     
     for k in [0,1]:
