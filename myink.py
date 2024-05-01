@@ -1732,27 +1732,30 @@ class myinkc(hopper):
         flierprops = dict(marker=',', markerfacecolor='black', markersize=12, linestyle='none')
         ax = self.get_ax()
         bp = ax.boxplot(data, flierprops=flierprops, **kwargs)
+        
+        # annotate with mean, median
         if annot:
+            # markers
             annotargs = dict(alpha=0.5, c=mc)
             self.scatter(x, means+stds, marker="^", label="mean+stdev", **annotargs) # triag up
             self.scatter(x, means, marker="s", label="mean", **annotargs) # square
             self.scatter(x, means-stds, marker="v", label="mean-stdev", **annotargs) # triag down
 
-        if len(data) < 5:
-            # annotate with mean, median
-            # https://stackoverflow.com/questions/58066009/how-to-display-numeric-mean-and-std-values-next-to-a-box-plot-in-a-series-of-box
-            for i, line in enumerate(bp['medians']):
-                x, y = line.get_xydata()[1]
-                text = ' μ={:.2f}\n σ={:.2f}'.format(means[i], stds[i])
-                ax.annotate(text, xy=(x, y))
-
+            # numbers
+            if len(data) < 5:
+                # https://stackoverflow.com/questions/58066009/how-to-display-numeric-mean-and-std-values-next-to-a-box-plot-in-a-series-of-box
+                for i, line in enumerate(bp['medians']):
+                    x, y = line.get_xydata()[1]
+                    text = ' μ={:.2f}\n σ={:.2f}'.format(means[i], stds[i])
+                    ax.annotate(text, xy=(x, y))
+        """
         if availability:
             if not xlabels:
                 xlabels=np.zeros(len(data.T))
             for i, datacolumn in enumerate(data.T):
                 avail_pc = ml.availability_frac(data=datacolumn, nan_bad=nan_bad)*100
                 xlabels[i] = f"{xlabels[i]}\n({avail_pc:.1f}%)"
-
+        """
 
         # # xy_labelling
         ax.set_ylabel(ylabel)
@@ -2046,12 +2049,12 @@ class myinkc(hopper):
                         pos_avg=True, pos_med=False, weighted=False, # plot options
                         title="", labels=[], markers=[], # annotations
                     colors=np.array([["bisque", "sandybrown", "darkorange", "red"], ["lavender", "cornflowerblue", "blue", "purple"]]).T,
-                    export=False, **subpkwargs):
+                    **subpkwargs):
         """ plot two Sxy plots via magDBs, highlight envelope  and avgs
 
         - mxs: [A,B]
-        - labels (str)
-        - title (str)
+        - labels (str) f. A,B
+        - title: (str)
         - colors = [[bg_colors, ex_colors, avg_colors, med_colors],[..]].T
         - pos_avg: show avg line per set over positions
         - pos_med: show median line per set over positions
@@ -2118,8 +2121,7 @@ class myinkc(hopper):
             for avg, color, label in zip(avgs, avg_colors, labels):
                 self.plot(x_axis, avg, color=color, label=f"{label}, median")
                 
-        if not export:
-            self.title(title)
+        self.title(title)
 
 
     def spind_rechts(self, mainwidth=2, smallaxes=2):
