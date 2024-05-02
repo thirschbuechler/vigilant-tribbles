@@ -1784,7 +1784,9 @@ class myinkc(hopper):
         l.insert(1,"median")
         h.insert(1,medianlinelegendline)
         # location dependent on datalen
-        if len(data)==2:
+        if len(statistics) == 2 : # as len(data) can have a empty dimension at beginning or sth
+            if len(data) !=2:
+                self.log.warning(f"boxplot - evaded for badge creation: {len(data)=} but {len(statistics)=}")
             loc = "center"
             legkwargs = dict(bbox_to_anchor=(0.5, 0.25), loc=loc)
             if badgedata:
