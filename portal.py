@@ -102,7 +102,6 @@ class portal(Fruit.Fruit):
         # bin override via ":" notation possible
         if ".bin" in newpath:
             newpath = newpath.split(":")[0] # eg folder:0.bin
-            #print("bla is ".format(bla))
 
         now=self.getpath()
         newpath_abs=os.path.join(now,newpath)
@@ -112,11 +111,9 @@ class portal(Fruit.Fruit):
         elif os.path.exists(newpath_abs):
             os.chdir(newpath_abs)
         elif (newpath in now):
-            #raise Exception("dude you are already there")
-            self.log.info("dude you are already there")
-            #pass
+            self.log.info(f"cd where? dude you are already there: ({newpath})")
         else:
-            raise Exception("neither abs nor relative {} exists, now: {}".format(newpath,now))
+            raise Exception(f"neither abs nor relative {newpath=} exists, {now=}")
         # note: a "\\ error" (\\ occouring in path not found) usually means the path is invalid (not escape issue or sth)
 
 
@@ -148,12 +145,7 @@ class hopper(portal):
         self.rootdir=defaultpath # change as you please
         
         self.myprint=ms.dummy   
-        
-        
-        #if not ("folder" in kwargs): #$$ dunno why but this didn'work - instead multiple folder-keys were created or sth - made defaultparam for "folder" in portal init
-            #kwargs["folder"]=defaultpath
-
-        #print("hopper folder is {}".format(kwargs["folder"]))
+    
         super().__init__(*args, **kwargs) # superclass init, in case there is any
     
     
@@ -170,7 +162,7 @@ class hopper(portal):
             self.rootdir = newpath
         else:
             self.rootdir = self.getpath()
-        self.log.info("rootdir from {} to {}".format(self.rootdir,newpath))
+        self.log.info(f"change setting {self.rootdir=} to {newpath=}")
     
 
     def cdup(self):
@@ -220,15 +212,15 @@ class hopper(portal):
             file=os.path.expanduser(os.path.join("~",file))
             #path=file
             if not os.path.exists(file):
-                raise Exception("no file {}".format(file))
+                raise Exception(f"no file {file}")
             try:
                 with open(file,"r") as f:
                     path = f.read()
             except Exception as e:
-                print("reading {} failed, dueto {}".format(file,str(e)))
+                self.log.error(f"reading {file} failed, dueto {str(e)}")
 
         if not os.path.exists(path):
-            raise Exception("The folder read from {} is not existant (on this computer)".format(str(path)))
+            raise Exception(f"The folder read from {str(path)} is not existant (on this computer)")
         else:
             return path
 
@@ -364,7 +356,7 @@ class hopper(portal):
             # bins and keys are given values
             pass
         
-        txt = [("{}: {}".format(key,len(bins[key]))) for key in keys]
+        txt = [f"{key}: {len(bins[key])}" for key in keys]
         return(txt)
     
 
