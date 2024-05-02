@@ -556,12 +556,14 @@ class myinkc(hopper):
             oh_my.remove()
 
 
-    def yticklabels(self, stuff, **kwargs):
-        self.get_ax().set_yticks(range(0,len(stuff)))
+    def yticklabels(self, stuff, offset=0, **kwargs):
+        ticks = np.arange(0,len(stuff)) + offset
+        self.get_ax().set_yticks(ticks)
         self.get_ax().set_yticklabels(stuff, **kwargs)
 
-    def xticklabels(self, stuff, **kwargs):
-        self.get_ax().set_xticks(range(0,len(stuff)))
+    def xticklabels(self, stuff, offset=0, **kwargs):
+        ticks = np.arange(0,len(stuff)) + offset
+        self.get_ax().set_xticks(ticks)
         self.get_ax().set_xticklabels(stuff, **kwargs)
 
 
@@ -1904,9 +1906,11 @@ class myinkc(hopper):
         
         # show all ticks
         if np.size(xlabels):
-            self.xticklabels(xlabels, ha="right") # horizontal alignment
+            self.xticklabels(xlabels, offset=0.5, ha="right") # horizontal alignment
         if np.size(ylabels):
-            self.yticklabels(ylabels)
+            # reorder the list by flipping int
+            ylabels = ylabels[::-1]
+            self.yticklabels(ylabels, offset=0.5)
         
         # how many labels is too many to display all and rotate?
         thres = 16
@@ -3327,6 +3331,23 @@ def calibrate_corr_mx_label(ns = range(3,10), labellen=1, **kwargs):
         pe.show()
 
 
+def corr_mx_tester(ns=[3], **kwargs):
+    pe = myinkc()
+    clims = []
+    
+    for n in ns:
+        narr = np.arange(0,n, dtype=np.int8)
+
+        vec = np.linspace(0.1,0.5,n)
+        mx = np.diag(vec)
+        mx[mx==0] = np.nan
+        pe.plot_corr_mx(mx=mx,xlabels=narr, ylabels=narr, clims=clims, optlabel="", aspect="square", cb_label="1E", **kwargs)
+
+        pe.show()
+
+
+
+
 def get_maximum_gui_plot_figsize():
     # usecase: figure looks nice maximized, how to save it automatically? howto extract fig size:
     # https://stackoverflow.com/questions/62195970/get-size-of-maximized-matplotlib-figure
@@ -3410,10 +3431,11 @@ if testing:#call if selected, after defined, explanation see above
     #statistics_visu()
     
     #calibrate_corr_mx_label() # old; new: cal_plot_corr_mx.py
-    
+    corr_mx_tester()
+
     #boxplottest()
 
-    shield_test()
+    #shield_test()
     #shield_test(shapes=["hex"], lens=[3], dbg=True)
     pass
 
