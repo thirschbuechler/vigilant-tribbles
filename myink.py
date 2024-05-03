@@ -1738,10 +1738,11 @@ class myinkc(hopper):
         # annotate with mean, median
         if annot:
             # markers
+            annotstr=["mean+std", "mean", "mean-std"]
             annotargs = dict(alpha=0.5, c=mc)
-            self.scatter(x, means+stds, marker="^", label="mean+stdev", **annotargs) # triag up
-            self.scatter(x, means, marker="s", label="mean", **annotargs) # square
-            self.scatter(x, means-stds, marker="v", label="mean-stdev", **annotargs) # triag down
+            self.scatter(x, means+stds, marker="^", label=annotstr[0], **annotargs) # triag up
+            self.scatter(x, means, marker="s", label=annotstr[1], **annotargs) # square
+            self.scatter(x, means-stds, marker="v", label=annotstr[2], **annotargs) # triag down
 
             # numbers
             if len(data) < 5:
@@ -1778,11 +1779,29 @@ class myinkc(hopper):
         medianlinelegendline = Line2D([0], [0], color='orange', marker="_", lw=1, label='Line')
         quartilelegendline = Line2D([0], [0], color='black', marker="_", lw=1, label='Line')
         h, l = ax.get_legend_handles_labels()
+        
         # insert
         l.insert(0,"quartiles")
         h.insert(0,quartilelegendline)
+
         l.insert(1,"median")
         h.insert(1,medianlinelegendline)
+
+        # modifiy
+        if annot:
+            plusminus = "±"
+            for item in annotstr:
+                ii = l.index(item)
+                if annotstr.index(item) == 1:
+                    l[ii] = f"mean {plusminus} std"
+                    # also change marker symbols to "^sv" to show all 3 in this line for the text just defined
+                    #h[ii].set_marker("^sv") # not possible
+                else:
+                    # remove the up-down alone labels
+                    l.pop(ii)
+                    h.pop(ii)
+
+        
         # location dependent on datalen
         if len(statistics) == 2 : # as len(data) can have a empty dimension at beginning or sth
             if len(data) !=2:
