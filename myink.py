@@ -171,6 +171,10 @@ class myinkc(hopper):
         """ legacy fct for save-lastgraph in case of tikz_enable() called"""
         self.save_lastgraph(fn=fn)
 
+    def save_lastfig(self, *args, **kwargs):
+        # for same namingscheme as saveallfigs
+        """ save last fig as png or tikz"""
+        self.save_lastgraph(*args, **kwargs)
 
     def save_lastgraph(self, fn=""):
         """ save last graph as png or tikz """
@@ -216,6 +220,7 @@ class myinkc(hopper):
                     
 
     def saveallfigs(self, fns=[]):
+        """ wrap save_lastgraph for a list of fns (filenames)"""
         figs = list(map(plt.figure, plt.get_fignums()))
         if not figs:
             raise Exception("no figs retrieved to save, there are none!")
