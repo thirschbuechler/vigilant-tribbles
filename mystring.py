@@ -317,6 +317,15 @@ def str_split_via_indices(s="",split_points=[]):
     return([s[i: j] for i, j in zip(split_points, split_points[1:])])
 
 
+def myunit(value, unit='', sep="\N{THIN SPACE}"):
+    """ return formatted string for a given float
+        optional:
+        - unit (str t append)
+        - sep: separator (str, default Unicode-thin-space, non-ascii!)
+    """
+    return(f"{value}{sep}{unit}")
+
+
 def enginerd(value, unit='', places=2, sep="\N{THIN SPACE}", **kwargs): #u2009 thinspace not nice in tex, also "G" in graph and Hz in label == unprofessional -_-
     """ return engineer-nerd formatted string for a given float
         optional:
