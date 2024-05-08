@@ -1025,6 +1025,13 @@ class myinkc(hopper):
             x = np.arange(0,len(labels))
         ax.set_xticks(x)
         ax.set_xticklabels(labels)
+
+    def sudo_ylabels(self, labels=[], y=""):
+        ax = self.get_ax()
+        if not y:
+            y = np.arange(0,len(labels))
+        ax.set_yticks(y)
+        ax.set_yticklabels(labels)
         
     def common_ax_labels(self,xlabel="",ylabel=""):
         """ add a big axis, hide frame """
