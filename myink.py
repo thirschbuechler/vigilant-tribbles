@@ -1146,15 +1146,21 @@ class myinkc(hopper):
         return plt.text(*args, **kwargs)
 
 
-    def add_shieldbadge(self, input, front=True, shape="hex", dbg=False, targetat4 = 3/4, exclude=[], anchor="topright"):
+    def add_shieldbadge(self, input, front=True, dbg=False,
+                        wscale=1, scale=None, targetat4 = 3/4, # scaling factors
+                        exclude=[], anchor="topright"):
         """ add a shield-badge-like shaped textbox in upper right corner, call after plot AND xlabels etc. done
         
-            - input: stringlines, or list of stringlines to verify to be the same,
-            char-width only for 3characters
-            - shape: which shape (hex, flag, rect) to use
+            - input:
+                * stringlines, or list of stringlines to verify to be the same,
+                * char-width only for 3characters
             - dbg: debug info?
-            - targetat4: target fontsize at 4 (default 3/4 of ylabel)
+            - scaling parameters
+                * targetat4: target fontsize at 4 instead of 10 (default 3/4 of ylabel)
+                * wscale: width scaling factor
+                * scale: manual overall scale factor, ontop of width
             - exclude: list of strings to exclude if a gcode is contained in them
+            - anchor: position of the shield-badge
         
         """
         
@@ -1257,7 +1263,7 @@ class myinkc(hopper):
         # nugget - vertical stretched hexagon
         # dimensions
         h = 0.25 + n
-        w = 0.1
+        w = 0.1 * wscale
         s = h/2.5
 
         # center anchor
@@ -1297,15 +1303,17 @@ class myinkc(hopper):
         # create the path
         path = Path(verts, codes)
 
-        # prep scale (acc to textsize)
-        fontsize = ax.yaxis.label.get_size()*1
-        # ylabel fontsize is 10 per default and well sized
-        # shall be targetat4 at 4
-        #targetat4 = 3/4 # it correlates but not 1:1, so make it a fct param
-        k = (1-targetat4)/6
-        d = targetat4 - 4*k
-        # correction factor:
-        scale = fontsize*k+d
+        if not scale:
+            # prep scale (acc to textsize)
+            fontsize = ax.yaxis.label.get_size()*1
+        
+            # ylabel fontsize is 10 per default and well sized
+            # shall be targetat4 at 4
+            #targetat4 = 3/4 # it correlates but not 1:1, so make it a fct param
+            k = (1-targetat4)/6
+            d = targetat4 - 4*k
+            # correction factor:
+            scale = fontsize*k+d
 
         # create the patch
         shield = patches.PathPatch(path, facecolor='white', alpha=0.5, edgecolor='black', linewidth=2*scale,transform=ax.transAxes)
