@@ -1344,6 +1344,8 @@ class myinkc(hopper):
             bbox={'facecolor':'white','alpha':0,'edgecolor':'none','pad':1}, # textbox: no color, bg: alpha=0!
             ha='center', va='center') 
 
+        return shield
+
 
     def rect(self, *args, **kwargs):
         """ draw a rectangle using Patches-Rectangle """
@@ -1521,10 +1523,15 @@ class myinkc(hopper):
             extent = list(extent)
             extent[2], extent[3] = extent[3], extent[2]
         
+        # put in extent
         kwargs["extent"]=extent
-        s = self.imshow(mx, **kwargs)
+
+        # finally,  call imshow
+        handle = self.imshow(mx, **kwargs)
+
         #self.autoscale_fig() # call after labels? so outside
-        return s
+
+        return handle
 
 
     def imshow(self, *args, **kwargs):
