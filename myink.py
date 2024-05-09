@@ -1157,7 +1157,7 @@ class myinkc(hopper):
 
 
     def add_shieldbadge(self, input, front=True, dbg=False,
-                        wscale=1, scale=None, targetat4pt = 3/4, linescale=None, # scaling factors
+                        wscale=1, fixedscale=None, targetat4pt = 3/4, linescale=None, # scaling factors
                         anchor="topright",# placement
                         exclude=[]):
         """ add a shield-badge-like shaped textbox in upper right corner, call after plot AND xlabels etc. done
@@ -1169,7 +1169,8 @@ class myinkc(hopper):
             - scaling parameters
                 * targetat4pt: target fontsize at 4 instead of 10 (default 3/4 of ylabel)
                 * wscale: width scaling factor
-                * scale: manual overall scale factor, ontop of width
+                * fixedscale: overrides targetat4pt, but ontop of width
+                * linescale: scaling factor for lines (overrides targetat4pt influence)
             - exclude: list of strings to exclude if a gcode is contained in them
             - anchor: position of the shield-badge
                 * top/bottom
@@ -1332,7 +1333,9 @@ class myinkc(hopper):
         # create the path
         path = Path(verts, codes)
 
-        if not scale:
+        if fixedscale:
+            scale = fixedscale
+        else:
             # prep scale (acc to textsize)
             fontsize = ax.yaxis.label.get_size()*1
         
