@@ -1157,7 +1157,7 @@ class myinkc(hopper):
 
 
     def add_shieldbadge(self, input, front=True, dbg=False,
-                        wscale=1, fixedscale=None, targetat4pt = 3/4, linescale=None, # scaling factors
+                        dscale=1, wscale=1, fixedscale=None, targetat4pt = 3/4, targetat10pt=1, linescale=None, # scaling factors
                         anchor="topright",# placement
                         exclude=[]):
         """ add a shield-badge-like shaped textbox in upper right corner, call after plot AND xlabels etc. done
@@ -1167,10 +1167,13 @@ class myinkc(hopper):
                 * char-width only for 3characters
             - dbg: debug info?
             - scaling parameters
-                * targetat4pt: target fontsize at 4 instead of 10 (default 3/4 of ylabel)
-                * wscale: width scaling factor
-                * fixedscale: overrides targetat4pt, but ontop of width
-                * linescale: scaling factor for lines (overrides targetat4pt influence)
+                * dynamic - target at fontsize..
+                    - targetat4pt: target at fontsize 4
+                    - targetat10: target at 10 fontsize
+                    - wscale: width scaling factor
+                - fixed
+                    * fixedscale: overrides targetatXpt, but ontop of width
+                    * linescale: scaling factor for lines (overrides targetatXpt influence)
             - exclude: list of strings to exclude if a gcode is contained in them
             - anchor: position of the shield-badge
                 * top/bottom
@@ -1337,15 +1340,18 @@ class myinkc(hopper):
             scale = fixedscale
         else:
             # prep scale (acc to textsize)
-            fontsize = ax.yaxis.label.get_size()*1
+            fontsize = ax.yaxis.label.get_size()
         
             # ylabel fontsize is 10 per default and well sized
             # shall be targetat4pt at 4
-            #targetat4pt = 3/4 # it correlates but not 1:1, so make it a fct param
-            k = (1-targetat4pt)/6
-            d = targetat4pt - 4*k
+            # on plot_corr_mx its 5 usually
+            #
+            k = (targetat10pt-targetat4pt)/6
+            d = (10*targetat10pt - 4*targetat4pt)/6
             # correction factor:
             scale = fontsize*k+d
+
+            scale *= dscale/fontsize
 
         if not linescale:
             linescale = 2*scale
@@ -1372,7 +1378,11 @@ class myinkc(hopper):
 
         # apply transform
         shield.set_transform(scale_transform + ax.transData)
-
+        
+        dbg=False
+        if dbg:
+            fontsize = ax.yaxis.label.get_size()
+            text+=f"\n{fontsize}"
 
         # add the text
         ax.text(text_x, text_y, text,
