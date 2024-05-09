@@ -1167,7 +1167,7 @@ class myinkc(hopper):
                 * char-width only for 3characters
             - dbg: debug info?
             - scaling parameters
-                * targetat4: target fontsize at 4 instead of 10 (default 3/4 of ylabel)
+                * targetat4pt: target fontsize at 4 instead of 10 (default 3/4 of ylabel)
                 * wscale: width scaling factor
                 * scale: manual overall scale factor, ontop of width
             - exclude: list of strings to exclude if a gcode is contained in them
@@ -1337,8 +1337,8 @@ class myinkc(hopper):
             fontsize = ax.yaxis.label.get_size()*1
         
             # ylabel fontsize is 10 per default and well sized
-            # shall be targetat4 at 4
-            #targetat4 = 3/4 # it correlates but not 1:1, so make it a fct param
+            # shall be targetat4pt at 4
+            #targetat4pt = 3/4 # it correlates but not 1:1, so make it a fct param
             k = (1-targetat4pt)/6
             d = targetat4pt - 4*k
             # correction factor:
