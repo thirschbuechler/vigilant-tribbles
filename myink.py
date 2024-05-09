@@ -1147,8 +1147,9 @@ class myinkc(hopper):
 
 
     def add_shieldbadge(self, input, front=True, dbg=False,
-                        wscale=1, scale=None, targetat4 = 3/4, # scaling factors
-                        exclude=[], anchor="topright"):
+                        wscale=1, scale=None, targetat4pt = 3/4, linescale=None, # scaling factors
+                        anchor="topright",# placement
+                        exclude=[]):
         """ add a shield-badge-like shaped textbox in upper right corner, call after plot AND xlabels etc. done
         
             - input:
@@ -1161,6 +1162,11 @@ class myinkc(hopper):
                 * scale: manual overall scale factor, ontop of width
             - exclude: list of strings to exclude if a gcode is contained in them
             - anchor: position of the shield-badge
+                * top/bottom
+                * left/right
+                * center
+                * combinations like "topright"
+                * or list of x,y
         
         """
         
@@ -1238,27 +1244,40 @@ class myinkc(hopper):
         text_x = None
         text_y = None
 
-        # first check for center
-        if "center" in anchor:
-            text_x = 0.5
-            text_y = 0.5
-        
-        # right left
-        if "right" in anchor:
-            text_x = 0.85
-            text_y = 0.8
-        elif "left" in anchor:
-            text_x = 0.15
-            text_y = 0.5
 
-        # top bottom
-        if "top" in anchor:
-            text_y = 0.85 - n/2
-        elif "bot" in anchor:
-            text_y = 0.15 + n/2
+        if type(anchor) == str:
+
+
+            # introduce c to make combinations like centerleftbot possible
+            c = 0
+
+            # first check for center
+            if "center" in anchor:
+                text_x = 0.5
+                text_y = 0.5
+                c = 0.5
+            
+            # right left
+            if "right" in anchor:
+                text_x = 0.85-c
+                text_y = 0.8-c
+            elif "left" in anchor:
+                text_x = abs(c-0.15)
+                text_y = abs(c-0.5)
+
+            # top bottom
+            if "top" in anchor:
+                text_y = c-0.85 - n/2
+            elif "bot" in anchor:
+                text_y = abs(c-0.15) + n/2
+        elif type(anchor) ==list:
+            text_x, text_y = anchor
+        else:
+            raise Exception(f"shieldbadge - {anchor=} unknown {type(anchor)=}")
 
         if text_x == None or text_y == None:
             raise Exception(f"shieldbadge - {anchor=} not parsable or implemented")
+
 
         # nugget - vertical stretched hexagon
         # dimensions
@@ -1310,13 +1329,16 @@ class myinkc(hopper):
             # ylabel fontsize is 10 per default and well sized
             # shall be targetat4 at 4
             #targetat4 = 3/4 # it correlates but not 1:1, so make it a fct param
-            k = (1-targetat4)/6
-            d = targetat4 - 4*k
+            k = (1-targetat4pt)/6
+            d = targetat4pt - 4*k
             # correction factor:
             scale = fontsize*k+d
 
+        if not linescale:
+            linescale = 2*scale
+
         # create the patch
-        shield = patches.PathPatch(path, facecolor='white', alpha=0.5, edgecolor='black', linewidth=2*scale,transform=ax.transAxes)
+        shield = patches.PathPatch(path, facecolor='white', alpha=0.5, edgecolor='black', linewidth=linescale,transform=ax.transAxes)
         
         # add the patch to the Axes
         ax.add_patch(shield)
@@ -1343,6 +1365,8 @@ class myinkc(hopper):
         ax.text(text_x, text_y, text,
             bbox={'facecolor':'white','alpha':0,'edgecolor':'none','pad':1}, # textbox: no color, bg: alpha=0!
             ha='center', va='center') 
+
+        self.log.info(f"added shieldbadge at {text_x=}, {text_y=}")
 
         return shield
 
@@ -1512,7 +1536,7 @@ class myinkc(hopper):
 
             # add "resting" space below via nrows=2
             self.subplots(nrows=2, **kwargs_fig)
-
+            
             self.ax_onward()# go to row 2
             self.blank() # remove axis lines
             self.ax_backtrack()
@@ -1526,10 +1550,23 @@ class myinkc(hopper):
         # put in extent
         kwargs["extent"]=extent
 
-        # finally,  call imshow
-        handle = self.imshow(mx, **kwargs)
 
-        #self.autoscale_fig() # call after labels? so outside
+        # # any function pointer to call immediately before or after?
+        # remove from kwargs so it does't get passed to imshow
+        before = kwargs.pop("before_imshow",ms.dummy)
+        after = kwargs.pop("after_imshow",ms.dummy)
+
+        # call and make attr for later
+        self.beforeimshowres = before(self)
+        
+        # # finally,  call imshow # #
+        handle = self.imshow(mx, **kwargs)
+        
+        # call and maybe use attr beforeimshowres
+        after(self)
+
+
+        # self.autoscale_fig() - call after labels - so outside!
 
         return handle
 
@@ -1948,10 +1985,12 @@ class myinkc(hopper):
             max_xlabellen = 2
             max_ylabellen = 2
 
+
         # # plot
         #  imshow pixely - don't mush it up with interpolation
         imim = self.imshowpro(mx=mx, interpolation="none", cmap=cmap, kwargs_fig=kwargs_fig, pixelscale=pixelscale, **kwargs)
         
+
         # show all ticks
         if np.size(xlabels):
             self.xticklabels(xlabels, offset=0.5, ha="right") # horizontal alignment
