@@ -1157,7 +1157,7 @@ class myinkc(hopper):
 
 
     def add_shieldbadge(self, input, front=True, dbg=False,
-                        dscale=1, wscale=1, fixedscale=None, targetat4pt = 3/4, targetat10pt=1, linescale=None, # scaling factors
+                        dscale=None, wscale=1, fixedscale=None, targetat4pt = 3/4, targetat10pt=1, linescale=None, # scaling factors
                         anchor="topright",# placement
                         exclude=[]):
         """ add a shield-badge-like shaped textbox in upper right corner, call after plot AND xlabels etc. done
@@ -1171,6 +1171,7 @@ class myinkc(hopper):
                     - targetat4pt: target at fontsize 4
                     - targetat10: target at 10 fontsize
                     - wscale: width scaling factor
+                    - dscale: dynamic scaling factor PER fontsize, ontop of others
                 - fixed
                     * fixedscale: overrides targetatXpt, but ontop of width
                     * linescale: scaling factor for lines (overrides targetatXpt influence)
@@ -1259,32 +1260,35 @@ class myinkc(hopper):
         text_y = None
 
 
+        
         if type(anchor) == str:
+        # 9 positions possible, starting at..
 
-
-            # introduce c to make combinations like centerleftbot possible
-            c = 0
-
-            # first check for center
+            # center, ..
             if "center" in anchor:
                 text_x = 0.5
                 text_y = 0.5
-                c = 0.5
             
+            # then overwrite x ..
+
             # right left
             if "right" in anchor:
-                text_x = 0.85-c
-                text_y = 0.8-c
+                text_x = 0.85
+                #text_y = 0.8
             elif "left" in anchor:
-                text_x = abs(c-0.15)
-                text_y = abs(c-0.5)
+                text_x = 0.15
+                #text_y = 0.5
+
+            # .. or y, if needed.
 
             # top bottom
             if "top" in anchor:
-                text_y = c-0.85 - n/2
+                text_y = 0.85 - n/2
             elif "bot" in anchor:
-                text_y = abs(c-0.15) + n/2
+                text_y = 0.15 + n/2
+
         elif type(anchor) ==list:
+            # or screw the text, load fig coordinates directly from anchor var
             text_x, text_y = anchor
         else:
             raise Exception(f"shieldbadge - {anchor=} unknown {type(anchor)=}")
@@ -1351,7 +1355,8 @@ class myinkc(hopper):
             # correction factor:
             scale = fontsize*k+d
 
-            scale *= dscale/fontsize
+            if dscale:
+                scale *= dscale/fontsize
 
         if not linescale:
             linescale = 2*scale
@@ -1378,11 +1383,6 @@ class myinkc(hopper):
 
         # apply transform
         shield.set_transform(scale_transform + ax.transData)
-        
-        dbg=False
-        if dbg:
-            fontsize = ax.yaxis.label.get_size()
-            text+=f"\n{fontsize}"
 
         # add the text
         ax.text(text_x, text_y, text,
