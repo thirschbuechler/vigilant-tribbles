@@ -444,7 +444,7 @@ class myinkc(hopper):
             self.fig=fig
     
     
-    def twinx(self, ax=None):
+    def twinx(self, ax=None, left=False):
         """ dual use of x-axis generates y label and ticks on right """
         ax = self.get_ax(ax)
         #pos = int(np.where (self.axs == ax)[0]) # integer of first occourance
@@ -456,13 +456,23 @@ class myinkc(hopper):
         self.twins.append(self.ax)
         #self.ax_onward()
 
+        if left:
+            ax.spines['right'].set_position(('outward', 0))
+            ax.yaxis.set_ticks_position('left')
+            ax.yaxis.set_label_position('left')
+
     
-    def twiny(self, ax=None):
+    def twiny(self, ax=None, bot=False):
         """ dual use of y-axis generates x label and ticks on top """
         ax = self.get_ax(ax)
         #pos = int(np.where (self.axs == self.ax)[0]) # integer of first occourance
         self.ax = ax.twiny()
         self.twins.append(self.ax)
+
+        if bot:
+            ax.spines['top'].set_position(('outward', 0))
+            ax.xaxis.set_ticks_position('bottom')
+            ax.xaxis.set_label_position('bottom')
     
     
     def suptitle(self, title=""):
