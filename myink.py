@@ -1472,7 +1472,11 @@ class myinkc(hopper):
 
             if square_operation or square_cal:
                 if "figsize" in kwargs_fig:
-                    raise Exception("figsize in square mode not settable\nI'm afraid Dave, I cannot let you do that.")
+                    if not square_cal:
+                        raise Exception("figsize in square mode not settable\nI'm afraid Dave, I cannot let you do that.")
+                    else:
+                        self.log.warning("figsize in square_cal mode not settable - will be overwritten")
+                        kwargs_fig.pop("figsize",None)
                 else:
                     # aspect ratio dependent on data size,
                     aspect = xdatalen / ydatalen
@@ -1514,22 +1518,30 @@ class myinkc(hopper):
                         if aspect != 1:
                             raise Exception("aspect not implemented in lookuptable - also not useful - how did it happen?")
                         
-                        # fetch table
-                        df = cplm.get_cal()
-                        
-                        # case labels are ascending ints
-                        if max_chars <= 2:
-                            row = df[ ((df["labellen"] == 2) & (df["datalen"] == ydatalen)) ]
-                        # case labels are text of length about 20 - there is only that entry atm - HACK
+                        maxcalibrateddatalen = 40
+                        # hint: use aspect="squareish", too, for large mx
+
+                        if ydatalen < maxcalibrateddatalen:
+                            # fetch table
+                            df = cplm.get_cal()
+                            
+                            # case labels are ascending ints
+                            if max_chars <= 2:
+                                row = df[ ((df["labellen"] == 2) & (df["datalen"] == ydatalen)) ]
+                            # case labels are text of length about 20 - there is only that entry atm - HACK
+                            else:
+                                # exclude maxchars == 2  case with ">2"
+                                row = df[ ((df["labellen"] > 2) & (df["datalen"] == ydatalen)) ]
+                            
+                            #print(row)
+                            if len(row)!=1:
+                                raise Exception(f"not exactly one match but {len(row)} for {max_chars=}, {ydatalen=} in lookuptable: {row}")
+                            else:
+                                pixelscale = float(row["pixelscale"])
+
                         else:
-                            # exclude maxchars == 2  case with ">2"
-                            row = df[ ((df["labellen"] > 2) & (df["datalen"] == ydatalen)) ]
-                        
-                        #print(row)
-                        if len(row)!=1:
-                            raise Exception(f"not exactly one match but {len(row)} for {max_chars=}, {ydatalen=} in lookuptable: {row}")
-                        else:
-                            pixelscale = float(row["pixelscale"])
+                            # ydatalen >= 30
+                            pixelscale = 1
                         
                     # calc scaling factor to font
                     fa = 22 / 72 * pixelscale 
@@ -1550,19 +1562,25 @@ class myinkc(hopper):
         # close current open figure, if empty ax
             self.close("emptyax")
             
-            # # cb fix # # 
-            # to fit still when colorbar is there and not be too small
-            if xfig:
-                xfig = np.max([1.2, xfig]) 
-                kwargs_fig.update(dict(figsize=(xfig,yfig)))
-                #self.log.info(f"imshowpro: {xfig=} {yfig=} {pixelscale=}")
 
-            # add "resting" space below via nrows=2
-            self.subplots(nrows=2, **kwargs_fig)
-            
-            self.ax_onward()# go to row 2
-            self.blank() # remove axis lines
-            self.ax_backtrack()
+
+            if ydatalen < maxcalibrateddatalen:
+                            # # cb fix # # 
+                # to fit still when colorbar is there and not be too small
+                if xfig:
+                    xfig = np.max([1.2, xfig]) 
+                    kwargs_fig.update(dict(figsize=(xfig,yfig)))
+                    #self.log.info(f"imshowpro: {xfig=} {yfig=} {pixelscale=}")
+                    
+                # add "resting" space below via nrows=2
+                self.subplots(nrows=2, **kwargs_fig)
+                
+                self.ax_onward()# go to row 2
+                self.blank() # remove axis lines
+                self.ax_backtrack()
+            else:
+                self.subplots(**kwargs_fig)
+
             self.ax_i = -1 # HACK - put into expected location to start w ax_onward() in a loop
 
         if y_label_inverted:
@@ -1582,7 +1600,7 @@ class myinkc(hopper):
         # call and make attr for later
         self.beforeimshowres = before(self)
         
-        # # finally,  call imshow # #
+        # # > > > finally,  call imshow < < < # #
         handle = self.imshow(mx, **kwargs)
         
         # call and maybe use attr beforeimshowres

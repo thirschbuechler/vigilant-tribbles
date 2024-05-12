@@ -193,6 +193,9 @@ if __name__ == '__main__': # test if called as executable, not as library
 
     calibrate(want_width_px=30, labellens = [2,22],datalens = np.arange(3,16), px_arr = np.arange(0,5,0.05))        
     
+    # better not try and just use imshow without second subplot or scaling
+    #calibrate(want_width_px=20, labellens = [2,22],datalens = np.arange(17,43), px_arr = np.arange(0,5,0.05))        
+    
     # saz all40
         # impossible
         #calibrate(want_width_px=30, labellens = [2,20], datalens = [40], px_arr = [0,1])    
