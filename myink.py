@@ -1400,7 +1400,9 @@ class myinkc(hopper):
         # eg. (50,100),40,80, edgecolor='red', facecolor='none', lw=4)
         self.get_ax().add_patch(patches.Rectangle(*args, **kwargs))
 
-    def imshowpro(self, mx=None, x_axis=None, y_axis=None, y_label_inverted=False, pixelscale=1, kwargs_fig={}, **kwargs):
+    def imshowpro(self, mx=None, x_axis=None, y_axis=None, y_label_inverted=False, pixelscale=1, kwargs_fig={}, 
+                        maxcalibrateddatalen = 40, maxpaddingdatalen=40, # hint: use aspect="squareish", too, for large mx
+                  **kwargs):
         """ souped-up mpl imshow api"""
 
         # # import conditioning # #
@@ -1518,7 +1520,7 @@ class myinkc(hopper):
                         if aspect != 1:
                             raise Exception("aspect not implemented in lookuptable - also not useful - how did it happen?")
                         
-                        maxcalibrateddatalen = 40
+                        #maxcalibrateddatalen = 40
                         # hint: use aspect="squareish", too, for large mx
 
                         if ydatalen < maxcalibrateddatalen:
@@ -1562,10 +1564,8 @@ class myinkc(hopper):
         # close current open figure, if empty ax
             self.close("emptyax")
             
-
-
-            if ydatalen < maxcalibrateddatalen:
-                            # # cb fix # # 
+            if ydatalen < maxcalibrateddatalen and ydatalen < maxpaddingdatalen:
+                # # cb fix # # 
                 # to fit still when colorbar is there and not be too small
                 if xfig:
                     xfig = np.max([1.2, xfig]) 
