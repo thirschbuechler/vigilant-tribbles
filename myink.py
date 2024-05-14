@@ -1818,11 +1818,16 @@ class myinkc(hopper):
         for i,item in enumerate(data):
             
             # squish item dimensions down to statistics
-            mins = ml.nanmin(item)
-            maxes = ml.nanmax(item)
-            means = ml.nanmean(item)
-            stds = np.std(item)
-            statistics.append([mins, means, maxes, stds])
+            # only apply if not all nan or empty
+            if ml.my_any(item) and ml.count_non_nan(item):
+                mins = ml.nanmin(item)
+                maxes = ml.nanmax(item)
+                means = ml.nanmean(item)
+                stds = np.std(item)
+                statistics.append([mins, means, maxes, stds])
+            else:
+                # append empty line
+                statistics.append([np.nan, np.nan, np.nan, np.nan])
 
         # unpack
         mins, means, maxes, stds  = np.array(statistics).astype("float").T
@@ -1866,12 +1871,18 @@ class myinkc(hopper):
         if meanline:
             y = means
             x = np.arange(len(means))
-
+            # delete x and y at indices y is nan
+            
+            x = x[~np.isnan(y)]
+            y = y[~np.isnan(y)]
+    
             # get line per ele
             k,d = self.LSQ_line(x,y)
             line = k*x+d
-
-            self.plot(x,line, c=mc, lw=1, label=f"slope {self.enginerd(k,places=1)}")
+            if ml.count_non_nan(line) > 1:
+                self.plot(x,line, c=mc, lw=1, label=f"slope {self.enginerd(k,places=1)}")
+            else:
+                raise Exception(f"meanline failed: {x=}, {y=}, {line=}")
 
 
 

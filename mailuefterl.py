@@ -720,7 +720,14 @@ def my_any(thing):
     False
 
 
+
     # # full # #
+
+    # nan - not a feature but it is what it is
+    # use sth like "my_any(item) and count_non_nan(item)"
+    >>> my_any(np.nan)
+    True
+
     # str
     >>> my_any("bla")
     True
