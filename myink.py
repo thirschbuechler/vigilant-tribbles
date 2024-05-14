@@ -1768,8 +1768,11 @@ class myinkc(hopper):
         self.autoscale_fig()
 
 
-    def boxplot(self, data=[], xlabels="", meanoffset=False, ylabel="", title="", mc = "green", 
-                availability=False, nan_bad=True, annot=True, badgedata={}, **kwargs):
+    def boxplot(self, data=[], xlabels="",ylabel="", title="",
+                annot=True, mc = "green", mediancol = 'orange', meanline=False,
+                availability=False, nan_bad=True,
+                badgedata={},
+                **kwargs):
         """
         boxplot
 
@@ -1778,7 +1781,6 @@ class myinkc(hopper):
         - mc: markercolors for mean, std edges upper+lower
         - xlabels: data labels
         - ylabel
-        - meanoffset
         - annot: annotate ,ean, mean+-stdev?
         
         availability related:
@@ -1821,13 +1823,9 @@ class myinkc(hopper):
             means = ml.nanmean(item)
             stds = np.std(item)
             statistics.append([mins, means, maxes, stds])
+
         # unpack
         mins, means, maxes, stds  = np.array(statistics).astype("float").T
-
-        # optional user-offset, per loop-item to be compatible w ragged-lists
-        if meanoffset:
-            data = data - means
-            ylabel+=", means subtracted"
 
         # consider boxplots are plotted at x-offset of +1 for some reason:
         x=np.arange(len(data))+1
@@ -1865,6 +1863,18 @@ class myinkc(hopper):
                 xlabels[i] = f"{xlabels[i]}\n({avail_pc:.1f}%)"
         """
 
+        if meanline:
+            y = means
+            x = np.arange(len(means))
+
+            # get line per ele
+            k,d = self.LSQ_line(x,y)
+            line = k*x+d
+
+            self.plot(x,line, c=mc, lw=1, label=f"slope {self.enginerd(k,places=1)}")
+
+
+
         # # xy_labelling
         ax.set_ylabel(ylabel)
         if np.any(np.array(xlabels, dtype=object)): # a.any() warning fix, for evaluating bool(list([1,2,3])) or bool(list([0,0,0])), bool(list([[],[],[]])) etc.
@@ -1881,7 +1891,8 @@ class myinkc(hopper):
         self.legend()
         from matplotlib.lines import Line2D
         #https://matplotlib.org/stable/gallery/text_labels_and_annotations/custom_legends.html
-        medianlinelegendline = Line2D([0], [0], color='orange', marker="_", lw=1, label='Line')
+        
+        medianlinelegendline = Line2D([0], [0], color=mediancol, marker="_", lw=1, label='Line')
         quartilelegendline = Line2D([0], [0], color='black', marker="_", lw=1, label='Line')
         h, l = ax.get_legend_handles_labels()
         
