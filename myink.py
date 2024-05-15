@@ -253,7 +253,7 @@ class myinkc(hopper):
         import subprocess
         with hopper(self.figs_dir):
             # todo - stdout=PIPE or sth to get useful return value
-            self.log.trail(text+"postprocessing..")
+            self.log.trail("postprocessing " +text)
             proc = subprocess.Popen(cmd, shell=True)
             proc.wait() # ensure it's done before continuing
             self.log.trail(text+"postprocessing done!")
