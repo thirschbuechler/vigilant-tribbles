@@ -297,31 +297,50 @@ def babysit(eval, *args, **kwargs):
 
         note: all runtime warnings of one fct ignored
         maybe to do only ignore zeromean nan slice ones
+
+        also make sure to return nan if no valid data is present, e.g. all nans in a slice
+        (as the default numpy behaviour is weird)
     """
 
-    with warnings.catch_warnings():
-        warnings.simplefilter("ignore", category=RuntimeWarning)
-        return eval(*args,**kwargs)
-    
-    # alternatively (even thouth with_context is superior):
-    # np.seterr(divide='ignore', invalid='ignore') # temp disable for nan operations
-    # nan operations
-    # np.seterr(divide='warn', invalid='warn') # re-enable
+    # this can return an element for parsing a ragged-list with nans instead of having an empty element there
+    return_nan = kwargs.pop("return_nan", False)
+    if not my_any(args) and return_nan:
+        return np.nan
+    else:
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", category=RuntimeWarning)
+            return eval(*args,**kwargs)
         
-        
+        # alternatively (even thouth with_context is superior):
+        # np.seterr(divide='ignore', invalid='ignore') # temp disable for nan operations
+        # nan operations
+        # np.seterr(divide='warn', invalid='warn') # re-enable
+            
+
+# some hairy cases are at bottom in "main", with scalar and/or nested elements    
 def nanmean(*args, **kwargs):
-    """
-    # some hairy cases are at bottom in "main", with scalar and/or nested elements
-    """
+    """ nanmean with babysit - no RuntimeWarning for nans
+        - return_nan (bool)- option if no valid data is present"""  
     return babysit(np.nanmean,*args, **kwargs)
 
 def nanmax(*args, **kwargs):
+    """ nanmax with babysit - no RuntimeWarning for nans
+        - return_nan (bool)- option if no valid data is present"""
     return babysit(np.nanmax,*args, **kwargs)
 
 def nanmin(*args, **kwargs):
+    """ nanmin with babysit - no RuntimeWarning for nans
+        - return_nan (bool)- option if no valid data is present"""
     return babysit(np.nanmin,*args, **kwargs)
 
+def nanstd(*args, **kwargs):
+    """ nanstd with babysit - no RuntimeWarning for nans
+        - return_nan (bool)- option if no valid data is present"""
+    return babysit(np.nanstd,*args, **kwargs)
+
 def divide(*args, **kwargs):
+    """ divide with babysit - no RuntimeWarning for nans
+        - return_nan (bool)- option if no valid data is present"""
     return babysit(np.divide,*args, **kwargs)
 
 def sign_sym(var):

@@ -1818,16 +1818,13 @@ class myinkc(hopper):
         for i,item in enumerate(data):
             
             # squish item dimensions down to statistics
-            # only apply if not all nan or empty
-            if ml.my_any(item) and ml.count_non_nan(item):
-                mins = ml.nanmin(item)
-                maxes = ml.nanmax(item)
-                means = ml.nanmean(item)
-                stds = np.std(item)
-                statistics.append([mins, means, maxes, stds])
-            else:
-                # append empty line
-                statistics.append([np.nan, np.nan, np.nan, np.nan])
+            # make sure to get an element (return_nan) if all are nan
+            mins = ml.nanmin(item, return_nan=True)
+            maxes = ml.nanmax(item, return_nan=True)
+            means = ml.nanmean(item, return_nan=True)
+            stds = ml.nanstd(item, return_nan=True)
+            statistics.append([mins, means, maxes, stds])
+            
 
         # unpack
         mins, means, maxes, stds  = np.array(statistics).astype("float").T
