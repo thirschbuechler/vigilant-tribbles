@@ -1830,7 +1830,8 @@ class myinkc(hopper):
         mins, means, maxes, stds  = np.array(statistics).astype("float").T
 
         # consider boxplots are plotted at x-offset of +1 for some reason:
-        x=np.arange(len(data))+1
+        xoff = 1
+        x=np.arange(len(data)) + xoff
 
         data = data.T
         # # plotting # #        
@@ -1870,7 +1871,7 @@ class myinkc(hopper):
             x = np.arange(len(means))
             # delete x and y at indices y is nan
             
-            x = x[~np.isnan(y)]
+            x = x[~np.isnan(y)] + xoff
             y = y[~np.isnan(y)]
     
             # get line per ele
