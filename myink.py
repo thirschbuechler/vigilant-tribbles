@@ -1243,9 +1243,11 @@ class myinkc(hopper):
 
         ax = self.get_ax()
 
+        # get textsize in fig
+        ylabel_text_size = ax.yaxis.label.get_size()
+
         # add text size before and after reset coordsys
         if dbg:
-            ylabel_text_size = ax.yaxis.label.get_size()
             text += "\n" + f"{ylabel_text_size}"
 
         # lines are breaks+1
@@ -1343,9 +1345,7 @@ class myinkc(hopper):
         if fixedscale:
             scale = fixedscale
         else:
-            # prep scale (acc to textsize)
-            fontsize = ax.yaxis.label.get_size()
-        
+            # # prep scale (acc to textsize)        
             # ylabel fontsize is 10 per default and well sized
             # shall be targetat4pt at 4
             # on plot_corr_mx its 5 usually
@@ -1353,10 +1353,10 @@ class myinkc(hopper):
             k = (targetat10pt-targetat4pt)/6
             d = (10*targetat10pt - 4*targetat4pt)/6
             # correction factor:
-            scale = fontsize*k+d
+            scale = ylabel_text_size*k+d
 
             if dscale:
-                scale *= dscale/fontsize
+                scale *= dscale/ylabel_text_size
 
         if not linescale:
             linescale = 2*scale
