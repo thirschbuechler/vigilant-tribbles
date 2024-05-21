@@ -1398,7 +1398,7 @@ class myinkc(hopper):
             bbox={'facecolor':'white','alpha':0,'edgecolor':'none','pad':1}, # textbox: no color, bg: alpha=0!
             ha='center', va='center') 
 
-        self.log.info(f"added shieldbadge at {text_x=}, {text_y=}")
+        self.log.info(f"added shieldbadge at {text_x=:.2f}, {text_y=:.2f}")
 
         return shield
 
