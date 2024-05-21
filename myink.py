@@ -1247,9 +1247,16 @@ class myinkc(hopper):
         ylabel_text_size = ax.yaxis.label.get_size()
         figsize = ax.get_figure().get_size_inches()
 
+        # check if self has attribute metadata
+        if hasattr(self, "metadata"):
+            # get metadata
+            metadata = self.metadata
+        else:
+            metadata = {}
+
         # add text size before and after reset coordsys
         if dbg:
-            for ele in [ylabel_text_size, figsize]:
+            for ele in [ylabel_text_size, figsize, bool(metadata)]:
                 text += "\n" + f"{ele}"
 
         # lines are breaks+1
