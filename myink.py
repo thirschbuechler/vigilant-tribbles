@@ -1897,6 +1897,7 @@ class myinkc(hopper):
         ax.minorticks_on()
         
         # # legend customization
+        # init default, mod later
         self.legend()
         from matplotlib.lines import Line2D
         #https://matplotlib.org/stable/gallery/text_labels_and_annotations/custom_legends.html
@@ -1929,14 +1930,24 @@ class myinkc(hopper):
         
         # location dependent on datalen
         if len(statistics) == 2 : # as len(data) can have a empty dimension at beginning or sth
-            if len(data) !=2:
-                self.log.warning(f"boxplot - evaded for badge creation: {len(data)=} but {len(statistics)=}")
+            #if len(data) !=2:
+            #    self.log.warning(f"boxplot - evaded for badge creation: {len(data)=} but {len(statistics)=}")
+            
+            # legend + badge
             loc = "center"
-            legkwargs = dict(bbox_to_anchor=(0.5, 0.25), loc=loc)
+            
+            # legend
+            legkwargs = dict(bbox_to_anchor=(0.5, 0.25), loc=loc, facecolor='white', framealpha=0.5)
+
+            # badge
             if badgedata:
                 badgedata["anchor"] = loc+"top"
         else:
-            legkwargs = {}
+            legkwargs = dict(loc="lower center", facecolor='white', framealpha=0.5)
+
+            if badgedata:
+                badgedata["anchor"] = "botright"
+
         # put
         self.legend(handles=h,labels=l, **legkwargs)   
 
