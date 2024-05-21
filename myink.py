@@ -810,6 +810,10 @@ class myinkc(hopper):
                 self.imshow(Image.open("myfigures/stinkbug.webp"))
         self.blank()
         self.title(title)
+        t = self.text(0.5, 0.1, title,
+                            verticalalignment='center', horizontalalignment='center',
+                            transform=self.get_ax().transAxes)
+        t.set_bbox(dict(facecolor='red', alpha=0.5, edgecolor='red'))
 
 
     def markernum(self, num):
@@ -2915,7 +2919,7 @@ def tester():
         boxplottest()
         #calibrate_corr_mx_label()
         #test_waterfall_size() # not applicable unless calibrated before - HACK: todo (only done for production msr stuff atm)
-        myinkc().bug()
+        myinkc().bug("bugtext")
         gradientmaster_test()
         test_rect()
         test_spinds_axold()
