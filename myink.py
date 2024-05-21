@@ -1243,12 +1243,14 @@ class myinkc(hopper):
 
         ax = self.get_ax()
 
-        # get textsize in fig
+        # get sizes
         ylabel_text_size = ax.yaxis.label.get_size()
+        figsize = ax.get_figure().get_size_inches()
 
         # add text size before and after reset coordsys
         if dbg:
-            text += "\n" + f"{ylabel_text_size}"
+            for ele in [ylabel_text_size, figsize]:
+                text += "\n" + f"{ele}"
 
         # lines are breaks+1
         l = text.count("\n")+1
