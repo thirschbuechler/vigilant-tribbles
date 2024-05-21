@@ -1886,8 +1886,14 @@ class myinkc(hopper):
             # get line per ele
             k,d = self.LSQ_line(x,y)
             line = k*x+d
-            if ml.count_non_nan(line) > 1:
-                self.plot(x,line, c=mc, lw=1, label=f"slope {self.enginerd(k,places=1)}")
+
+            # plot with legend-entry (label) if non-nan
+            if ml.count_non_nan(line) > 2:
+                if self.tex:
+                    sep = r"$\thinspace$"
+                else:
+                    sep="\N{THIN SPACE}"
+                self.plot(x,line, c=mc, lw=1, label=f"Δ{sep}/{sep}item: {self.enginerd(-k,places=1)}")
             else:
                 raise Exception(f"meanline failed: {x=}, {y=}, {line=}")
 
