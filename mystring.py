@@ -181,6 +181,9 @@ def dict_a_fully_in_b(dict_a={}, dict_b={}):
     >>> dict_a_fully_in_b({1:2}, {1:3, 2:3})
     False
 
+    >>> dict_a_fully_in_b({1:1, 2:3}, {2:3, 1:True})
+    True
+
         
     """
     return (len(dictlist_intersection([dict_b, dict_a]))==len(dict_a))
