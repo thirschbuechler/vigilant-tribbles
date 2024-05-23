@@ -5,6 +5,13 @@
 portal - enter folder via with-context, cleanup when leaving
 hopper (child class) - traverse folders and ease file operations
 
+NOTE: low-level IO via os.path is not recommended anymore, use pathlib for new projects
+
+(had issues where it would not report existing files if too
+performant (no print(),  only self.log.info() etc,),
+despite permissions and cwd() being correct)
+
+
 Created on Mon May 18 21:06:39 2020
 @author: thirschbuechler
 """
