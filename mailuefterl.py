@@ -323,6 +323,11 @@ def nanmean(*args, **kwargs):
         - return_nan (bool)- option if no valid data is present"""  
     return babysit(np.nanmean,*args, **kwargs)
 
+def nanmedian(*args, **kwargs):
+    """ nanmean with babysit - no RuntimeWarning for nans
+        - return_nan (bool)- option if no valid data is present"""  
+    return babysit(np.nanmedian,*args, **kwargs)
+
 def nanmax(*args, **kwargs):
     """ nanmax with babysit - no RuntimeWarning for nans
         - return_nan (bool)- option if no valid data is present"""

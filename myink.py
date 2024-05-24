@@ -2289,9 +2289,9 @@ class myinkc(hopper):
             self.plot(x_axis, enve_min, color=ex_color, marker=marker, markevery=100)
         # end for-compare
         
-        avgs = (np.nanmean(mxs,axis=1))
-        #avgs2 = [np.nanmean(mx,axis=0) for mx in mxs] # same
-        medians = (np.nanmedian(mxs,axis=1))
+        avgs = (ml.nanmean(mxs,axis=1))
+        #avgs2 = [ml.nanmean(mx,axis=0) for mx in mxs] # same
+        medians = (ml.nanmedian(mxs,axis=1))
 
         # plot medians over pos per freq
         x_axis = xaxes[0]
