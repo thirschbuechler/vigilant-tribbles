@@ -1160,7 +1160,7 @@ class myinkc(hopper):
         return plt.text(*args, **kwargs)
 
 
-    def add_shieldbadge(self, input, front=True, dbg=False,
+    def add_shieldbadge(self, input, front=True, dbg=False, extend_outside=False,
                         dscale=None, wscale=1, fixedscale=None, targetat4pt = 3/4, targetat10pt=1, linescale=None, # scaling factors
                         anchor="topright",# placement
                         exclude=[]):
@@ -1186,6 +1186,7 @@ class myinkc(hopper):
                 * center
                 * combinations like "topright"
                 * or list of x,y
+            - extend_outside: allowed to be outside the plot area rectangle?
         
         """
         
@@ -1242,8 +1243,8 @@ class myinkc(hopper):
         ax = self.get_ax()
 
         # put it infront of the rest
-        if front:
-            self.reset_coordsys()
+        #if front:
+        #    self.reset_coordsys()
 
         ax = self.get_ax()
 
@@ -1260,6 +1261,7 @@ class myinkc(hopper):
 
         # add text size before and after reset coordsys
         if dbg:
+            extend_outside = True
             for ele in [ylabel_text_size, figsize, bool(metadata)]:
                 text += "\n" + f"{ele}"
 
@@ -1374,8 +1376,10 @@ class myinkc(hopper):
         if not linescale:
             linescale = 2*scale
 
+        #self.get_ax().set_aspect('equal') # makes shieldbadge pos ok in SAZ_P but subplot is too narrow suddenly
+
         # create the patch
-        shield = patches.PathPatch(path, facecolor='white', alpha=0.5, edgecolor='black', linewidth=linescale,transform=ax.transAxes)
+        shield = patches.PathPatch(path, facecolor='white', alpha=0.5, edgecolor='black', linewidth=linescale,transform=ax.transAxes, clip_on=extend_outside)
         
         # add the patch to the Axes
         ax.add_patch(shield)
