@@ -1166,6 +1166,7 @@ class myinkc(hopper):
                         exclude=[]):
         """ add a shield-badge-like shaped textbox in upper right corner, call after plot AND xlabels etc. done
         
+            !first add colorbar, then shieldbadge, if needed!
             - input:
                 * stringlines, or list of stringlines to verify to be the same,
                 * char-width only for 3characters
@@ -1243,10 +1244,14 @@ class myinkc(hopper):
         ax = self.get_ax()
 
         # put it infront of the rest
-        #if front:
-        #    self.reset_coordsys()
-
-        ax = self.get_ax()
+        if front:
+            ax = self.reset_coordsys()
+            if not ax:
+                ax = self.get_ax()
+            #else:
+            #    ax.set_aspect('equal') not only too narrow but also too small using this
+        else:
+            ax = self.get_ax()
 
         # get sizes
         ylabel_text_size = ax.yaxis.label.get_size()
@@ -1375,8 +1380,6 @@ class myinkc(hopper):
 
         if not linescale:
             linescale = 2*scale
-
-        #self.get_ax().set_aspect('equal') # makes shieldbadge pos ok in SAZ_P but subplot is too narrow suddenly
 
         # create the patch
         shield = patches.PathPatch(path, facecolor='white', alpha=0.5, edgecolor='black', linewidth=linescale,transform=ax.transAxes, clip_on=extend_outside)
@@ -2874,14 +2877,36 @@ class myinkc(hopper):
         """ reset coord sys to absolute - eg clean up previous plot random spacing (G53 gcode)
             - e.g. histos have 0,0 on lower left and not 0,0 on upper right per def --> call before and after annotating it w plot 
 
-            NOTE: ! DANGER !
-                - INVALIDATES PREVIOUS AX HANDLES (new get_ax() required)
-                - MIGHT KILL x,y ticks
+            (previously used twinx, twiny, but that creates two new axes. It is better to just make one "manually" via add_axes)
+
+            ! temporarily puts it into self.ax, not into self.axs as that messes up plots !
+            --> ergo, cannot be found with ax_onward or ax_backtrack
+
+            returns new ax, 
+
         """ 
-        self.get_ax().margins(0) # AFTER plot - 
-        self.twinx() # new axes for both
-        self.twiny()
-        self.hidexy() # hide xy labels etc
+        fig = self.get_fig()
+        ax = self.get_ax()
+    
+        # create new axes on top of the existing ones
+        ax2 = fig.add_axes(ax.get_position(), frame_on=False)
+
+        # set x and y limits to [0, 1]
+        ax2.set_xlim(0, 1)
+        ax2.set_ylim(0, 1)
+        
+        # cannot insert as it messes up many things
+        #self.axs=np.array(list(self.axs).append(ax))
+        #self.ax=ax2
+
+        # hide xy labels etc
+        #self.hidexy()
+        ax2.xaxis.set_visible(False)
+        ax2.yaxis.set_visible(False)
+
+        self.ax = ax2
+
+        return ax2
 
 
     #</myinkc> - if an indent level is wrong fcts afterwards not defined!
