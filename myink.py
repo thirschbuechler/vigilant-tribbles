@@ -21,7 +21,7 @@ from logging import exception
 import re
 import os
 import numpy as np
-import pandas as pd
+#import pandas as pd
 
 import matplotlib as mpl
 import matplotlib.pyplot as plt
@@ -33,6 +33,8 @@ from matplotlib.ticker import PercentFormatter # histo percent
 from matplotlib.transforms import Bbox
 import matplotlib.patches as patches
 from matplotlib.path import Path
+from matplotlib.lines import Line2D
+#from matplotlib.patches import Arc, Circle
 
 try:
     import mystring as ms
@@ -51,7 +53,7 @@ except:
 
 modulepath = (os.path.dirname(os.path.abspath(__file__)))
 
-#from matplotlib.patches import Arc, Circle
+
 
 from PIL import Image
 
@@ -102,6 +104,69 @@ class gradientmaster(object):
             return self.colors[i]
         else:
             return None
+
+
+class boxstats(hopper):
+    """ boxplot statistics helper class
+        - inherit hopper (for Fruit lineage)
+        - input: data
+        - attributes: means, stds, mins, maxes, meanline
+
+    """
+
+    def __init__(self, data, **kwargs):
+        
+        super().__init__(ID="boxstats", **kwargs) # (*args, **kwargs) # superclass inits
+
+        # init empty
+        self.mins = []
+        self.means = []
+        self.maxes = []
+        self.stds = []
+
+        self.len = 0
+        self.meanline = None        
+        
+        # # data conditioning # #
+        data = np.array(data, dtype=object) # can be a ragged list instead of mxn matrix
+        
+        # loop is ugly but always works w ragged bs
+        for i,item in enumerate(data):
+            
+            # squish item dimensions down to statistics
+            # make sure to get an element (return_nan) if all are nan
+            self.mins.append(ml.nanmin(item, return_nan=True))
+            self.maxes.append(ml.nanmax(item, return_nan=True))
+            self.means.append(ml.nanmean(item, return_nan=True))
+            self.stds.append(ml.nanstd(item, return_nan=True))
+            
+        self.mins = np.array(self.mins).astype("float")
+        self.maxes = np.array(self.maxes).astype("float")
+        self.means = np.array(self.means).astype("float")
+        self.stds = np.array(self.stds).astype("float")
+
+        self.len = len(self.means)
+    
+        # calc meanline
+        y = self.means
+        x = np.arange(len(y))
+        # delete x and y at indices y is nan
+        
+        x = x[~np.isnan(y)]
+        y = y[~np.isnan(y)]
+
+        # get line per ele
+        k,d = ml.LSQ_line(x,y)
+        meanline = k*x+d
+
+        # use fruit legacy
+        self.sprout("meanline", data=meanline, data_x=x)
+        
+        # nonstandard subfruit attr
+        self.meanline.k = k
+        self.meanline.d = d
+
+    # </class boxstats>
 
 
 ## thing to make matplotlib access easier ###
@@ -837,14 +902,9 @@ class myinkc(hopper):
         plt.close("all") # fun but not needed
     
     
-    def LSQ_line(self, x, y):
-        """ THE OLD FASHIONED MOORE PENROSE WAY"""
-        # make pinv basis
-        A = np.vstack([x, np.ones(len(x))]).T
-        # make pinv and unpack
-        k, d = np.linalg.lstsq(A, y, rcond=None)[0]
-        
-        return k,d
+    def LSQ_line(self, *args, **kwargs):
+        """ forward to mailuefterl LSQ_line """
+        return ml.LSQ_line(*args, **kwargs)
     
     
     def get_points(self):
@@ -1832,24 +1892,19 @@ class myinkc(hopper):
             stds = np.std(data, axis=0)
         """
 
-        # always works
+        # # data conditioning # #
         data = np.array(data, dtype=object) # can be a ragged list instead of mxn matrix
-        statistics = []
-        for i,item in enumerate(data):
-            
-            # squish item dimensions down to statistics
-            # make sure to get an element (return_nan) if all are nan
-            mins = ml.nanmin(item, return_nan=True)
-            maxes = ml.nanmax(item, return_nan=True)
-            means = ml.nanmean(item, return_nan=True)
-            stds = ml.nanstd(item, return_nan=True)
-            statistics.append([mins, means, maxes, stds])
-            
 
-        # unpack
-        mins, means, maxes, stds  = np.array(statistics).astype("float").T
+        # generate
+        stats = boxstats(data)
+        
+        # load
+        #mins = stats.means
+        #maxes = stats.maxe
+        means = stats.means
+        stds = stats.stds
 
-        # consider boxplots are plotted at x-offset of +1 for some reason:
+        # consider boxplots are plotted at x-offset of +1 for some reason, maybe to avoid ugly plot at 0
         xoff = 1
         x=np.arange(len(data)) + xoff
 
@@ -1887,16 +1942,10 @@ class myinkc(hopper):
         """
 
         if meanline:
-            y = means
-            x = np.arange(len(means))
-            # delete x and y at indices y is nan
-            
-            x = x[~np.isnan(y)] + xoff
-            y = y[~np.isnan(y)]
-    
-            # get line per ele
-            k,d = self.LSQ_line(x,y)
-            line = k*x+d
+            # fetch
+            line = stats.meanline.data
+            x = stats.meanline.data_x + xoff
+            k = stats.meanline.k
 
             # plot with legend-entry (label) if non-nan
             if ml.count_non_nan(line) > 2:
@@ -1928,7 +1977,6 @@ class myinkc(hopper):
         # # legend customization
         # init default, mod later
         self.legend()
-        from matplotlib.lines import Line2D
         #https://matplotlib.org/stable/gallery/text_labels_and_annotations/custom_legends.html
         
         medianlinelegendline = Line2D([0], [0], color=mediancol, marker="_", lw=1, label='Line')
@@ -1958,9 +2006,9 @@ class myinkc(hopper):
 
         
         # location dependent on datalen
-        if len(statistics) == 2 : # as len(data) can have a empty dimension at beginning or sth
+        if stats.len == 2 : # as len(data) can have a empty dimension at beginning or sth
             #if len(data) !=2:
-            #    self.log.warning(f"boxplot - evaded for badge creation: {len(data)=} but {len(statistics)=}")
+            #    self.log.warning(f"boxplot - evaded for badge creation: {len(data)=} but {stats.len=}")
             
             # legend + badge
             loc = "center"

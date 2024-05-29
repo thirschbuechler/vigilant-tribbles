@@ -348,6 +348,17 @@ def divide(*args, **kwargs):
         - return_nan (bool)- option if no valid data is present"""
     return babysit(np.divide,*args, **kwargs)
 
+
+def LSQ_line(x, y):
+    """ THE OLD FASHIONED MOORE PENROSE WAY"""
+    # make pinv basis
+    A = np.vstack([x, np.ones(len(x))]).T
+    # make pinv and unpack
+    k, d = np.linalg.lstsq(A, y, rcond=None)[0]
+    
+    return k,d
+
+
 def sign_sym(var):
     """ return plus/minus sign of number
 
