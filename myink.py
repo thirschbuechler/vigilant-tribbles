@@ -1904,7 +1904,10 @@ class myinkc(hopper):
                     sep = r"$\thinspace$"
                 else:
                     sep="\N{THIN SPACE}"
-                self.plot(x,line, c=mc, lw=1, label=f"Δ{sep}/{sep}item: {self.enginerd(-k,places=1)}")
+
+                slopetext = f"Δ{sep}/{sep}item: { '+' if k >= 0 else '' }{self.enginerd(k,places=1)}"
+
+                self.plot(x,line, c=mc, lw=1, label=slopetext)
             else:
                 raise Exception(f"meanline failed: {x=}, {y=}, {line=}")
 
