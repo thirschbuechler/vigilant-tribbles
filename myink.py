@@ -1917,6 +1917,7 @@ class myinkc(hopper):
         bp = ax.boxplot(data, flierprops=flierprops, **kwargs)
         
         # annotate with mean, median
+        annot = str(annot)
         if annot:
             # markers
             annotstr=["mean+std", "mean", "mean-std"]
