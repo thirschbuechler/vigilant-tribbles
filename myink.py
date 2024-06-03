@@ -1930,7 +1930,10 @@ class myinkc(hopper):
                 # https://stackoverflow.com/questions/58066009/how-to-display-numeric-mean-and-std-values-next-to-a-box-plot-in-a-series-of-box
                 for i, line in enumerate(bp['medians']):
                     x, y = line.get_xydata()[1]
-                    text = ' μ={:.2f}\n σ={:.2f}'.format(means[i], stds[i])
+                    if "nerd" in annot:
+                        text = f"µ={self.enginerd(means[i],places=2)}\nσ={self.enginerd(stds[i],places=2)}"
+                    else:
+                        text = ' μ={:.2f}\n σ={:.2f}'.format(means[i], stds[i])
                     ax.annotate(text, xy=(x, y))
         """
         if availability:
