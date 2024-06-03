@@ -123,6 +123,7 @@ class boxstats(hopper):
         self.means = []
         self.maxes = []
         self.stds = []
+        self.lens = []
 
         self.len = 0
         self.meanline = None        
@@ -139,6 +140,7 @@ class boxstats(hopper):
             self.maxes.append(ml.nanmax(item, return_nan=True))
             self.means.append(ml.nanmean(item, return_nan=True))
             self.stds.append(ml.nanstd(item, return_nan=True))
+            self.lens.append(np.size(item))
             
         self.mins = np.array(self.mins).astype("float")
         self.maxes = np.array(self.maxes).astype("float")
@@ -1935,6 +1937,10 @@ class myinkc(hopper):
                         text = f"µ={self.enginerd(means[i],places=2)}\nσ={self.enginerd(stds[i],places=2)}"
                     else:
                         text = ' μ={:.2f}\n σ={:.2f}'.format(means[i], stds[i])
+                    
+                    if "samples" in annot:
+                        text += f"\n(n={self.enginerd(stats.lens[i], places=0)})"
+
                     ax.annotate(text, xy=(x, y))
         """
         if availability:
