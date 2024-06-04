@@ -1901,14 +1901,16 @@ class myinkc(hopper):
         stats = boxstats(data)
         
         # load
-        #mins = stats.means
-        #maxes = stats.maxe
+        # mins = stats.means
+        # maxes = stats.maxe
         means = stats.means
         stds = stats.stds
+        # stats.len # more reliable than len(data) for ragged etd
+        # stats.lens # list of samples per column
 
         # consider boxplots are plotted at x-offset of +1 for some reason, maybe to avoid ugly plot at 0
         xoff = 1
-        x=np.arange(len(data)) + xoff
+        x=np.arange(stats.len) + xoff
 
         data = data.T
         # # plotting # #        
@@ -1929,7 +1931,7 @@ class myinkc(hopper):
             self.scatter(x, means-stds, marker="v", label=annotstr[2], **annotargs) # triag down
 
             # numbers
-            if len(data) < 5:
+            if stats.len < 5:
                 # https://stackoverflow.com/questions/58066009/how-to-display-numeric-mean-and-std-values-next-to-a-box-plot-in-a-series-of-box
                 for i, line in enumerate(bp['medians']):
                     x, y = line.get_xydata()[1]
