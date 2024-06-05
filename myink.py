@@ -2116,7 +2116,7 @@ class myinkc(hopper):
 
             etxt = f"ff persistence - fixedscale badge got {fixedscale_upstream=} but {fixedscale_override=}"
             
-            if fixedscale_upstream != fixedscale_override:
+            if fixedscale_upstream and (fixedscale_upstream != fixedscale_override):
                 self.log.error(etxt)
             else:
                 self.log.info(etxt)
