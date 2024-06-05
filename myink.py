@@ -1943,7 +1943,8 @@ class myinkc(hopper):
                     if "samples" in annot:
                         text += f"\n(n={self.enginerd(stats.lens[i], places=0)})"
 
-                    ax.annotate(text, xy=(x, y))
+                    # add text, tiny clearance for x-coord to right
+                    ax.annotate(text, xy=(x*1.05, y)) # (ha="left" default anyway, drawn right) right of vertical bar
         """
         if availability:
             if not xlabels:
@@ -1972,17 +1973,20 @@ class myinkc(hopper):
             else:
                 raise Exception(f"meanline failed: {x=}, {y=}, {line=}")
 
-
-
         # # xy_labelling
         ax.set_ylabel(ylabel)
         if np.any(np.array(xlabels, dtype=object)): # a.any() warning fix, for evaluating bool(list([1,2,3])) or bool(list([0,0,0])), bool(list([[],[],[]])) etc.
             xlabels = list(xlabels)
             xlabels.insert(0,0)#insert dummy at begin        
         ax.set_xticks(np.arange(len(xlabels)))
-        ax.set_xticklabels(xlabels, ha="right")#horizontal alignment
-        if len(data) > 2:
+        
+        if stats.len > 2:
+            ax.set_xticklabels(xlabels, ha="right")
             self.rotate_xticks(45, autoscale=0)
+        else:
+            # align the ticks centered below the data series
+            ax.set_xticklabels(xlabels, ha="center")
+
         ax.locator_params(axis='x', nbins=10)#, tight=True)
         ax.minorticks_on()
         
@@ -2016,9 +2020,19 @@ class myinkc(hopper):
                     l.pop(ii)
                     h.pop(ii)
 
+
+        # predefine legend kwargs
+        legkwargs = dict(loc="upper left", facecolor='white', framealpha=0.5)
         
         # location dependent on datalen
-        if stats.len == 2 : # as len(data) can have a empty dimension at beginning or sth
+
+        if stats.len == 1:
+            legkwargs.update(loc="upper left")
+
+            if badgedata:
+                badgedata["anchor"] = "topright"
+
+        elif stats.len == 2 : # as len(data) can have a empty dimension at beginning or sth
             #if len(data) !=2:
             #    self.log.warning(f"boxplot - evaded for badge creation: {len(data)=} but {stats.len=}")
             
@@ -2026,16 +2040,19 @@ class myinkc(hopper):
             loc = "center"
             
             # legend
-            legkwargs = dict(bbox_to_anchor=(0.5, 0.25), loc=loc, facecolor='white', framealpha=0.5)
+            legkwargs.update(dict(bbox_to_anchor=(0.5, 0.25), loc=loc))
 
             # badge
             if badgedata:
                 badgedata["anchor"] = loc+"top"
-        else:
-            legkwargs = dict(loc="lower center", facecolor='white', framealpha=0.5)
+        
+        elif stats.len > 2:
+            legkwargs.update(dict(loc="lower center"))
 
             if badgedata:
                 badgedata["anchor"] = "botright"
+        else:
+            raise Exception(f"boxplot - {stats.len=} not implemented") # zero?
 
         # put
         self.legend(handles=h,labels=l, **legkwargs)   
