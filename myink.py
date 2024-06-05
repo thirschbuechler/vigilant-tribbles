@@ -1933,15 +1933,20 @@ class myinkc(hopper):
             # numbers
             if stats.len < 5:
                 # https://stackoverflow.com/questions/58066009/how-to-display-numeric-mean-and-std-values-next-to-a-box-plot-in-a-series-of-box
-                for i, line in enumerate(bp['medians']):
+                for i, (line, mean, cstd, clen) in enumerate(zip(bp['medians'], means, stds, stats.lens)):
+                    # some loop var suffixed c for current to not overwrite builtin len, std
+                    # get coordinates
                     x, y = line.get_xydata()[1]
+
                     if "nerd" in annot:
-                        text = f"µ={self.enginerd(means[i],places=2)}\nσ={self.enginerd(stds[i],places=2)}"
+                        text = f"µ={self.enginerd(mean,places=2)}"
+                        text += f"\nσ={self.enginerd(cstd,places=2)}"
                     else:
-                        text = ' μ={:.2f}\n σ={:.2f}'.format(means[i], stds[i])
+                        text = f"μ={mean:.2f}"
+                        text += f"\n σ={cstd:.2f}"
                     
                     if "samples" in annot:
-                        text += f"\n(n={self.enginerd(stats.lens[i], places=0)})"
+                        text += f"\n(n={self.enginerd(clen, places=0)})"
 
                     # add text, tiny clearance for x-coord to right
                     annotation = ax.annotate(text, xy=(x*1.05, y)) # (ha="left" default anyway, drawn right) right of vertical bar
@@ -1980,7 +1985,7 @@ class myinkc(hopper):
                     
                     if xm:
                         # pick any mean to be in good ylims range
-                        ym = min(self.roadkill([means], hard=True))
+                        ym = mean
 
                         self.log.error(f"{xm=} {ym=}")
 
@@ -2096,7 +2101,7 @@ class myinkc(hopper):
             if badgedata:
                 badgedata["anchor"] = "botright"
         else:
-            raise Exception(f"boxplot - {stats.len=} not implemented") # zero?
+            raise Exception(f"boxplot - {stats.len=} not useful, {type(data)=}\n{data=}")
 
         # put
         self.legend(handles=h,labels=l, **legkwargs)   
