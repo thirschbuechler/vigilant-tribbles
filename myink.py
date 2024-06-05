@@ -2042,13 +2042,18 @@ class myinkc(hopper):
 
         self.title(title)
         self.autoscale_fig()
-
+        
         if badgedata:
-            fsc_parm = badgedata.pop("fixedscale", None)
-            badgedata["fixedscale"] = 0.9
+            fixedscale_upstream = badgedata.pop("fixedscale", None)
+            fixedscale_override = 0.9
+            badgedata["fixedscale"] = fixedscale_override 
 
-            if fsc_parm:
-                self.log.error(f"boxplot - fixedscale badge got {fsc_parm=} but is overwritten by default {badgedata['fixedscale']=}")
+            etxt = f"ff persistence - fixedscale badge got {fixedscale_upstream=} but {fixedscale_override=}"
+            
+            if fixedscale_upstream != fixedscale_override:
+                self.log.error(etxt)
+            else:
+                self.log.info(etxt)
     
             self.add_shieldbadge(**badgedata)
 
