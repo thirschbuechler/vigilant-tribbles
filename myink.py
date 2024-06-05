@@ -1944,7 +1944,51 @@ class myinkc(hopper):
                         text += f"\n(n={self.enginerd(stats.lens[i], places=0)})"
 
                     # add text, tiny clearance for x-coord to right
-                    ax.annotate(text, xy=(x*1.05, y)) # (ha="left" default anyway, drawn right) right of vertical bar
+                    annotation = ax.annotate(text, xy=(x*1.05, y)) # (ha="left" default anyway, drawn right) right of vertical bar
+
+                    # # move right border if needed
+                    # draw the figure to update the renderer
+                    plt.draw()
+                    fig = plt.gcf()
+
+                    # get the bounding box of the text in data coordinates
+                    bbox_text = annotation.get_window_extent()
+
+                    # transform the bounding box to figure coordinates
+                    bbox_text_fig = bbox_text.transformed(fig.transFigure.inverted())
+                    
+                    
+                    # # check if the text extends very close or beyond the figure boundaries
+                    # list-cast-hard: x,y as they might be scalars sometimes
+                    xm = ""
+                    if bbox_text_fig.x1 > 0.9:
+
+                        # made it wider and ugly but didnt provide space
+                        #plt.subplots_adjust(right=adjust_right)
+                        
+                        # pick rightmost_val+1
+                        xm = max([x])+1
+
+                    # also check other side
+                    if bbox_text_fig.x0 < 0:
+
+                        # made it wider and ugly but didnt provide space
+                        #plt.subplots_adjust(left=adjust_left)
+
+                        # pick leftmost_val-1
+                        xm = min([x])-1
+                    
+                    if xm:
+                        # pick any mean to be in good ylims range
+                        ym = min(self.roadkill([means], hard=True))
+
+                        self.log.error(f"{xm=} {ym=}")
+
+                        # invisible dummy to get the text into the legend
+                        self.scatter(xm,ym, alpha=0, label="") 
+
+                    #self.log.error(f"boxplot - {bbox_text_fig.x0=} {bbox_text_fig.x1=}")
+
         """
         if availability:
             if not xlabels:
