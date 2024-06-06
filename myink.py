@@ -27,7 +27,6 @@ import matplotlib as mpl
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 from matplotlib.transforms import Affine2D # scaling down a path-patch
-from matplotlib.ticker import EngFormatter, LogFormatterSciNotation, ScalarFormatter #enginerd stuff
 from matplotlib.ticker import (MultipleLocator, FormatStrFormatter) # nicergrid
 from matplotlib.ticker import PercentFormatter # histo percent
 from matplotlib.transforms import Bbox
@@ -586,75 +585,13 @@ class myinkc(hopper):
         else:
             return ""
         
-        
-    def enginerd_xaxis(self, ax=None, unit='Hz', **kwargs):
-        ax = self.get_ax(ax)
-        self.enginerd_axis(ax.xaxis, unit=unit, **kwargs)
-        
 
-    def enginerd_yaxis(self, ax=None, unit='Hz', **kwargs):
-        ax = self.get_ax(ax)
-        self.enginerd_axis(ax.yaxis, unit=unit, **kwargs)        
-        
-
-    def enginerd(self, value, unit='', places=2, smallonly=False, sep="\N{THIN SPACE}", text=True, **kwargs): #u2009 thinspace not nice in tex, also "G" in graph and Hz in label == unprofessional -_-
-        """ return engineer-nerd formatted string for a given float
-            
-            optional:
-            - places : how many decimals (default = 2)
-            - unit (str t append)
-            - sep: separator (str, default Unicode-thin-space, non-ascii!)
-            - smallonly: only format if format-string with selected places does not appear as zero (default = False) - "read coffee percipitate if that's the only thing"
-            - text: return as text (default = True) or as formatter (False)
-            - kwargs: additional kwargs for formatter
-
-            note: self.tex overrides sep, if active
-
-            # https://matplotlib.org/3.1.0/gallery/text_labels_and_annotations/engineering_formatter.html
-            
-            name is pun on engineer-nerd
+    def enginerd(self, *args, **kwargs):
+        """ route to mystring.enginerd, include self.tex
         """
-        go = True
-        
-        # separator overrides
-        if not unit:
-            sep = "" # no separator if no unit
-        elif self.tex:
-            sep = r"$\thinspace$"
-
-        # smallonly might remove go-signal
-        if smallonly:
-            verybasicstr = f"{value:.{places}f}" # :.2f but variable
-            
-            # check if it needs re-formatting
-            if float(verybasicstr) == 0.0:
-            
-                # actual zero
-                if value == 0.0:
-                    go = False
-                    return("0")
-            
-                # only displayed as 0, needs reformatting
-                else:
-                    go = True
-            else:
-                # not zero, no reformatting needed
-                go = False
-        
-        # regular operation block
-        if go:
-
-            if text==True:
-                return(EngFormatter(places=places, sep=sep, **kwargs).format_eng(value)+unit)
-            else:
-                if not self.tex:
-                    return(EngFormatter(places=places, sep=sep, **kwargs))
-                else:
-                    return(ScalarFormatter(**kwargs)) # eg puts 10E9 on right
-        else:
-            return verybasicstr
-                    
-        
+        kwargs["tex"] = self.tex
+        return ms.enginerd(*args, **kwargs)
+                
     def enginerd_axis(self, axissub="", **kwargs):
         """ set enginerd formatter for a axis"""
 
@@ -664,7 +601,15 @@ class myinkc(hopper):
             raise exception("Specify axis for enginerd format!")
         
         axissub.set_major_formatter(self.enginerd(text=False, value=None, **kwargs))
-    
+
+    def enginerd_xaxis(self, ax=None, unit='Hz', **kwargs):
+        ax = self.get_ax(ax)
+        self.enginerd_axis(ax.xaxis, unit=unit, **kwargs)
+
+    def enginerd_yaxis(self, ax=None, unit='Hz', **kwargs):
+        ax = self.get_ax(ax)
+        self.enginerd_axis(ax.yaxis, unit=unit, **kwargs)        
+
     
     def killlegend(self,ax=None):
         ax = self.get_ax(ax)

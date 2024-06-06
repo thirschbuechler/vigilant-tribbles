@@ -11,8 +11,7 @@ Created on June 21, 2021
 @author: thirschbuechler
 """
 import re #sorting
-from matplotlib.ticker import EngFormatter # enginerd
-#import numpy as np # ndarray for list vecorization in split string index bla
+from matplotlib.ticker import EngFormatter, LogFormatterSciNotation, ScalarFormatter #enginerd stuff
 
 
 def dummy(*args, **kwargs):
@@ -329,18 +328,61 @@ def myunit(value, unit='', sep="\N{THIN SPACE}"):
     return(f"{value}{sep}{unit}")
 
 
-def enginerd(value, unit='', places=2, sep="\N{THIN SPACE}", **kwargs): #u2009 thinspace not nice in tex, also "G" in graph and Hz in label == unprofessional -_-
-    """ return engineer-nerd formatted string for a given float
-        optional:
-        - places : how many decimals (default = 2)
-        - unit (str t append)
-        - sep: separator (str, default Unicode-thin-space, non-ascii!)
+def enginerd(value, unit='', places=2, smallonly=False, sep="\N{THIN SPACE}", text=True, tex=False, **kwargs): #u2009 thinspace not nice in tex, also "G" in graph and Hz in label == unprofessional -_-
+        """ return engineer-nerd formatted string for a given float
+            
+            optional:
+            - places : how many decimals (default = 2)
+            - unit (str t append)
+            - sep: separator (str, default Unicode-thin-space, non-ascii!)
+            - smallonly: only format if format-string with selected places does not appear as zero (default = False) - "read coffee percipitate if that's the only thing"
+            - text: return as text (default = True) or as formatter (False)
+            - tex overrides sep to be compatible
+            - kwargs: additional kwargs for formatter
 
-        # https://matplotlib.org/3.1.0/gallery/text_labels_and_annotations/engineering_formatter.html
+            # https://matplotlib.org/3.1.0/gallery/text_labels_and_annotations/engineering_formatter.html
+            
+            name is pun on engineer-nerd
+        """
+        go = True
         
-        name is pun on engineer-nerd
-    """
-    return(EngFormatter(places=places, sep=sep, **kwargs).format_eng(value)+unit)
+        # separator overrides
+        if not unit:
+            sep = "" # no separator if no unit
+        elif tex:
+            sep = r"$\thinspace$"
+
+        # smallonly might remove go-signal
+        if smallonly:
+            verybasicstr = f"{value:.{places}f}" # :.2f but variable
+            
+            # check if it needs re-formatting
+            if float(verybasicstr) == 0.0:
+            
+                # actual zero
+                if value == 0.0:
+                    go = False
+                    return("0")
+            
+                # only displayed as 0, needs reformatting
+                else:
+                    go = True
+            else:
+                # not zero, no reformatting needed
+                go = False
+        
+        # regular operation block
+        if go:
+
+            if text==True:
+                return(EngFormatter(places=places, sep=sep, **kwargs).format_eng(value)+unit)
+            else:
+                if not tex:
+                    return(EngFormatter(places=places, sep=sep, **kwargs))
+                else:
+                    return(ScalarFormatter(**kwargs)) # eg puts 10E9 on right
+        else:
+            return verybasicstr
 
 
 ###################### testing #############################
