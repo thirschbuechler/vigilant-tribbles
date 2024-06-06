@@ -1892,12 +1892,17 @@ class myinkc(hopper):
         xoff = 1
         x=np.arange(stats.len) + xoff
 
+        # input conditioning
         data = data.T
+
+        # plotprep
+        flierprops = dict(marker=',', markerfacecolor='black', markersize=12, linestyle='none')
+        ax = self.get_ax()
+
         # # plotting # #        
         # flierprops == outlier-marker type
         #   - ","==pixel-marker
-        flierprops = dict(marker=',', markerfacecolor='black', markersize=12, linestyle='none')
-        ax = self.get_ax()
+
         bp = ax.boxplot(data, flierprops=flierprops, **kwargs)
         
         # annotate with mean, median
