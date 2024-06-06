@@ -597,27 +597,62 @@ class myinkc(hopper):
         self.enginerd_axis(ax.yaxis, unit=unit, **kwargs)        
         
 
-    def enginerd(self, value, unit='', places=2, sep="\N{THIN SPACE}", text=True, **kwargs): #u2009 thinspace not nice in tex, also "G" in graph and Hz in label == unprofessional -_-
+    def enginerd(self, value, unit='', places=2, smallonly=False, sep="\N{THIN SPACE}", text=True, **kwargs): #u2009 thinspace not nice in tex, also "G" in graph and Hz in label == unprofessional -_-
         """ return engineer-nerd formatted string for a given float
+            
             optional:
             - places : how many decimals (default = 2)
             - unit (str t append)
             - sep: separator (str, default Unicode-thin-space, non-ascii!)
+            - smallonly: only format if format-string with selected places does not appear as zero (default = False) - "read coffee percipitate if that's the only thing"
+            - text: return as text (default = True) or as formatter (False)
+            - kwargs: additional kwargs for formatter
+
+            note: self.tex overrides sep, if active
 
             # https://matplotlib.org/3.1.0/gallery/text_labels_and_annotations/engineering_formatter.html
             
             name is pun on engineer-nerd
         """
-        if self.tex:
+        go = True
+        
+        # separator overrides
+        if not unit:
+            sep = "" # no separator if no unit
+        elif self.tex:
             sep = r"$\thinspace$"
-        if text==True:
-            return(EngFormatter(places=places, sep=sep, **kwargs).format_eng(value)+unit)
+
+        # smallonly might remove go-signal
+        if smallonly:
+            verybasicstr = f"{value:.{places}f}" # :.2f but variable
+            
+            # check if it needs re-formatting
+            if float(verybasicstr) == 0.0:
+            
+                # actual zero
+                if value == 0.0:
+                    go = False
+                    return("0")
+            
+                # only displayed as 0, needs reformatting
+                else:
+                    go = True
+            else:
+                # not zero, no reformatting needed
+                go = False
+        
+        # regular operation block
+        if go:
+
+            if text==True:
+                return(EngFormatter(places=places, sep=sep, **kwargs).format_eng(value)+unit)
+            else:
+                if not self.tex:
+                    return(EngFormatter(places=places, sep=sep, **kwargs))
+                else:
+                    return(ScalarFormatter(**kwargs)) # eg puts 10E9 on right
         else:
-            if not self.tex:
-                return(EngFormatter(places=places, sep=sep, **kwargs))
-            else:#places=places, sep=sep, 
-                #return(LogFormatterSciNotation(**kwargs))
-                return(ScalarFormatter(**kwargs)) # eg puts 10E9 on right
+            return verybasicstr
                     
         
     def enginerd_axis(self, axissub="", **kwargs):
@@ -1939,8 +1974,14 @@ class myinkc(hopper):
                     x, y = line.get_xydata()[1]
 
                     if "nerd" in annot:
-                        text = f"µ={self.enginerd(mean,places=2)}"
-                        text += f"\nσ={self.enginerd(cstd,places=2)}"
+                        if "smallonly" in annot:
+                            smallonly=True
+                        else:
+                            smallonly=False
+
+                        text = f"µ={self.enginerd(mean,places=2,smallonly=smallonly)}"
+                        text += f"\nσ={self.enginerd(cstd,places=2,smallonly=smallonly)}"
+
                     else:
                         text = f"μ={mean:.2f}"
                         text += f"\n σ={cstd:.2f}"
