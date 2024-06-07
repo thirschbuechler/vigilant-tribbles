@@ -1942,7 +1942,7 @@ class myinkc(hopper):
                     # add text, tiny clearance for x-coord to right
                     annotation = ax.annotate(text, xy=(x*1.05, y)) # (ha="left" default anyway, drawn right) right of vertical bar
 
-                    # # move right border if needed
+                    # # "boxplot auto-border mod" - move right border if needed
                     # draw the figure to update the renderer
                     plt.draw()
                     fig = plt.gcf()
@@ -1978,7 +1978,7 @@ class myinkc(hopper):
                         # pick any mean to be in good ylims range
                         ym = mean
 
-                        self.log.error(f"{xm=} {ym=}")
+                        self.log.info(f"boxplot auto-border mod: {xm=} {ym=}")
 
                         # invisible dummy to get the text into the legend
                         self.scatter(xm,ym, alpha=0, label="") 
