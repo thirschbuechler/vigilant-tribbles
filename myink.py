@@ -330,37 +330,40 @@ class myinkc(hopper):
             - ax_backtrack
             - ax_move(int) #relative
             """
+        # "nofig" enables to override's a function's desire to create its own figure,
+        #        eg. for using it in collated subplot, a existing one, or a spind
+        makefig = not (kwargs.get("nofig", False))
+        if makefig:
+            if self.rc_autoreset:
+                # set medfig, bigfig or any other figsize right after subplots() init per graphset,
+                # and use this to make next ones default to default automatically
+                self.canvas_params_reset()
 
-        if self.rc_autoreset:
-            # set medfig, bigfig or any other figsize right after subplots() init per graphset,
-            # and use this to make next ones default to default automatically
-            self.canvas_params_reset()
+            # # cleanup last graph  # #
+            # save tikz if enabled #
+            if self.outputformat=="tikz": # if enabled - save here and with self.show()
+                if self.subplot_counter>0: # not first one and var created by enabling
+                    self.tikz_save_lastgraph()
+            # cleanup tikz vars #
+            self.current_suptitle = ""
+            self.current_title = ""
 
-        # # cleanup last graph  # #
-        # save tikz if enabled #
-        if self.outputformat=="tikz": # if enabled - save here and with self.show()
-            if self.subplot_counter>0: # not first one and var created by enabling
-                self.tikz_save_lastgraph()
-        # cleanup tikz vars #
-        self.current_suptitle = ""
-        self.current_title = ""
-
-        # # new graph # #
-        self.fig, self.axs = plt.subplots(*args, **kwargs)
-        
-        # save properties #
-        self.ax_i = 0
-        self.subplot_counter+=1
-
-        if not (hasattr(self.axs, "__iter__")):#case axs was ax only #np.size didn't work for 2d axs
-            self.ax=self.axs#put singular here    
-            self.axs=np.array([self.axs])# axs list here - enable parsing always
-        
-        else: # case axs is list already
-            self.axs=self.roadkill(self.axs) #remove any dimensions    
-            self.ax=self.axs[0]
+            # # new graph # #
+            self.fig, self.axs = plt.subplots(*args, **kwargs)
             
-        return self.fig, self.axs
+            # save properties #
+            self.ax_i = 0
+            self.subplot_counter+=1
+
+            if not (hasattr(self.axs, "__iter__")):#case axs was ax only #np.size didn't work for 2d axs
+                self.ax=self.axs#put singular here    
+                self.axs=np.array([self.axs])# axs list here - enable parsing always
+            
+            else: # case axs is list already
+                self.axs=self.roadkill(self.axs) #remove any dimensions    
+                self.ax=self.axs[0]
+                
+            return self.fig, self.axs
     
     
     def close(self, st="all"):
