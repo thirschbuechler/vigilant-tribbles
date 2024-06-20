@@ -3725,19 +3725,25 @@ def barstacked_test():
     pe.show()
 
 
-def shield_test(lens=[1,2,2,5]):
+def shield_test(lens=[1,2,2,5], rowsubplot=False):
     pe = myinkc()   
     
     for k in [0,1]:
         if k==1:
             pe.mycanvassize(medfig=True) # reset afterwards via one-time-use myinkc element
 
-    
+        if rowsubplot:
+            pe.subplots(nrows=len(lens))
+            pe.ax_i = -1 # for loop
         for i in lens:
-            pe.subplots()
+            if not rowsubplot:
+                pe.subplots()
+            else:
+                pe.ax_onward()
             text = [f"N0{i}" for i in range(0,i)]
             text = "\n".join(text)
             pe.add_shieldbadge(text, anchor="lefttop")
+            
                 
     pe.show()
 
@@ -3773,11 +3779,12 @@ if testing:#call if selected, after defined, explanation see above
     #statistics_visu()
     
     #calibrate_corr_mx_label() # old; new: cal_plot_corr_mx.py
-    corr_mx_tester()
+    #corr_mx_tester()
 
     #boxplottest()
 
     #shield_test()
+    shield_test(rowsubplot=1)
     #shield_test(shapes=["hex"], lens=[3], dbg=True)
     pass
 
