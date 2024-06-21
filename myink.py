@@ -1080,15 +1080,33 @@ class myinkc(hopper):
 
     def sudo_xlabels(self, labels=[], x=""):
         ax = self.get_ax()
-        if not x:
-            x = np.arange(0,len(labels))
+        if not ml.my_any(x):
+            # fetch ticks
+            xticks = ax.get_xticks()
+
+            if ml.my_any(xticks):
+                # use min/max from axis to ensure the ticks align with the data
+                x = np.linspace(np.min(xticks), np.max(xticks), len(labels))
+            else:
+                # dummy to count from 0
+                x = np.arange(0,len(labels))
+        
         ax.set_xticks(x)
         ax.set_xticklabels(labels)
 
     def sudo_ylabels(self, labels=[], y=""):
         ax = self.get_ax()
-        if not y:
-            y = np.arange(0,len(labels))
+        if not ml.my_any(y):
+            # fetch ticks 
+            yticks = ax.get_yticks()
+            
+            if ml.my_any(yticks):
+                # use min/max from axis to ensure the ticks align with the data
+                y = np.linspace(np.min(yticks), np.max(yticks), len(labels))
+            else:
+                # dummy to count from 0
+                y = np.arange(0,len(labels))
+        
         ax.set_yticks(y)
         ax.set_yticklabels(labels)
         
