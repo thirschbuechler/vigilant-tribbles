@@ -109,6 +109,11 @@ def list_to_str(mylist):
     return st
 
 
+def list_to_strlist(mylist):
+    """ for doctest, as it doesn't like \n character in input"""
+    return "\n".join(mylist)
+
+
 def dictlist_intersection(mydictlist):
     """
     find common key-value pairs in a list of dictionaries
