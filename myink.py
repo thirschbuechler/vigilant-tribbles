@@ -1213,8 +1213,7 @@ class myinkc(hopper):
         
             !first add colorbar, then shieldbadge, if needed!
             - input:
-                * stringlines, or list of stringlines to verify to be the same,
-                * char-width only for 3characters
+                * list
             - dbg: debug info?
             - scaling parameters
                 * dynamic - target at fontsize..
@@ -1236,40 +1235,13 @@ class myinkc(hopper):
         
         """
         
-        # # input conditioning
-        # typically it's a string separated by \n, as a list class attr has issues upstream somewhere
-        if type(input) == str:
-            text = input
-        elif type(input) == list:
-            # find out if homogenous            
-            if len(set(input))==1:
-                # all the same - use the first one
-                text = input[0]
-            else:
-                # dissect list if necessary
-                # old: self.log.error(f"shieldbadge - {input=} not homogenous: {len(set(input))=}")
-                
-                # split the input via "\n" into lists
-                inputlist = [part.split("\n") for part in input]
+        if hasattr(self,"gcode_masseur"):
+            input = self.gcode_masseur(input)
 
-                # find the overlap between the lists
-                settings = set(self.roadkill(inputlist, hard=True))
+        # cycle over input and remove excluders
+        [input.remove(ele) for ele in exclude if ele in input]
 
-                text = "\n".join(settings)
-        else:
-            raise Exception(f"shieldbadge - {input=} not parsable")
-
-
-        # # handle exclude-list    
-        mylist = text.split("\n")
-
-        tmp = []
-        for item in mylist:
-            # is one of the small gcodes in any exclude-list element?
-            if not any(item in ex for ex in exclude):
-                tmp.append(item)
-            
-        mylist = tmp
+        mylist = input # TODO rename input to mylist
 
         # # sort
         def sorting_key(s):
