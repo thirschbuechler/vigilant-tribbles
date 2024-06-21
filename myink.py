@@ -1205,15 +1205,14 @@ class myinkc(hopper):
         return plt.text(*args, **kwargs)
 
 
-    def add_shieldbadge(self, input, front=True, dbg=False, extend_outside=False,
+    def add_shieldbadge(self, mylist, front=True, dbg=False, extend_outside=False,
                         dscale=None, wscale=1, fixedscale=None, targetat4pt = 3/4, targetat10pt=1, linescale=None, # scaling factors
                         anchor="topright",# placement
                         exclude=[]):
         """ add a shield-badge-like shaped textbox in upper right corner, call after plot AND xlabels etc. done
         
             !first add colorbar, then shieldbadge, if needed!
-            - input:
-                * list
+            - mylist: list of strings
             - dbg: debug info?
             - scaling parameters
                 * dynamic - target at fontsize..
@@ -1236,12 +1235,10 @@ class myinkc(hopper):
         """
         
         if hasattr(self,"gcode_masseur"):
-            input = self.gcode_masseur(input)
+            mylist = self.gcode_masseur(mylist)
 
         # cycle over input and remove excluders
-        [input.remove(ele) for ele in exclude if ele in input]
-
-        mylist = input # TODO rename input to mylist
+        [mylist.remove(ele) for ele in exclude if ele in mylist]
 
         # # sort
         def sorting_key(s):
