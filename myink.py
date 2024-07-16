@@ -105,6 +105,7 @@ class gradientmaster(object):
             return None
 
 
+# NOTE - cannot be in mailuefterl, as that is imported into fruit (for bins_to_xaxes), but boxstats wants to import hopper (which is a portal and a fruit by lineage)
 class boxstats(hopper):
     """ boxplot statistics helper class
         - inherit hopper (for Fruit lineage)
