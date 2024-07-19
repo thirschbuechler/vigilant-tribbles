@@ -10,8 +10,12 @@ note: listt is used to not overwrite builtin list fct
 Created on June 21, 2021
 @author: thirschbuechler
 """
-import re #sorting
-from matplotlib.ticker import EngFormatter, LogFormatterSciNotation, ScalarFormatter #enginerd stuff
+# sorting
+import re
+
+# enginerd stuff
+from matplotlib.ticker import EngFormatter, LogFormatterSciNotation, ScalarFormatter 
+import numpy as np
 
 
 def dummy(*args, **kwargs):
@@ -348,6 +352,27 @@ def enginerd(value, unit='', places=2, smallonly=False, sep="\N{THIN SPACE}", te
             # https://matplotlib.org/3.1.0/gallery/text_labels_and_annotations/engineering_formatter.html
             
             name is pun on engineer-nerd
+
+            ## doctest examples
+            # cannot test unit-param well, because \t in \thinspace get's interpreted by doctest as \t only -_-
+
+            >>> enginerd(1000, sep=" ")
+            '1.00k'
+
+            >>> enginerd(0.1, sep=" ", smallonly=False)
+            '100.00m'
+
+            # showoff smallonly
+            >>> enginerd(1000, sep=" ", smallonly=True)
+            '1000.00'
+
+            >>> enginerd(0.1, sep=" ", smallonly=True)
+            '0.10'
+
+            # nan-handler
+            >>> enginerd(np.nan, "Hz", places=0, smallonly=True)
+            'nan'
+
         """
         go = True
         
@@ -357,7 +382,15 @@ def enginerd(value, unit='', places=2, smallonly=False, sep="\N{THIN SPACE}", te
         elif tex:
             sep = r"$\thinspace$"
 
-        # smallonly might remove go-signal
+        try:
+            if np.isnan(value):
+                return "nan"
+            else:
+                pass
+        except:
+            pass
+
+        # "smallonly" might remove go-signal
         if smallonly:
             verybasicstr = f"{value:.{places}f}" # :.2f but variable
             
