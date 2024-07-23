@@ -263,16 +263,28 @@ def get_shape(a):
     return (len(shapes),) + shapes[0]
 
 # thanks copilot
+def is_iterable(item):
+    try:
+        iter(item)
+        return not isinstance(item, str)  # Exclude strings
+    except TypeError:
+        return False
+
+# thanks copilot
 def is_ragged(a):
     if isinstance(a, np.ndarray) and a.dtype != object:
         # If a is a non-object numpy array, it's not ragged
         return False
     if isinstance(a, list):
         # If a is a list, check if all elements have the same length
-        return len(set(map(len, a))) > 1
+        # Use is_iterable to avoid TypeError on non-iterable elements
+        lengths = [len(item) if is_iterable(item) else 0 for item in a]
+        return len(set(lengths)) > 1
     if isinstance(a, np.ndarray):
         # If a is an object numpy array, check if all elements have the same shape
-        return len(set(map(np.shape, a))) > 1
+        # Use is_iterable to avoid TypeError on non-iterable elements
+        shapes = [np.shape(item) if is_iterable(item) else (0,) for item in a]
+        return len(set(shapes)) > 1
     # If a is not a list or array, it's not ragged
     return False
 
