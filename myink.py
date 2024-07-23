@@ -162,7 +162,7 @@ class boxstats(hopper):
         meanline = k*x+d
 
         # use fruit legacy
-        self.sprout("meanline", data=meanline, data_x=x)
+        self.sprout("meanline", data=meanline, x_axis=x)
         
         # nonstandard subfruit attr
         self.meanline.k = k
@@ -1988,7 +1988,7 @@ class myinkc(hopper):
         if meanline:
             # fetch
             line = stats.meanline.data
-            x = stats.meanline.data_x + xoff
+            x = stats.meanline.x_axis + xoff
             k = stats.meanline.k
 
             # plot with legend-entry (label) if non-nan

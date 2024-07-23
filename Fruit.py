@@ -46,7 +46,10 @@ sys.path.pop(len(sys.path)-1)
 class Fruit(object):
     #__metaclass__ = GetAttr
     def __init__(self, ID=None, root=None, 
-                    data=[], data_x=None, bins=[], metadata={}, basiclogger = False,
+                    data=[],
+                    x_axis=None, bins=[],
+                    y_axis=None,
+                    metadata={}, basiclogger = False,
                     **kwargs):
         
         # parentclass object doesn't take anything, catch stray kwargs
@@ -97,12 +100,15 @@ class Fruit(object):
         self.data = data
         self.bins = bins
         # direct or indirect assignment
-        if type(data_x)!=type(None):
-            self.data_x = data_x
+        if type(x_axis)!=type(None):
+            self.x_axis = x_axis
         elif np.any(bins):
-            self.data_x = bin_to_xaxis(bins)
+            self.x_axis = bin_to_xaxis(bins)
         else:
-            self.data_x = [] # eg only contains data=mx
+            self.x_axis = [] # eg only contains data=mx
+
+        if type(y_axis)!=type(None):
+            self.y_axis = y_axis
         # endif, end __init__
         
 
@@ -179,8 +185,8 @@ class Fruit(object):
             """
         if slice:
             data = self.data[slice[0]:slice[1]]
-            data_x = self.data_x[slice[0]:slice[1]]
-            return self.sprout(str(slice), data=data, data_x=data_x)
+            x_axis = self.x_axis[slice[0]:slice[1]]
+            return self.sprout(str(slice), data=data, x_axis=x_axis)
         else:
             return self
 
@@ -298,10 +304,10 @@ def fruittester():
     # sprout branches
     x = np.arange(0,10)
     data = x
-    root.sprout("Apple", metadata={"color":"red"}, data_x=x, data=data)
+    root.sprout("Apple", metadata={"color":"red"}, x_axis=x, data=data)
     x = np.arange(0,2*np.pi, np.pi/16)
     data = np.cos(x)
-    root.sprout("Banana", metadata={"color":"green"}, data_x=x, data=data)
+    root.sprout("Banana", metadata={"color":"green"}, x_axis=x, data=data)
     
 
     # # testdrive
@@ -328,12 +334,12 @@ def slice_test():
     [3, 4]
     [8, 9]
     """
-    root = Fruit("rottenapple", metadata={"color":"black", "origin": "Joe's"}, data_x=[1,2,3,4,5], data=[6,7,8,9,10])
+    root = Fruit("rottenapple", metadata={"color":"black", "origin": "Joe's"}, x_axis=[1,2,3,4,5], data=[6,7,8,9,10])
     slice = [2,4]
     
     ele = root.slicer(slice=slice)
     # access directly or via dict of main
-    print(ele.data_x)
+    print(ele.x_axis)
     print(root[str(slice)].data)
     # check meta
     print(ele.metadata)
