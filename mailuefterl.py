@@ -272,6 +272,41 @@ def is_iterable(item):
 
 # thanks copilot
 def is_ragged(a):
+    """ check if a is a ragged nested sequence 
+    
+    # ragged list
+    >>> is_ragged([[1, 2], [3, 4, 5], [6]])
+    True
+
+    # ragged array
+    >>> is_ragged(np.array([[1, 2], [3, 4, 5], [6]], dtype=object))
+    True
+
+    # non-ragged list
+    >>> is_ragged([[1, 2], [3, 4], [5, 6]])
+    False
+
+    # non-ragged array
+    >>> is_ragged(np.array([[1, 2], [3, 4], [5, 6]]))
+    False
+
+    # ragged list with ragged sublists
+    >>> is_ragged([[1, 2], [3, [4, 5]], [6]])
+    True
+
+    # ragged array with ragged subarrays
+    >>> is_ragged(np.array([[1, 2], np.array([3, [4, 5]], dtype=object), [6]], dtype=object))
+    True
+
+    # non-ragged list with ragged sublists
+    >>> is_ragged([[1, 2], [3, [4, 5]], [6, 7]])
+    False
+    
+    # non-ragged array with ragged subarrays
+    >>> is_ragged(np.array([[1, 2], [3, [4, 5]], [6, 7]], dtype=object))    
+    False
+    
+    """
     if isinstance(a, np.ndarray) and a.dtype != object:
         # If a is a non-object numpy array, it's not ragged
         return False
