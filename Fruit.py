@@ -107,8 +107,11 @@ class Fruit(object):
         else:
             self.x_axis = [] # eg only contains data=mx
 
-        if type(y_axis)!=type(None):
-            self.y_axis = y_axis
+        #if type(y_axis)!=type(None):
+        #    self.y_axis = y_axis
+        #else:
+        #    self.y_axis = None
+        self.y_axis = y_axis
         # endif, end __init__
         
 
@@ -186,7 +189,7 @@ class Fruit(object):
         if slice:
             data = self.data[slice[0]:slice[1]]
             x_axis = self.x_axis[slice[0]:slice[1]]
-            return self.sprout(str(slice), data=data, x_axis=x_axis)
+            return self.sprout(str(slice), data=data, x_axis=x_axis, y_axis=self.y_axis)
         else:
             return self
 
