@@ -1505,6 +1505,9 @@ class myinkc(hopper):
                 #if len(y_axis)>17 and (ydatalen==16):
                 #    y_axis=y_axis[0::10]
 
+                # ensure it's not a list, to have a shape
+                y_axis = np.array(y_axis)
+
                 if ((np.size(y_axis)) == ydatalen):
                     # inverted for waterfall
                     extent = (mymin(x_axis), mymax(x_axis),mymin(y_axis), mymax(y_axis))
