@@ -90,10 +90,32 @@ def count_non_nan(data):
     
     CAUTION: cannot handle np.array([np.array, np.array])
             --> use np.concatenate with transposed arr, etc.
+
+    >>> count_non_nan(np.array([1,2,3,np.nan]))
+    3
+
+    >>> count_non_nan(np.array([np.nan for _ in range(0,20)]))
+    0
+
+    >>> count_non_nan(np.array([np.nan for _ in range(0,20)], dtype=object))
+    0
     """
-    #print(type(data))
-    #print(f"{data=}")
-    return np.count_nonzero(~np.isnan(data))
+
+    try:
+        # cast if necessary
+        if not isinstance(data, np.ndarray):
+            data = np.array(data, dtype=float)
+
+        # parse if ragged
+        if data.dtype == object:
+            return np.count_nonzero([not np.isnan(x) for x in data])
+        # direct if possible
+        else:
+            return np.count_nonzero(~np.isnan(data))
+        
+        # show debug info if absolutely unavoidable
+    except Exception as e:
+        raise Exception(f"error in count_non_nan({data}): {e}")
 
 
 def count_nan(data):
@@ -351,7 +373,10 @@ def babysit(eval, *args, **kwargs):
 
     # this can return an element for parsing a ragged-list with nans instead of having an empty element there
     return_nan = kwargs.pop("return_nan", False)
+    
     if not my_any(args) and return_nan:
+        return np.nan
+    elif count_non_nan(args) == 0 and return_nan:
         return np.nan
     else:
         with warnings.catch_warnings():
