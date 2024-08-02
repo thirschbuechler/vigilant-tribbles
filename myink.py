@@ -2301,7 +2301,7 @@ class myinkc(hopper):
         ypos = n - (0.12*n+0.29)
         xpos = 0.14*n-0.87
 
-        self.get_ax().text(xpos, ypos, optlabel,
+        self.text(xpos, ypos, optlabel,coord="data", 
             bbox={'facecolor':'white','alpha':1,'edgecolor':'none','pad':1},
             ha='left', va='center') 
         self.ax_onward()
