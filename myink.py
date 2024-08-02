@@ -1219,9 +1219,34 @@ class myinkc(hopper):
         """ route through plt.imread"""
         return plt.imread(*args, **kwargs)
 
-    def text(self, *args, **kwargs):
-        """ forward to plt.text, (not ax.text here)"""
-        return plt.text(*args, **kwargs)
+    def text(self, coord="canvas", *args, **kwargs):
+        """ put text onto a graph
+        - coord: "canvas" or "data"
+        - basic args: x,y, text
+        - more kwargs:
+            - fontdict
+            - fontsize
+            - color
+            - rotation
+            - bbox
+            - ha: horizontal alignment
+            - va: vertical alignment
+            - transform: transform=ax.transAxes
+            - backgroundcolor
+            - alpha
+            - .. https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.text.html
+        
+        # canvas coordinates
+        plt.text: canvas coordinates (0,0) is lower left corner, (1,1) is upper right
+
+        # data coordinates:
+        ax.text: axis coordinates (0,0) is lower left corner, (1,1) is upper right
+        """
+        
+        if coord=="canvas":
+            return plt.text(*args, **kwargs)
+        else:
+            return self.get_ax().text(*args, **kwargs)
 
 
     def add_shieldbadge(self, mylist, front=True, dbg=False, extend_outside=False,
