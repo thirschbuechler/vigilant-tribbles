@@ -2767,10 +2767,17 @@ class myinkc(hopper):
             raise Exception(f" ecke {type=} not implemented")
 
 
-    def plot_outlines(self, outlines, gradientplot=False, monocolor=False, makecanvas=True, title=True, renormalize=True, do_offset=True, linestyle_dict={}, **kwargs):
+    def plot_outlines(self, outlines,
+                        gradientplot=False, monocolor=False, # colorfullness
+                        makecanvas=True, legend=True,
+                        renormalize=True, do_offset=True, # data manipulation
+                        linestyle_dict={}, **kwargs):
         """ hist plotter
             - outlines = (hist, bins, metadata)
             
+            - renormalize: adapt based on y_max
+            - do_offset: use metadata["offset_dB"]
+
             # options
             makecanvas:
                 - common-meta and subplots()
@@ -2782,6 +2789,8 @@ class myinkc(hopper):
                 - choose all black for outlines
             """
         
+        if kwargs:
+            raise Exception(f"plot_outlines got unexpected kwargs: {kwargs}")
 
         # keys to delete for plotting
         meta_del_list = ["filling", "setkeys"]
@@ -2898,18 +2907,14 @@ class myinkc(hopper):
         if not monoculture_lines:
             txt.append(f"linestyles {metadata_to_str(linestyle_dict)}")
         txt = "\n".join(txt)
-        if title:
-            self.title(txt)
-        else:
-            print("Title supressed:")
-            print(txt)
+        self.title(txt)
             
         # print metadata, or make legend
         #if (not monoculture_lines and n>10) or (monoculture_lines and n>5):
         if n>10:
             for k, (hist, bins, metadata) in enumerate(outlines):
                 print(f"{k}: {metadata}")
-        else:
+        elif legend:
             self.legend()
 
 
