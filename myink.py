@@ -554,6 +554,8 @@ class myinkc(hopper):
             fig = self.get_fig()
             fig.suptitle(title)
             self.current_suptitle = title
+        else:
+            self.log.warning(f"{title=} suppressed by self.export")
         
     
     def figlabel(self, title=None):
@@ -573,6 +575,8 @@ class myinkc(hopper):
             if title!=None:    
                     ax.set_title(title)
                     self.current_title = title
+        else:
+            self.log.warning(f"{title=} suppressed by self.export")
         
     def axlabel(self, title=None): 
         """  alias title """
