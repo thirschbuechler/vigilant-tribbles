@@ -1285,8 +1285,17 @@ class myinkc(hopper):
         if hasattr(self,"gcode_masseur"):
             mylist = self.gcode_masseur(mylist)
 
+        # remove duplicates of flattened list
+        mylist = list(set(ml.roadkill(mylist)))
+
         # cycle over input and remove excluders
-        [mylist.remove(ele) for ele in exclude if ele in mylist]
+        #   note: list-comprehension doesn't work here
+        mylist2 = []
+        for listitem in mylist:
+            if not any(listitem in ex for ex in exclude):
+                mylist2.append(listitem)
+
+        mylist = mylist2
 
         # # sort
         def sorting_key(s):
