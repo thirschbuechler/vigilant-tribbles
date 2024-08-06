@@ -584,6 +584,45 @@ def recursive_array(obj):
         return np.stack([recursive_array(x) for x in obj])
     
 
+def autoroadkill(thing):
+    """
+    there can be only one dimension
+    
+    brute forces roadkill with different kwargs,
+    use with caution.
+
+    >>> autoroadkill(["a", "b", "c"])
+    array(['a', 'b', 'c'], dtype=object)
+
+    >>> autoroadkill([["a", "b", "c"], ["d", "e", "f"]])
+    array(['a', 'b', 'c', 'd', 'e', 'f'], dtype=object)
+
+    >>> autoroadkill([["a", "b", "c"], ["d", "e", "f"], ["g", "h", "i"]])
+    array(['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i'], dtype=object)
+
+    >>> autoroadkill([["a", "b", "c"], ["e", "f"], ["3"]])
+    array(['a', 'b', 'c', 'e', 'f', '3'], dtype='<U1')
+
+    """
+    kwargoptions = [dict(hard=False, soft=False), dict(hard=True, soft=False), dict(soft=True, hard=False), dict(hard=2, soft=False)]
+    for kwargoption in kwargoptions:
+        try:
+            res = roadkill(thing, **kwargoption)
+            # check dimension, list-cast to ensure an inhomogeneous list triggers next loop-iteration via exception
+            if len(np.shape(list(res))) == 1:
+                # return if shape changed
+                return res
+        except Exception as e:
+            # ignore exceptions if roadkill fails
+            pass
+        finally:
+            pass
+
+    # but raise an exception if no shape change, 
+    #       and no return triggered above
+    raise Exception(f"no shape change for {thing} with roadkill")
+
+
 def roadkill(thing, hard=False, soft=False):
     """Flatten if possible - remove any dimensions and make a list.
     
@@ -592,7 +631,7 @@ def roadkill(thing, hard=False, soft=False):
         * hard (bool, optional): Determines the level of "hardness". Defaults to False.
             - False: please be flat - squish a little
             - True: sudo "be_flat!" - deploy the hammer
-            - 2: sneaky "be_flat!" - add a dummy (and remove it again)
+            - 2: sneaky "be_flat!" - add dummy nan's on end
         * soft (bool, optional): Determines the level of "softness". Defaults to False.
             - False: no softness, hardness possible
             - True: np.squeeze, disable hard
