@@ -1285,8 +1285,12 @@ class myinkc(hopper):
         if hasattr(self,"gcode_masseur"):
             mylist = self.gcode_masseur(mylist)
 
+        # split mylist substrings by "\n" - legacy support
+        mylist = [x.split("\n") for x in mylist]
+
         # remove duplicates of flattened list
-        mylist = list(set(ml.roadkill(mylist)))
+        mylist = ml.autoroadkill(mylist)
+        mylist = list(set(mylist))
 
         # cycle over input and remove excluders
         #   note: list-comprehension doesn't work here
@@ -1307,7 +1311,7 @@ class myinkc(hopper):
 
         mylist = sorted(mylist, key=sorting_key)
 
-        # # stick back together
+        # # stick together
         text = "\n".join(mylist)
 
 
