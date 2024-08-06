@@ -1223,7 +1223,7 @@ class myinkc(hopper):
         """ route through plt.imread"""
         return plt.imread(*args, **kwargs)
 
-    def text(self, coord="canvas", *args, **kwargs):
+    def text(self, *args, coord="canvas", **kwargs):
         """ put text onto a graph
         - coord: "canvas" or "data"
         - basic args: x,y, text
