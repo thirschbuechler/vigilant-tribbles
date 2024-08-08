@@ -648,7 +648,7 @@ class myinkc(hopper):
             - bbox_to_anchor, loc, borderaxespad, ..
         """
         ax = self.get_ax()
-        ax.legend(**kwargs)
+        return ax.legend(**kwargs)
 
 
     def modlegend(self, mylegendtext=None, addtext=None, title=None, rmsubstr=None, ax=None, *args, **kwargs):#, *args, **kwargs for ax.legend only
