@@ -1286,7 +1286,12 @@ class myinkc(hopper):
             mylist = self.gcode_masseur(mylist)
 
         # split mylist substrings by "\n" - legacy support
-        mylist = [x.split("\n") for x in mylist]
+        try:
+            mylist = [x.split("\n") for x in mylist]
+        except:
+            # if it doesn't work, it's probably fine already
+            #mylist = mylist
+            pass
 
         # remove duplicates of flattened list
         mylist = ml.autoroadkill(mylist)
