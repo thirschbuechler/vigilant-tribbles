@@ -1279,7 +1279,7 @@ class myinkc(hopper):
                 * combinations like "topright"
                 * or list of x,y
             - extend_outside: allowed to be outside the plot area rectangle?
-        
+            - front: put in front of the rest? HACK - reset coordsys
         """
         
         if hasattr(self,"gcode_masseur"):
@@ -1458,7 +1458,8 @@ class myinkc(hopper):
 
         # create the patch
         shield = patches.PathPatch(path, facecolor='white', alpha=0.5, edgecolor='black', linewidth=linescale,transform=ax.transAxes, clip_on=extend_outside)
-        
+        shield.set_zorder(10)  # place on top
+
         # add the patch to the Axes
         ax.add_patch(shield)
 
@@ -1484,7 +1485,8 @@ class myinkc(hopper):
             bbox={'facecolor':'white','alpha':0,'edgecolor':'none','pad':1}, # textbox: no color, bg: alpha=0!
             ha='center', va='center') 
 
-        self.log.info(f"added shieldbadge at {text_x=:.2f}, {text_y=:.2f}")
+        self.log.info(f"added shieldbadge (len={l}) at {text_x=:.2f}, {text_y=:.2f}")
+        self.log.crumb(f"shieldbadge {text=}")
 
         return shield
 
