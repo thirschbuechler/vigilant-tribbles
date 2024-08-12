@@ -3779,7 +3779,7 @@ def barstacked_test():
     pe.show()
 
 
-def shield_test(lens=[1,2,2,5], rowsubplot=False):
+def shield_textlen_test(lens=[1,2,2,5], rowsubplot=False):
     pe = myinkc()   
     
     for k in [0,1]:
@@ -3797,9 +3797,225 @@ def shield_test(lens=[1,2,2,5], rowsubplot=False):
             text = [f"N0{i}" for i in range(0,i)]
             text = "\n".join(text)
             pe.add_shieldbadge(text, anchor="lefttop")
-            
                 
     pe.show()
+
+
+def spind_shieldbadge_test():
+    pe = myinkc()    
+    pe.setLogLevel("DEBUG")
+
+    i=3
+    pe.spinds([5,1,1], keep_old_ax=True)
+    #pe.subplots()
+    text = [f"N0{i}" for i in range(0,i)]
+    #text = "\n".join(text)
+
+    #pe.reset_coordsys()
+    pe.ax_onward()
+    pe.ax_onward()
+    pe.ax_onward()
+    
+    pe.add_shieldbadge(text, anchor="center", front=True)
+    # probably shieldbadge ok but spinds gridspec faulty, as cannot put manual shieldbadge onto spind, but manual shieldbadge onto manual gridspec
+    plt.title("both pe")
+
+    pe.show()
+
+
+def gridspec_patch_test():
+    import matplotlib.pyplot as plt
+    import matplotlib.patches as patches
+    from matplotlib.path import Path
+    import numpy as np
+
+    # Example path
+    vertices = [
+        (0.1, 0.1),
+        (0.2, 0.2),
+        (0.3, 0.1),
+        (0.1, 0.1),
+    ]
+    codes = [
+        Path.MOVETO,
+        Path.LINETO,
+        Path.LINETO,
+        Path.CLOSEPOLY,
+    ]
+    path = Path(vertices, codes)
+
+    # Create figure and gridspec
+    #fig = plt.figure()
+
+    rows_def = [1]  # Example rows_def
+    cols_def = [3]  # Example cols_def
+    ax_out = []
+    axold = []
+    keep_old_ax = False  # Example flag
+
+    ncols = sum(cols_def)
+    nrows = sum(rows_def)
+
+    fig, axs_mx = plt.subplots(nrows=nrows, ncols=ncols)
+    axs_mx = np.atleast_2d(axs_mx)  # Ensure axs_mx is always a 2D array
+
+    # gridspec magic - fetch main pointer
+    gs = axs_mx[0, 0].get_gridspec()
+
+    # on top left of figure is 0,0
+    top = 0  # first height-loop offset
+    for height in rows_def:
+        # calc edges along z-axis
+        bot = top + height
+
+        start = 0  # first width-loop offset
+        for width in cols_def:
+            # calc edges along x-axis
+            end = start + width
+            # remember new ax; gridspec format: [row-slice,column-slice]
+            ax_out.append(fig.add_subplot(gs[top:bot, start:end]))
+            start = end  # set next width-loop offset
+
+        top = bot  # set next loop start
+
+    # after gridspec magic, remove or keep old axs
+    for axs_row in axs_mx:
+        for ax in axs_row:
+            # self.blank(ax)  # Assuming self.blank is a method to clear the axis
+            if not keep_old_ax:
+                ax.remove()
+            else:
+                axold.append(ax)
+
+    # put into np.array as expected via other fct
+    ax_out = np.concatenate([ax_out, axold])
+
+    # put axs inside self
+    ax = ax_out[0]  # Use the first axis from ax_out
+
+    # Add PathPatch to the first axis
+    shield = patches.PathPatch(path, facecolor='white', alpha=1.0, edgecolor='black', linewidth=2, transform=ax.transAxes, clip_on=False)
+    shield.set_zorder(10)  # Ensure it's on top
+    ax.add_patch(shield)
+
+    plt.title("both manual")
+
+    # Display plot
+    plt.show()
+
+
+def spind_path_test():
+    pe = myinkc()
+    pe.spinds()
+    ax = pe.get_ax()
+
+    # Example path
+    vertices = [
+        (0.1, 0.1),
+        (0.2, 0.2),
+        (0.3, 0.1),
+        (0.1, 0.1),
+    ]
+    codes = [
+        Path.MOVETO,
+        Path.LINETO,
+        Path.LINETO,
+        Path.CLOSEPOLY,
+    ]
+    path = Path(vertices, codes)
+
+    # Add PathPatch to the first axis
+    shield = patches.PathPatch(path, facecolor='white', alpha=1.0, edgecolor='black', linewidth=2, transform=ax.transAxes, clip_on=False)
+    shield.set_zorder(10)  # Ensure it's on top
+    ax.add_patch(shield)
+
+    plt.title("spind w manual badge")
+
+    # Display plot
+    plt.show()
+
+def gridspec_shieldbadge_test():
+    import matplotlib.pyplot as plt
+    import matplotlib.patches as patches
+    from matplotlib.path import Path
+    import numpy as np
+
+    # Example path
+    vertices = [
+        (0.1, 0.1),
+        (0.2, 0.2),
+        (0.3, 0.1),
+        (0.1, 0.1),
+    ]
+    codes = [
+        Path.MOVETO,
+        Path.LINETO,
+        Path.LINETO,
+        Path.CLOSEPOLY,
+    ]
+    path = Path(vertices, codes)
+
+    # Create figure and gridspec
+    #fig = plt.figure()
+
+    rows_def = [1]  # Example rows_def
+    cols_def = [3]  # Example cols_def
+    ax_out = []
+    axold = []
+    keep_old_ax = False  # Example flag
+
+    ncols = sum(cols_def)
+    nrows = sum(rows_def)
+
+    fig, axs_mx = plt.subplots(nrows=nrows, ncols=ncols)
+    axs_mx = np.atleast_2d(axs_mx)  # Ensure axs_mx is always a 2D array
+
+    # gridspec magic - fetch main pointer
+    gs = axs_mx[0, 0].get_gridspec()
+
+    # on top left of figure is 0,0
+    top = 0  # first height-loop offset
+    for height in rows_def:
+        # calc edges along z-axis
+        bot = top + height
+
+        start = 0  # first width-loop offset
+        for width in cols_def:
+            # calc edges along x-axis
+            end = start + width
+            # remember new ax; gridspec format: [row-slice,column-slice]
+            ax_out.append(fig.add_subplot(gs[top:bot, start:end]))
+            start = end  # set next width-loop offset
+
+        top = bot  # set next loop start
+
+    # after gridspec magic, remove or keep old axs
+    for axs_row in axs_mx:
+        for ax in axs_row:
+            # self.blank(ax)  # Assuming self.blank is a method to clear the axis
+            if not keep_old_ax:
+                ax.remove()
+            else:
+                axold.append(ax)
+
+    # put into np.array as expected via other fct
+    ax_out = np.concatenate([ax_out, axold])
+
+    # put axs inside self
+    ax = ax_out[0]  # Use the first axis from ax_out
+
+    pe = myinkc()
+    pe.ax = ax
+    pe.axs = ax_out
+    pe.ax_i = 0
+    
+    # neither work
+    pe.add_shieldbadge(["N01"], anchor="lefttop", front=False)
+    #pe.add_shieldbadge("N01", anchor="lefttop", extend_outside=True)
+
+    # Display plot
+    plt.show()
+
 
 #-#-# module test #-#-#
 if testing:#call if selected, after defined, explanation see above
@@ -3837,9 +4053,17 @@ if testing:#call if selected, after defined, explanation see above
 
     #boxplottest()
 
-    #shield_test()
-    shield_test(rowsubplot=1)
-    #shield_test(shapes=["hex"], lens=[3], dbg=True)
+    #shield_textlen_test()
+    #shield_textlen_test(rowsubplot=1)
+    #shield_textlen_test(shapes=["hex"], lens=[3], dbg=True)
+    
+    # note: major issue was front=True with reset_coordsys
+    spind_shieldbadge_test() # both pe
+    gridspec_patch_test() # both manual
+    gridspec_shieldbadge_test() # man gridspec w pe patch
+    spind_path_test()# spind w manual baddge
+    
+
     pass
 
 
