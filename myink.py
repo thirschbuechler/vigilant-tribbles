@@ -2543,11 +2543,7 @@ class myinkc(hopper):
         fig, axs_mx = plt.subplots(ncols=ncols, nrows=nrows, **subplots_kwargs)
         
         # enable loop also for single line
-        if nrows==1:
-            axs_mx = [axs_mx] 
-        if ncols==1:
-            axs_mx = [axs_mx] 
-            
+        axs_mx = np.atleast_2d(axs_mx)
         
         # prep collectors
         axold = []
