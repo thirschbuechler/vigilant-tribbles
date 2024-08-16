@@ -1442,9 +1442,13 @@ class myinkc(hopper):
         # create the path
         path = Path(verts, codes)
 
+        # scale
         if fixedscale:
+            # manual
             scale = fixedscale
         else:
+            # autogen if not given
+            #
             # # prep scale (acc to textsize)        
             # ylabel fontsize is 10 per default and well sized
             # shall be targetat4pt at 4
@@ -1458,11 +1462,16 @@ class myinkc(hopper):
             if dscale:
                 scale *= dscale/ylabel_text_size
 
-        if not linescale:
-            linescale = 2*scale
+        # linescale
+        if linescale==None:
+            # autogen if not given
+            linewidth = 2*scale
+        else:
+            # manual
+            linewidth = linescale
 
         # create the patch
-        shield = patches.PathPatch(path, facecolor='white', alpha=0.5, edgecolor='black', linewidth=linescale,transform=ax.transAxes, clip_on=extend_outside)
+        shield = patches.PathPatch(path, facecolor='white', alpha=0.5, edgecolor='black', linewidth=linewidth,transform=ax.transAxes, clip_on=extend_outside)
         shield.set_zorder(10)  # place on top
 
         # add the patch to the Axes
