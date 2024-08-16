@@ -49,7 +49,8 @@ class Fruit(object):
                     data=[],
                     x_axis=None, bins=[],
                     y_axis=None,
-                    metadata={}, basiclogger = False,
+                    metadata={},
+                    basiclogger = False, loglevel=logging.TRAIL, # logging stuff
                     **kwargs):
         
         # parentclass object doesn't take anything, catch stray kwargs
@@ -58,33 +59,44 @@ class Fruit(object):
         super().__init__(**kwargs) # (*args, **kwargs) # superclass inits
         
         # # logger setup
-        #levels_now = logging._levelToName.values()
-        # docu see: def self.setLogLevel()
+        
+        # add custom loglevels
         addLoggingLevel('TRAIL',  logging.INFO - 2)
         addLoggingLevel('CRUMB', logging.DEBUG + 2)
+        # levels_now = logging._levelToName.values()
+        # docu see: def self.setLogLevel()
 
+        # basicconfig - ok for small projects
         if basiclogger:
-            #logging.basicConfig(level=logging.INFO)
-            logging.basicConfig(level=logging.TRAIL)
-            # then logging.info() etc works
+            logging.basicConfig(level=loglevel)
+            
             self.log = logging
+        
+        # Streamhandler - better for a large project with potentially nested ones
         else:
             self.log = logging.getLogger(__class__.__name__)
             
             # prevent console spam by multiple handlers via child-objects
             if not self.log.handlers:
+                
                 # create console handler and set level to debug
                 ch = logging.StreamHandler()
-                #ch.setLevel(logging.INFO)
-                ch.setLevel(logging.TRAIL)
+                
+                # set level
+                ch.setLevel(loglevel)
+                
                 # create formatter
                 formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+                
                 # add formatter to ch
                 ch.setFormatter(formatter)
+                
                 # add ch to logger
                 self.log.addHandler(ch)
 
-        self.myprint = self.log.info # hack for legay legacy
+        # legacy hack
+        self.myprint = self.log.info
+
         # # class props etc setup
         self.root = root # root obj
         self.ID = ID # name of this container
