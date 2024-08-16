@@ -53,7 +53,8 @@ class Fruit(object):
                     basiclogger = False, loglevel=logging.TRAIL, # logging stuff
                     **kwargs):
         
-        # parentclass object doesn't take anything, catch stray kwargs
+        # # catch stray kwargs,
+        #   as parentclass object doesn't take anything
         if kwargs:
             raise Exception(f"{kwargs=} shouldn't exist here - mis-routed kwargs!")
         super().__init__(**kwargs) # (*args, **kwargs) # superclass inits
@@ -111,20 +112,20 @@ class Fruit(object):
         # direct assignment attrs
         self.data = data
         self.bins = bins
+
         # direct or indirect assignment
         if type(x_axis)!=type(None):
             self.x_axis = x_axis
+            if np.any(bins):
+                self.log.warning("x_axis and bins given, using x_axis, discarding bins")
         elif np.any(bins):
+            # no x_axis (elif), but bins
             self.x_axis = bin_to_xaxis(bins)
         else:
             self.x_axis = [] # eg only contains data=mx
 
-        #if type(y_axis)!=type(None):
-        #    self.y_axis = y_axis
-        #else:
-        #    self.y_axis = None
         self.y_axis = y_axis
-        # endif, end __init__
+        # end __init__
         
 
     def setLogLevel(self, level):
