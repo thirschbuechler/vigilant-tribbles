@@ -1782,7 +1782,7 @@ class myinkc(hopper):
         return markers, stemlines, baseline
 
 
-    def autoscale_fig(self, halt_if_failed=False):
+    def autoscale_fig(self, halt_if_failed=False, redraw=False):
         """
         try to fit most text of axis ticks, labels, titles w.o. overlapping
         - usually works, only GUI panel might overlap still
@@ -1796,6 +1796,8 @@ class myinkc(hopper):
 
             # try to fit everything onto plot
             try:
+                if redraw:
+                    self.get_fig().canvas.draw()
                 plt.tight_layout()
             
             # catch any Warning if generated
@@ -1808,6 +1810,8 @@ class myinkc(hopper):
                 warnings.resetwarnings()
 
         else:
+            if redraw:
+                self.get_fig().canvas.draw()
             # might generate ignorable warning
             plt.tight_layout()
 
