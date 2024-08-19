@@ -1906,7 +1906,7 @@ class myinkc(hopper):
 
 
     def boxplot(self, data=[], xlabels="",ylabel="", title="",
-                annot=True, mc = "green", mediancol = 'orange', meanline=False,
+                annot=True, mc = "green", mediancol = 'orange', meanline=False, markerkwargs={}, # annotation related args
                 availability=False, nan_bad=True,
                 badgedata={},
                 **kwargs):
@@ -1915,10 +1915,12 @@ class myinkc(hopper):
 
         copied from stickplot, adapted
         - data: input array/list
-        - mc: markercolors for mean, std edges upper+lower
         - xlabels: data labels
         - ylabel
-        - annot: annotate ,ean, mean+-stdev?
+        - annot: annotate
+            - mean always, meanonly removes mean+-stdev
+            - mc: markercolors for mean, std edges upper+lower
+            - markerkwargs: call hvmarkers
         
         availability related:
         - availability: add availability [%] into xlabel?
@@ -1981,14 +1983,31 @@ class myinkc(hopper):
         bp = ax.boxplot(data, flierprops=flierprops, **kwargs)
         
         # annotate with mean, median
-        annot = str(annot)
         if annot:
+
+            # define which separator to use
+            if self.tex:
+                sep = r"$\thinspace$"
+            else:
+                sep="\N{THIN SPACE}"
+
+            # showstd logic
+            showstd = True
+            if type(annot) == str:
+                if "meanonly" in annot:
+                    showstd = False
+            
             # markers
-            annotstr=["mean+std", "mean", "mean-std"]
+            plusminus = "±"
             annotargs = dict(alpha=0.5, c=mc)
-            self.scatter(x, means+stds, marker="^", label=annotstr[0], **annotargs) # triag up
-            self.scatter(x, means, marker="s", label=annotstr[1], **annotargs) # square
-            self.scatter(x, means-stds, marker="v", label=annotstr[2], **annotargs) # triag down
+
+            # mean probably always nice to know
+            self.scatter(x, means, marker="s", label=f"µ{sep}{plusminus}{sep}σ", **annotargs) # square
+
+            # sometimes show/hide std
+            if showstd:
+                self.scatter(x, means+stds, marker="^", label="_", **annotargs) # triag up, label hidden
+                self.scatter(x, means-stds, marker="v", label="_", **annotargs) # triag down, label hidden
 
             # numbers
             if stats.len < 5:
@@ -1998,6 +2017,10 @@ class myinkc(hopper):
                     # get coordinates
                     x, y = line.get_xydata()[1]
 
+                    # ensure string
+                    annot = str(annot)
+
+                    # case-switch
                     if "nerd" in annot:
                         if "smallonly" in annot:
                             smallonly=True
@@ -2077,10 +2100,6 @@ class myinkc(hopper):
 
             # plot with legend-entry (label) if non-nan
             if ml.count_non_nan(line) > 2:
-                if self.tex:
-                    sep = r"$\thinspace$"
-                else:
-                    sep="\N{THIN SPACE}"
 
                 slopetext = f"Δ{sep}/{sep}item: { '+' if k >= 0 else '' }{self.enginerd(k,places=1)}"
 
@@ -2121,20 +2140,12 @@ class myinkc(hopper):
         l.insert(1,"median")
         h.insert(1,medianlinelegendline)
 
-        # modifiy
-        if annot:
-            plusminus = "±"
-            for item in annotstr:
-                ii = l.index(item)
-                if annotstr.index(item) == 1:
-                    l[ii] = f"mean {plusminus} std"
-                    # also change marker symbols to "^sv" to show all 3 in this line for the text just defined
-                    #h[ii].set_marker("^sv") # not possible
-                else:
-                    # remove the up-down alone labels
-                    l.pop(ii)
-                    h.pop(ii)
+        if markerkwargs:
+            markername=markerkwargs.pop("label","label:label")
+            markerline = self.hvmarkers(**markerkwargs)
 
+            l.insert(-1, markername)
+            h.insert(-1, markerline)
 
         # predefine legend kwargs
         legkwargs = dict(loc="upper left", facecolor='white', framealpha=0.5)
