@@ -846,9 +846,28 @@ class myinkc(hopper):
         """ oszi like horizontal cursors"""
         ax = self.get_ax(ax)
         xlims=ax.get_xlim()
-        ax.hlines(start,  xlims[0], xlims[1], colors=col, linestyles=linestyles)
-        ax.hlines(stop,  xlims[0], xlims[1], colors=col, linestyles=linestyles)
+        lines1 = ax.hlines(start,  xlims[0], xlims[1], colors=col, linestyles=linestyles)
+        lines2 = ax.hlines(stop,  xlims[0], xlims[1], colors=col, linestyles=linestyles)
+
+        # return one of them for possible legend inclusion
+        return lines2
         
+
+    def hvmarkers(self, orientation, lims, **kwargs):
+        """ wrapper for vmarkers and hmarkers """
+        
+        # too avoid renaming all current hmarker vmarker calls
+        if "color" in kwargs:
+            kwargs["col"] = kwargs.pop("color")
+        if "linestyle" in kwargs:
+            kwargs["linestyles"] = kwargs.pop("linestyle")
+
+        # call the right one
+        if "v" in orientation:
+            return self.vmarkers(lims[0], lims[1], **kwargs)
+        elif "h" in orientation:
+            return self.hmarkers(lims[0], lims[1], **kwargs)
+
 
     # mixture of keyworded and non-keyworded arguments, aswell as routing not everything through makes this not practical
     # does what it says on the tin -- 
