@@ -3039,13 +3039,10 @@ class myinkc(hopper):
             txt.append("histogram, normalized outlines")
         else:
             txt.append("histogram")
-        txt.append(f"common meta: {metadata_to_str(common_meta)}")
+        txt.append(f"common meta: {metadata_to_str(common_meta, maxlen=50, blocktext=True)}")
         if not monoculture_lines:
-            txt.append(f"linestyles {metadata_to_str(linestyle_dict)}")
+            txt.append(f"linestyles {metadata_to_str(linestyle_dict, maxlen=50, blocktext=True)}")
         
-        # insert some linebreaks
-        txt = [ms.str_to_blocktext(txti, maxlen=50, in_sep=", ", out_sep="\n") for txti in txt]
-
         # join
         txt = "\n".join(txt)
 
@@ -3228,7 +3225,7 @@ class myinkc(hopper):
 
 
 
-def metadata_to_str(metadata):
+def metadata_to_str(metadata={}, blocktext=False, maxlen=40):
     for key in metadata.keys():
         if (metadata[key]):
 
@@ -3239,8 +3236,11 @@ def metadata_to_str(metadata):
                 # np.char.isnumeric only works on strings
                 metadata[key] = ms.enginerd(metadata[key], sep=" ")
 
-    label = ms.dict_to_str(metadata)
-    return label
+    if blocktext:
+        return ms.dict_to_blocktext(metadata, maxlinelen=maxlen)
+    else:
+        return ms.dict_to_str(metadata)
+    
 # # # # # # # # # # # # # # # # # # # # # # tester # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 #region tester
 
