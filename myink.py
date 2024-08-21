@@ -212,7 +212,6 @@ class myinkc(hopper):
             - return kwargs without used params
                 (for further __init__ processing)
             """
-
         
         for key in figsizes.keys():
             if key in kwargs:
@@ -233,10 +232,6 @@ class myinkc(hopper):
         plt.style.use("ggplot")
         self.outputformat = "tikz"
 
-
-    def tikz_save_lastgraph(self, fn=""):
-        """ legacy fct for save-lastgraph in case of tikz_enable() called"""
-        self.save_lastgraph(fn=fn)
 
     def save_lastfig(self, *args, **kwargs):
         # for same namingscheme as saveallfigs
@@ -305,6 +300,10 @@ class myinkc(hopper):
         else:
             plt.figure(fig)
             self.save_lastgraph()
+
+    def saveallgraphs(self, *args, **kwargs):
+        """ alias saveallfigs """
+        self.saveallfigs(*args, **kwargs)
 
 
     def postprocess_figs(self, cmd, text=""):
