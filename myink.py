@@ -440,33 +440,40 @@ class myinkc(hopper):
         plt.savefig(*args, dpi=800, **kwargs)
 
 
+    # legacy forwarder
+    def roadkill(self, *args, **kwargs):
+        return ml.roadkill(*args, **kwargs)
+    
+
     def ax_onward(self):
         """ move to next subplot axis """
         self.ax_move(1)
         return self.ax
-        
     
     def ax_backtrack(self):
         """ move to prev subplot axis """
         self.ax_move(-1)
         return self.ax
     
-    
-    def roadkill(self, *args, **kwargs):
-        return ml.roadkill(*args, **kwargs)
-    
-    
     def ax_move(self, where):
         """ move relative up/down to another subplot axis """
+        # move index
         self.ax_i = self.ax_i + where
         
+        if self.ax_i < 0:
+            self.log.warning("ax_i < 0 - overflowing to last element index (-1)")
+
+        # flatten for iterating over it
         self.axs = self.roadkill(self.axs)
-        
+        # sanity check
         if np.size(self.axs)==0:
             raise Exception("only one axis - can't iterate")
+        
+        # move actual element
         self.ax = self.axs[self.ax_i]
+
+        # legacy return val
         return self.ax
-    
     
 
     def get_ax(self, ax=None): 
