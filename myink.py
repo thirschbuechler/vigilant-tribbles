@@ -2653,6 +2653,8 @@ class myinkc(hopper):
         self.ax = ax_out[0]
         self.axs = ax_out
         self.ax_i = 0
+        # remember gs pointer for vspace, hspace updates etc.
+        self.gs = gs 
     
 
     def spinds_fail(self, mylist=[1,1,3,1], nrows=1):
@@ -2860,15 +2862,23 @@ class myinkc(hopper):
 
             # options
             makecanvas:
-                - common-meta and subplots()
-                - uncommon metadata in legend
-                - common metadata in title
+                - 1:
+                    - common-meta and subplots()
+                    - uncommon metadata in legend
+                    - common metadata in title
+                - n:
+                    - one figure per outline
+                - gallery:
+                    - one figure (spind) for all outlines
             gradientplot
                 - for each hist, select color along spectrum of cm.turbo
             monocolor
                 - choose all black for outlines
             """
         
+        # init a var
+        common_meta = {}
+
         # direct Fruit plotting option
         if not outlines:
             # check if self has attr bins
@@ -2888,18 +2898,44 @@ class myinkc(hopper):
         # keys to delete for plotting
         meta_del_list = ["filling", "setkeys"]
 
-        if makecanvas:
-            self.subplots()
-
-        n = len(outlines)
-        if not n:
+        # # length dependencies
+        # gradientmaster
+        l = len(outlines)
+        if not l:
             raise Exception(f"0 outlines given: {outlines}")
         else:
-            g = gradientmaster(datalen=n, gradientplot=gradientplot, monocolor=monocolor)
+            g = gradientmaster(datalen=l, gradientplot=gradientplot, monocolor=monocolor)
+
+        # figure
+        if makecanvas=="gallery":
+
+            # find out how to decompose it into an nxm grid
+            nrows, ncols = ml.gallery_factors(l)
+
+            self.spinds(ncols=ncols, nrows=nrows)
+
+            # dirty loop fix for using ax_onward() before each loop-plot,
+            #       to not go out of bound on last ax_onward, after last pot
+            self.ax_backtrack()
+        
+        elif makecanvas=="n":
+            for outline in outlines:
+                
+                # recursively call self
+                self.plot_outlines(outlines=[outline], makecanvas=1,
+                                    gradientplot=gradientplot, monocolor=monocolor,
+                                    legend=legend, renormalize=renormalize,
+                                    do_offset=do_offset, linestyle_dict=linestyle_dict,
+                                    **kwargs)
+                # delete so it won't be looped over below
+                outlines = []
 
         # find common meta, prep, in case of single-canvas straight-forward no-malarky
-        if makecanvas:
+        elif makecanvas==1:
             
+            # common figure
+            self.subplots()
+
             # collect metadata
             metadatas = []
             for k, (hist, bins, metadata) in enumerate(outlines):
@@ -2933,8 +2969,7 @@ class myinkc(hopper):
             #common_meta.pop("msr") 
             common_meta = common_meta.copy() # avoid runtimeerror when removing stuff because subinstances didnt get duplicated?
         else:
-            print("ignoring common_meta, as makecanvas==False")
-            common_meta = {}
+            self.log.info("ignoring common_meta, as makecanvas==False")
             
         # plot
         monoculture_lines = False
@@ -2973,40 +3008,73 @@ class myinkc(hopper):
             # # fix overflowing legend-newlines
             label = ms.str_to_blocktext(label, ", ", " ", 80)
 
-            # plot options
-            pkwargs = dict(label=label, linestyle=linestyle, color=g.cycle(k))
-
-            # process
-            txt = []
+            # fetch
             x = ml.bin_to_xaxis(bins)
             y = hist
+
+            # offset / normalize
             if ("offset_dB" in metadata) and do_offset:
                 x+=metadata["offset_dB"]*np.ones(np.shape(x))
-
+            #
             if renormalize:
                 y=y/ml.nanmax(y)
-                txt.append("histogram, normalized outlines")
-            else:
-                txt.append("histogram")
+                #txt.append("histogram, normalized outlines") # below
 
+            # plotprep per loop
+            pkwargs = dict(label=label, linestyle=linestyle, color=g.cycle(k))
+            if makecanvas=="n":
+                self.subplots()
+            elif makecanvas=="gallery":
+                self.ax_onward()
+            
             # plot
             self.plot(x, y, **pkwargs)
-
+            
             #print(f"plotted {hist} {metadata}")
 
         # # finalize graph # #
-        # put title, or don't
+        # make title txt
+        txt = []
+        if renormalize:
+            txt.append("histogram, normalized outlines")
+        else:
+            txt.append("histogram")
         txt.append(f"common meta: {metadata_to_str(common_meta)}")
         if not monoculture_lines:
             txt.append(f"linestyles {metadata_to_str(linestyle_dict)}")
+        
+        # insert some linebreaks
+        txt = [ms.str_to_blocktext(txti, maxlen=50, in_sep=", ", out_sep="\n") for txti in txt]
+
+        # join
         txt = "\n".join(txt)
-        self.title(txt)
+
+        # put title
+        if makecanvas==1:
+            self.title(txt)
+        elif makecanvas=="gallery":
+            self.suptitle(txt)
+            # # put same xaxis on all subplots
+            # first collect all xlims
+            xlims = []
+            for ax in self.axs:
+                xlims.append(ax.get_xlim())
+
+            # then set all to the same
+            xlims = ml.roadkill(xlims)
+            xlims = min(xlims), max(xlims)
+            for ax in self.axs:
+                ax.set_xlim(*xlims)
+
+            # remove space between subplots on figure
+            #self.get_fig().subplots_adjust(hspace=0.0, wspace=0.0)
+            self.gs.update(hspace=0.0, wspace=0.0)
             
         # print metadata, or make legend
         #if (not monoculture_lines and n>10) or (monoculture_lines and n>5):
-        if n>10:
+        if l>10:
             for k, (hist, bins, metadata) in enumerate(outlines):
-                print(f"{k}: {metadata}")
+                self.log.info(f"{k}: {metadata}")
         elif legend:
             self.legend()
 
