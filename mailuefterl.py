@@ -17,6 +17,7 @@ import colored_traceback.always # colorize terminal output and errors in termina
 import numpy as np
 import pandas as pd
 import warnings # numpy nanzero zeroslice stuff
+from functools import reduce
 
 
 def dummy(*args,**kwargs):
@@ -266,6 +267,58 @@ def is_scalar(a):
     except TypeError:
         return True
     return False
+
+
+# not performant or good, but works at least for small enough numbers
+#https://stackoverflow.com/questions/6800193/what-is-the-most-efficient-way-of-finding-all-the-factors-of-a-number-in-python/
+def factors(n):
+    """ integer factors of n, UNSORTED sometimes
+
+    >>> factors(9)
+    {1, 3, 9}
+
+    >>> factors(12)
+    {1, 2, 3, 4, 6, 12}
+    
+    """
+    return set(reduce(list.__add__, 
+                ([i, n//i] for i in range(1, int(n**0.5) + 1) if n % i == 0)))
+
+
+def gallery_factors(n):
+    """ get a nxm option for a gallery grid plot
+    
+    >>> gallery_factors(9)
+    [3, 3]
+
+    >>> gallery_factors(12)
+    [4, 3]
+
+    >>> gallery_factors(13)
+    [7, 2]
+    """
+    # get all int factors
+    f = list(factors(n))
+    
+    # sort
+    f.sort()
+
+    # remove boring ones (1,n)
+    f = f[1:-1]    
+    
+    # remove outer ones
+    while len(f) > 2:
+        f = f[1:-1]
+
+    # if not prime number list is not empty
+    if f:
+        largest = f[-1]
+        return [largest, int(n/largest)]
+    # prime number
+    else: 
+        # try again with one too much
+        return gallery_factors(n+1)
+        
 
 def get_shape(a):
     """
