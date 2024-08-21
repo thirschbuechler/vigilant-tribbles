@@ -34,6 +34,9 @@ def str_to_blocktext(input, in_sep, out_sep=" ", maxlen=5):
     
     >>> str_to_blocktext("this, is, very, long, this, is, even, longer, so, to, speak", in_sep=", ", maxlen=10)
     'this is very\\nlong this\\nis even\\nlonger\\nso to speak\\n\\n'
+
+    >>> str_to_blocktext("this, is, very, long, this, is, even, longer, so, to, speak", in_sep=", ", maxlen=20)
+    'this is very long\\nthis is even longer\\nso to speak \\n'
     """
     items = input.split(in_sep)
 
@@ -96,6 +99,37 @@ def dict_to_str(mydict):
     st="".join(st)
 
     return st
+
+
+def dict_to_blocktext(mydict, maxlinelen=50):
+    """ turn a dict into human-readable blocktext (newline separated), shuffle around key-value pairs to have best blocktext possible
+    """
+    st = dict_to_str(mydict)
+
+    # split by key-value pairs
+    st = str_to_blocktext(st, in_sep=", ", out_sep=" ", maxlen=maxlinelen)
+
+    # re-arrange key-value pairs to fill lines as best as possible
+    lens = [len(line) for line in st.split("\n")]
+
+    # arrange lines by longest to shortest
+    st = "\n".join([line for _, line in sorted(zip(lens, st.split("\n")), key=lambda pair: pair[0], reverse=True)])
+
+    # loop over lines and build output string, filling in holes
+    lines = st.split("\n")
+    out = []
+    while len(lines):
+        line = lines.pop(0)
+        if len(lines) > 0:
+            nextline = lines.pop(0)
+            if len(nextline) + len(line) < maxlinelen:
+                line += " " + nextline
+            else:
+                # re-insert
+                lines.insert(0, nextline)
+        out.append(line)
+    
+    return "\n".join(out)
 
 
 def list_to_str(mylist):
