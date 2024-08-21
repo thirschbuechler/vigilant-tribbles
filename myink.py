@@ -2571,8 +2571,10 @@ class myinkc(hopper):
     
 
     def spinds(self,
-                cols_def=[1,1,3,1], rows_def=[1], # regular features
-                keep_old_ax=False, ncols=None, nrows=None, # experimental
+                cols_def=[], rows_def=[], # row-col size definitions
+                #eg. cols_def=[1,1,3,1], rows_def=[1],
+                ncols=None, nrows=None, # or just how many same-sized ones
+                keep_old_ax=False,  # experimental
                 **subplots_kwargs): # passthrough
         """ 
         make n column axes
@@ -2585,14 +2587,27 @@ class myinkc(hopper):
             - nrows
         """
         
-        # total graph slots, for gridspec basis
-        #   - auto-def makes evenly spaced subplot axs "grid"
-        #   - man-def would allow maybe backdrop-ax w overlay-spinds
+        # # total graph slots, for gridspec basis
+        if ncols and cols_def:
+            raise Exception("spinds - either ncols or cols_def, not both!")
+        elif nrows and rows_def:
+            raise Exception("spinds - either ncols or rows_def, not both!")
+        
+        #   either calc background-grid from list
+        #       (later newer axs laid ontop according to row/cols-def lists)
         if not ncols:
             ncols = sum(cols_def)
         if not nrows:
             nrows = sum(rows_def)
+        #   or make same-sized ones
+        if not cols_def:
+            cols_def = np.ones(ncols, dtype=np.int8)
+        if not rows_def:
+            rows_def = np.ones(nrows, dtype=np.int8)
         
+        # tweet
+        self.log.info(f"making spinds -- {ncols=}, {nrows=}")
+
         # generate plot, get gridspec
         fig, axs_mx = plt.subplots(ncols=ncols, nrows=nrows, **subplots_kwargs)
         
@@ -3855,7 +3870,7 @@ def spind_shieldbadge_test():
     pe.setLogLevel("DEBUG")
 
     i=3
-    pe.spinds([5,1,1], keep_old_ax=True)
+    pe.spinds([5,1,1],[1], keep_old_ax=True)
     #pe.subplots()
     text = [f"N0{i}" for i in range(0,i)]
     #text = "\n".join(text)
@@ -3955,7 +3970,7 @@ def gridspec_patch_test():
 
 def spind_path_test():
     pe = myinkc()
-    pe.spinds()
+    pe.spinds(cols_def=[1,1,3,1], rows_def=[1])
     ax = pe.get_ax()
 
     # Example path
