@@ -2876,7 +2876,9 @@ class myinkc(hopper):
                 - choose all black for outlines
             """
         
-        # init a var
+        # # init vars
+        # at the beginning, this is only the call vars
+        initial_local_vars = locals().copy()
         common_meta = {}
 
         # direct Fruit plotting option
@@ -2919,14 +2921,18 @@ class myinkc(hopper):
             self.ax_backtrack()
         
         elif makecanvas=="n":
+            # # recursively call itself
             for outline in outlines:
-                
-                # recursively call self
-                self.plot_outlines(outlines=[outline], makecanvas=1,
-                                    gradientplot=gradientplot, monocolor=monocolor,
-                                    legend=legend, renormalize=renormalize,
-                                    do_offset=do_offset, linestyle_dict=linestyle_dict,
-                                    **kwargs)
+                # this is the way to go for adding new parameters
+                #   to fct call without having to add them here manually
+                kwargs_togo = initial_local_vars.copy()
+                kwargs_togo.pop("self")
+                kwargs_togo.pop("outlines")
+                kwargs_togo.pop("makecanvas")
+                kwargs_togo.pop("kwargs")
+                kwargs_togo.update(kwargs)
+                # call itself
+                self.plot_outlines(outlines=[outline], makecanvas=1, **kwargs_togo)
                 # delete so it won't be looped over below
                 outlines = []
 
