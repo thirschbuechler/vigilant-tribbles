@@ -2853,7 +2853,7 @@ class myinkc(hopper):
                         gradientplot=False, monocolor=False, # colorfullness
                         makecanvas=True, legend=True,
                         renormalize=True, do_offset=True, # data manipulation
-                        linestyle_dict={}, **kwargs):
+                        linestyle_dict={}, show_bins=False, **kwargs):
         """ hist plotter
             - outlines = (hist, bins, metadata)
             
@@ -3026,9 +3026,17 @@ class myinkc(hopper):
                 self.subplots()
             elif makecanvas=="gallery":
                 self.ax_onward()
-            
+
+            # plot bin grid?
+            if show_bins:
+                # plot vertical lines at bin edges
+                for bin in bins:
+                    self.get_ax().axvline(bin, color="gray", linestyle="--", alpha=0.25, zorder=1)
+
             # plot
-            self.plot(x, y, **pkwargs)
+            self.plot(x, y, zorder=10, **pkwargs)
+
+
             
             #print(f"plotted {hist} {metadata}")
 
