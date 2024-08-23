@@ -3021,6 +3021,7 @@ class myinkc(hopper):
             # offset / normalize
             if ("offset_dB" in metadata) and do_offset:
                 x+=metadata["offset_dB"]*np.ones(np.shape(x))
+                bins+=metadata["offset_dB"] # for show_bins
             #
             if renormalize:
                 y=y/ml.nanmax(y)
@@ -3033,16 +3034,17 @@ class myinkc(hopper):
             elif makecanvas=="gallery":
                 self.ax_onward()
 
+            # plot
+            self.plot(x, y, zorder=10, **pkwargs)
+
             # plot bin grid?
             if show_bins:
                 # plot vertical lines at bin edges
                 for bin in bins:
                     self.get_ax().axvline(bin, color="gray", linestyle="--", alpha=0.25, zorder=1)
 
-            # plot
-            self.plot(x, y, zorder=10, **pkwargs)
-
-
+                self.log.error(f"{k=},{bins}")
+                self.log.error(f"{k=},{x=}")
             
             #print(f"plotted {hist} {metadata}")
 
