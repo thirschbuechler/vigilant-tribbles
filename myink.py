@@ -2851,7 +2851,7 @@ class myinkc(hopper):
 
     def plot_outlines(self, outlines=None,
                         gradientplot=False, monocolor=False, # colorfullness
-                        makecanvas=True, legend=True,
+                        makecanvas=True, legend=True, badgedata={}, 
                         renormalize=True, do_offset=True, # data manipulation
                         linestyle_dict={}, show_bins=False, **kwargs):
         """ hist plotter
@@ -2880,6 +2880,7 @@ class myinkc(hopper):
         # at the beginning, this is only the call vars
         initial_local_vars = locals().copy()
         common_meta = {}
+        gcodes = []
 
         # direct Fruit plotting option
         if not outlines:
@@ -2908,18 +2909,39 @@ class myinkc(hopper):
         else:
             g = gradientmaster(datalen=l, gradientplot=gradientplot, monocolor=monocolor)
 
-        # figure
+
+        if makecanvas==1 or makecanvas=="gallery":
+                        
+            # collect metadata
+            metadatas = []
+            for k, (hist, bins, metadata) in enumerate(outlines):
+                gcode = metadata.pop("gcode","")
+                for key in metadata:
+                    value = metadata[key]
+                    if str(f"{key}: {value}") in gcode:
+                        metadata.pop(key)
+                        raise Exception(f"metadata key {key} is in gcode")
+                # remember result for later
+                gcodes.append(gcode)
+                metadatas.append(metadata)
+                # backpropagate pop
+                outlines[k] = (hist, bins, metadata)
+
+        # # figure switch
+        # gallery grid
         if makecanvas=="gallery":
 
             # find out how to decompose it into an nxm grid
             nrows, ncols = ml.gallery_factors(l)
 
+            # make grid canvas
             self.spinds(ncols=ncols, nrows=nrows)
 
             # dirty loop fix for using ax_onward() before each loop-plot,
             #       to not go out of bound on last ax_onward, after last pot
             self.ax_backtrack()
         
+        # multifigure
         elif makecanvas=="n":
             # # recursively call itself
             for outline in outlines:
@@ -2938,16 +2960,9 @@ class myinkc(hopper):
 
         # find common meta, prep, in case of single-canvas straight-forward no-malarky
         elif makecanvas==1:
-            
             # common figure
             self.subplots()
 
-            # collect metadata
-            metadatas = []
-            for k, (hist, bins, metadata) in enumerate(outlines):
-                # remember result for later
-                metadatas.append(metadata)
-            
             # remove unwanted metadata
             #   - to not end up on labels
             #   - to not kill the dictlist-intersection (eg. key10=[dict(1=2),dict(2=3)] --> unhasable error)
@@ -3006,7 +3021,7 @@ class myinkc(hopper):
                 # unless offset, remove
                 if key != "offset_dB":
                     metadata.pop(key,"")
-            
+
             label = metadata_to_str(metadata)
                 
             #label = f"${label}$" /u2009 issue
@@ -3037,14 +3052,19 @@ class myinkc(hopper):
             # plot
             self.plot(x, y, zorder=10, **pkwargs)
 
+            if not makecanvas=="gallery":
+                # add shieldbadge
+                badgedata = dict(badgedata, mylist=gcodes, anchor="topleft",fixedscale=0.85)
+                self.add_shieldbadge(**badgedata)
+
             # plot bin grid?
             if show_bins:
                 # plot vertical lines at bin edges
                 for bin in bins:
                     self.get_ax().axvline(bin, color="gray", linestyle="--", alpha=0.25, zorder=1)
 
-                self.log.error(f"{k=},{bins}")
-                self.log.error(f"{k=},{x=}")
+                self.log.crumb(f"{k=},{bins}")
+                self.log.crumb(f"{k=},{x=}")
             
             #print(f"plotted {hist} {metadata}")
 
