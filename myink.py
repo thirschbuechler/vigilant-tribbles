@@ -3051,13 +3051,9 @@ class myinkc(hopper):
 
             # plot
             self.plot(x, y, zorder=10, **pkwargs)
+            self.log.crumb(f"plotted {hist} {metadata}")
 
-            if not makecanvas=="gallery":
-                # add shieldbadge
-                badgedata = dict(badgedata, mylist=gcodes, anchor="topleft",fixedscale=0.85)
-                self.add_shieldbadge(**badgedata)
-
-            # plot bin grid?
+            # plot bin grid
             if show_bins:
                 # plot vertical lines at bin edges
                 for bin in bins:
@@ -3065,8 +3061,14 @@ class myinkc(hopper):
 
                 self.log.crumb(f"{k=},{bins}")
                 self.log.crumb(f"{k=},{x=}")
-            
-            #print(f"plotted {hist} {metadata}")
+
+            # add shieldbadge,
+            #   after all plotting done (incl. vlines)
+            if not makecanvas=="gallery":
+                # add shieldbadge
+                badgedata = dict(badgedata, mylist=gcodes, anchor="topleft",fixedscale=0.85)
+                self.add_shieldbadge(**badgedata)
+
 
         # # finalize graph # #
         # make title txt
