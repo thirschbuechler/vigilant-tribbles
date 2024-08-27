@@ -3048,6 +3048,7 @@ class myinkc(hopper):
                 self.subplots()
             elif makecanvas=="gallery":
                 self.ax_onward()
+                self.hidexy()
 
             # plot
             self.plot(x, y, zorder=10, **pkwargs)
