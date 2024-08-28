@@ -1328,7 +1328,7 @@ class myinkc(hopper):
 
     def add_shieldbadge(self, mylist, front=True, dbg=False, extend_outside=False,
                         dscale=None, wscale=1, fixedscale=None, targetat4pt = 3/4, targetat10pt=1, linescale=None, # scaling factors
-                        anchor="topright",# placement
+                        anchor="topright", anchorlegacy=True, # placement
                         exclude=[]):
         """ add a shield-badge-like shaped textbox in upper right corner, call after plot AND xlabels etc. done
         
@@ -1375,7 +1375,8 @@ class myinkc(hopper):
         mylist2 = []
         for listitem in mylist:
             if not any(listitem in ex for ex in exclude):
-                mylist2.append(listitem)
+                if listitem !=" ":
+                    mylist2.append(listitem)
 
         mylist = mylist2
 
@@ -1426,9 +1427,11 @@ class myinkc(hopper):
         # lines are breaks+1
         l = text.count("\n")+1
         
-        # scaled till it looked good
+        # scaled n till it looked good
         n = l-4
         n = 0.05*n
+        # nugget h
+        h = 0.25 + n
 
         # # shield-text pos according to anchor
         text_x = None
@@ -1444,15 +1447,13 @@ class myinkc(hopper):
                 text_x = 0.5
                 text_y = 0.5
             
-            # then overwrite x ..
+            # .. then overwrite x ..
 
             # right left
             if "right" in anchor:
-                text_x = 0.85
-                #text_y = 0.8
+                text_x = 0.85   
             elif "left" in anchor:
                 text_x = 0.15
-                #text_y = 0.5
 
             # .. or y, if needed.
 
@@ -1472,12 +1473,38 @@ class myinkc(hopper):
             raise Exception(f"shieldbadge - {anchor=} not parsable or implemented")
 
 
+        # rescale and correct offset
+        if not anchorlegacy:
+            # get bounds
+            xlims = ax.get_xlim()
+            ylims = ax.get_ylim()
+            
+            # calc scales
+            xscale = (xlims[1]-xlims[0])
+            yscale = (ylims[1]-ylims[0])
+
+            # move from 0..1 to new coord sys
+            text_x = text_x * xscale + xlims[0] 
+            text_y = text_y * yscale + ylims[0]
+
+            # scale nugget h and wscale factor
+            h *= yscale
+            wscale *= xscale
+
+            # data coordinates
+            transform=ax.transData
+        else:
+            # axis coordinates
+            transform=ax.transAxes
+
         # nugget - vertical stretched hexagon
         # dimensions
-        h = 0.25 + n
+        #h = 0.25 + n # moved up to n-calc
+
         w = 0.1 * wscale
         s = h/2.5
 
+        self.log.info(f"shieldbadge {h=:.2f}, {w=:.2f}, {s=:.2f}")
         # center anchor
         cx = text_x
         cy = text_y
@@ -1544,7 +1571,7 @@ class myinkc(hopper):
             linewidth = linescale
 
         # create the patch
-        shield = patches.PathPatch(path, facecolor='white', alpha=0.5, edgecolor='black', linewidth=linewidth,transform=ax.transAxes, clip_on=extend_outside)
+        shield = patches.PathPatch(path, facecolor='white', alpha=0.5, edgecolor='black', linewidth=linewidth, transform=transform, clip_on=extend_outside)
         shield.set_zorder(10)  # place on top
 
         # add the patch to the Axes
@@ -3273,15 +3300,16 @@ class myinkc(hopper):
 
 
     def reset_coordsys(self):
-        """ reset coord sys to absolute - eg clean up previous plot random spacing (G53 gcode)
+        """ reset coord sys to absolute - eg clean up previous plot random spacing by putting a dummy plot ontop (similar -- but not same effect -- to G53 gcode)
             - e.g. histos have 0,0 on lower left and not 0,0 on upper right per def --> call before and after annotating it w plot 
+            - better: get xlims, ylims and scale whatever text or rectangle etc has to go somewhere
 
             (previously used twinx, twiny, but that creates two new axes. It is better to just make one "manually" via add_axes)
 
             ! temporarily puts it into self.ax, not into self.axs as that messes up plots !
             --> ergo, cannot be found with ax_onward or ax_backtrack
 
-            returns new ax, 
+            returns new ax (not autosaved in self.axs)
 
         """ 
         fig = self.get_fig()
@@ -4020,7 +4048,7 @@ def shield_textlen_test(lens=[1,2,2,5], rowsubplot=False):
     pe.show()
 
 
-def spind_shieldbadge_test():
+def spind_shieldbadge_test(front=False, plotnr=0):
     pe = myinkc()    
     pe.setLogLevel("DEBUG")
 
@@ -4031,13 +4059,22 @@ def spind_shieldbadge_test():
     #text = "\n".join(text)
 
     #pe.reset_coordsys()
-    pe.ax_onward()
-    pe.ax_onward()
-    pe.ax_onward()
     
-    pe.add_shieldbadge(text, anchor="center", front=True)
+    pe.get_ax().set_xlim(20,80)
+    pe.get_ax().set_ylim(10,50)
+
+    #pe.get_ax().set_xlim(0,20)
+    #pe.get_ax().set_ylim(0,30)
+
+
+    plotnr = abs(plotnr)
+    while plotnr:
+        pe.ax_onward()
+        plotnr-=1
+    
+    pe.add_shieldbadge(text, anchor="center", front=front, anchorlegacy=False)
     # probably shieldbadge ok but spinds gridspec faulty, as cannot put manual shieldbadge onto spind, but manual shieldbadge onto manual gridspec
-    plt.title("both pe")
+    plt.title(f"both pe, {front=}, {plotnr=}")
 
     pe.show()
 
