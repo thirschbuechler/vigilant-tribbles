@@ -475,6 +475,54 @@ class myinkc(hopper):
         # legacy return val
         return self.ax
     
+    
+    def check_ax(self, ax=None, out=None):
+        """ dbg check axis for plotted objects
+            - ax: axis to check (default: self.ax)
+            - out: output function (default: self.log.info)
+            """
+        
+        if out is None:
+            out = self.log.info
+        
+        ax = self.get_ax(ax)
+        
+        # Check if the axis is visible
+        is_visible = ax.get_visible()
+        out(f"Axis visible: {is_visible}")
+
+        # Get the number of lines plotted
+        lines = ax.get_lines()
+        out(f"Number of lines plotted: {len(lines)}")
+
+        # Get the number of patches (e.g., rectangles, circles)
+        #patches = ax.get_patches()
+        patches = ax.patches # old mpl fix
+        out(f"Number of patches plotted: {len(patches)}")
+
+        # Get the number of images
+        images = ax.get_images()
+        out(f"Number of images plotted: {len(images)}")
+
+        # Get the number of collections (e.g., scatter plots)
+        #collections = ax.get_collections()
+        collections = ax.collections
+        out(f"Number of collections plotted: {len(collections)}")
+
+        # Get the number of text objects
+        texts = ax.texts
+        out(f"Number of text objects: {len(texts)}")
+
+        # Get the number of artists (general objects)
+        artists = ax.get_children()
+        out(f"Number of artists: {len(artists)}")
+
+        # Check axis limits
+        xlim = ax.get_xlim()
+        ylim = ax.get_ylim()
+        out(f"X-axis limits: {xlim}")
+        out(f"Y-axis limits: {ylim}")
+
 
     def get_ax(self, ax=None): 
         """ get class' ax or check if ax is passed and route through 
