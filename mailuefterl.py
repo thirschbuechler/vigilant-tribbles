@@ -637,7 +637,7 @@ def recursive_array(obj):
         return np.stack([recursive_array(x) for x in obj])
     
 
-def autoroadkill(thing):
+def autoroadkill(thing, halt=True):
     """
     there can be only one dimension
     
@@ -656,8 +656,18 @@ def autoroadkill(thing):
     >>> autoroadkill([["a", "b", "c"], ["e", "f"], ["3"]])
     array(['a', 'b', 'c', 'e', 'f', '3'], dtype='<U1')
 
+    >>> autoroadkill(['A, B, C', ['E', 'F', 'C', 'D']])
+    array(['A, B, C', 'E', 'F', 'C', 'D'], dtype=object)
+
+    >>> autoroadkill(np.array(['A, B, C', ['E', 'F', 'C', 'D']], dtype=object))
+    array(['A, B, C', 'E', 'F', 'C', 'D'], dtype=object)
+
     """
-    kwargoptions = [dict(hard=False, soft=False), dict(hard=True, soft=False), dict(soft=True, hard=False), dict(hard=2, soft=False)]
+    kwargoptions = [dict(hard=False, soft=False),
+                    dict(hard=True, soft=False),
+                    dict(soft=True, hard=False),
+                    dict(hard=2, soft=False),
+                    dict(hard=False, soft=2)]
     for kwargoption in kwargoptions:
         try:
             res = roadkill(thing, **kwargoption)
@@ -673,7 +683,10 @@ def autoroadkill(thing):
 
     # but raise an exception if no shape change, 
     #       and no return triggered above
-    raise Exception(f"no shape change for {thing} with roadkill")
+    if halt:
+        raise Exception(f"no shape change for {thing} with roadkill")
+    else:
+        return thing
 
 
 def roadkill(thing, hard=False, soft=False):
@@ -752,10 +765,23 @@ def roadkill(thing, hard=False, soft=False):
         
         # convert in case boolean is used
         hard = int(hard)
+        soft = int(soft)
         
-        if soft:
+        
+        if soft==1:
             # skip hardnesses
             return np.squeeze(thing)
+        elif soft==2:
+            # charm the input so it yields
+            
+            def flatten(lst):
+                for item in lst:
+                    if isinstance(item, list):
+                        yield from flatten(item)
+                    else:
+                        yield item
+
+            return np.array(list(flatten(thing)), dtype=object)
 
         # please be flat - squish a little
         if not hard:

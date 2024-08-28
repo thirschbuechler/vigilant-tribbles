@@ -1367,8 +1367,11 @@ class myinkc(hopper):
             pass
 
         # remove duplicates of flattened list
-        mylist = ml.autoroadkill(mylist)
-        mylist = list(set(mylist))
+        mylist = ml.autoroadkill(mylist, halt=False)
+        try:
+            mylist = list(set(mylist))
+        except:
+            raise Exception(f"shieldbadge - {mylist=} unhashable")
 
         # cycle over input and remove excluders
         #   note: list-comprehension doesn't work here
