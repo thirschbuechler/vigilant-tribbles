@@ -202,6 +202,7 @@ class hopper(portal):
         s = sanitize_filepath(s) # most issues solved
         s = s.replace("/", "") # don't get folders by a desanitzed slash-n
         s = s.replace(" ","_") # no spaces allowed - to facilitate easier shell processing
+        s = s.replace(",","_") # no commas allowed - stupid for csv
         return s
 
 
