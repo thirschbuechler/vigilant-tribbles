@@ -261,9 +261,7 @@ class myinkc(hopper):
             # pyright, pylance: ignore import error on module not present
             import tikzplotlib # type: ignore
             tikzplotlib.save(fn)
-            self.log.info("tikz saved {} in {}".format(fn, self.getpath() ) )
-            #self.subplot_counter+=1 # nope subplots does tha
-        #elif self.outputformat=="png":
+
         else:
             # assume png, svg, pdf, .. (something mpl can do) is chosen
             fn = "{}.{}".format(fn,self.outputformat)
@@ -275,6 +273,9 @@ class myinkc(hopper):
                     facecolor='auto', edgecolor='auto',
                     backend=None, **kwargs)
             """
+        
+        # tweet
+        self.log.info(f"saved {fn} in {self.getpath()}")
         
         # optional cleanup
         if self.close_after_savefig:
