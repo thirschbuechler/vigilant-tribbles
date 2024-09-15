@@ -1055,6 +1055,19 @@ def bintreesearch(evalfct, maxdeviate, left, right, echo=False, aborter=None):
 
 
 def list_to_range(lst):
+    """
+    convert list to range if possible, else return list
+    
+    note: may need str(list_to_range(list)) to prevent
+            the expansion of range-generator into list again
+    
+    >>> list_to_range([1,2,3,4,5])
+    range(1, 6)
+    
+    >>> list_to_range([1,5])
+    [1, 5]
+    
+    """
     low = int(min(lst))
     high = int(max(lst))
 
