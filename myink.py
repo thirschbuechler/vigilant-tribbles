@@ -1354,6 +1354,8 @@ class myinkc(hopper):
                 * or list of x,y
             - extend_outside: allowed to be outside the plot area rectangle?
             - front: put in front of the rest? HACK - reset coordsys
+
+            DO NOT CHANGE XLIMS, YLIMS, or use AUTOSCALE etc. afterwards!
         """
         
         if hasattr(self,"gcode_masseur"):
@@ -3129,7 +3131,7 @@ class myinkc(hopper):
                 self.ax_onward()
                 self.hidexy()
 
-            # plot
+            # --> plot <-- #
             self.plot(x, y, zorder=10, **pkwargs)
             self.log.crumb(f"plotted {hist} {metadata}")
 
@@ -3142,12 +3144,17 @@ class myinkc(hopper):
                 self.log.crumb(f"{k=},{bins}")
                 self.log.crumb(f"{k=},{x=}")
 
-            # add shieldbadge,
-            #   after all plotting done (incl. vlines)
-            if not makecanvas=="gallery":
-                # add shieldbadge
-                badgedata = dict(badgedata, mylist=gcodes, anchor="topleft",fixedscale=0.85)
-                self.add_shieldbadge(**badgedata)
+            if k==len(outlines)-1:
+                # add shieldbadge,
+                #   after all plotting done (incl. vlines)
+                if not makecanvas=="gallery":
+                    # defaults
+                    bdefaults = dict(anchor="topleft")
+                    # start with bdefaults and overwrite with badgedata if given
+                    badgedata = dict(bdefaults, **badgedata)
+                    # add shieldbadge
+                    badgedata = dict(badgedata, mylist=gcodes)
+                    self.add_shieldbadge(**badgedata)
 
 
         # # finalize graph # #
