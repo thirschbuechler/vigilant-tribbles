@@ -2933,7 +2933,7 @@ class myinkc(hopper):
     def plot_outlines(self, outlines=None,
                         gradientplot=False, monocolor=False, # colorfullness
                         makecanvas=True,
-                        legend=True, badgedata={}, show_bins=False, # annotations, for badgedata: set to None to disable
+                        legend=True, badgedata={}, show_bins=False, dontlabel=[], # annotations
                         renormalize=True, do_offset=True, # data manipulation
                         linestyle_dict={}, **kwargs): # plot() options
         """ hist plotter
@@ -2967,6 +2967,8 @@ class myinkc(hopper):
                 - show legend (bool: respect 10 threshold)
             - kwargs
                 - passthrough to plot()
+            - dontlabel (list)
+                - remove metadata keys from label
 
             """
         
@@ -3089,11 +3091,6 @@ class myinkc(hopper):
         # plot
         monoculture_lines = False
         for k, (hist, bins, metadata) in enumerate(outlines):
-            #print(metadata) # ff data comes here from fusion - ok
-            # # prepare
-
-            #if "avl" in metadata:
-            #    hist *= avl
 
             # fetch linestyle if msr
             if "msr" in metadata:
@@ -3106,23 +3103,36 @@ class myinkc(hopper):
                     monoculture_lines = False
                 else:
                     monoculture_lines = True
-                
             else:
                 linestyle = None
 
-            # remove known common metadata from label/legend
-            for key in common_meta.keys():
-                # unless offset, remove
-                if key != "offset_dB":
-                    metadata.pop(key,"")
+            # # build label # #
+            # remove offset from dontlabel if not applied
+            if not do_offset:
+                common_meta.pop("offset_dB", None)
+                metadata.pop("offset_dB", None)
 
+            # prep 
+            commonkeys_dontlabel = list(common_meta.keys())
+
+            # add to dontlabel ..
+            dontlabel.extend(commonkeys_dontlabel)
+            # .. and remove duplicates
+            dontlabel = list(set(dontlabel))
+
+            # do the popping
+            for key in dontlabel:
+                metadata.pop(key, "")
+
+            # generate label for this hist instance from metadata
             label = metadata_to_str(metadata)
                 
             #label = f"${label}$" /u2009 issue
 
-            # # fix overflowing legend-newlines
+            # fix overflowing legend-newlines
             label = ms.str_to_blocktext(label, ", ", " ", 80)
 
+            # # plotprep perloop
             # fetch
             x = ml.bin_to_xaxis(bins)
             y = hist
@@ -3136,7 +3146,7 @@ class myinkc(hopper):
                 y=y/ml.nanmax(y)
                 #txt.append("histogram, normalized outlines") # below
 
-            # plotprep per loop
+            # kwargs
             pkwargs = dict(label=label, linestyle=linestyle, color=g.cycle(k))
             if makecanvas=="n":
                 self.subplots()
@@ -3144,12 +3154,11 @@ class myinkc(hopper):
                 self.ax_onward()
                 self.hidexy()
 
+            #
             # --> plot <-- #
             self.plot(x, y, zorder=10, **pkwargs)
             self.log.crumb(f"plotted {hist} {metadata}")
-
-
-
+            #
                     
             # plot bin grid
             if show_bins:
