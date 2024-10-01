@@ -2932,17 +2932,18 @@ class myinkc(hopper):
 
     def plot_outlines(self, outlines=None,
                         gradientplot=False, monocolor=False, # colorfullness
-                        makecanvas=True, legend=True, badgedata={}, 
+                        makecanvas=True,
+                        legend=True, badgedata={}, show_bins=False, # annotations, for badgedata: set to None to disable
                         renormalize=True, do_offset=True, # data manipulation
-                        linestyle_dict={}, show_bins=False, **kwargs):
+                        linestyle_dict={}, **kwargs): # plot() options
         """ hist plotter
             - outlines = (hist, bins, metadata)
             
-            - renormalize: adapt based on y_max
-            - do_offset: use metadata["offset_dB"]
+            - renormalize (bool): adapt based on y_max
+            - do_offset (bool): use metadata["offset_dB"]
 
             # options
-            makecanvas:
+            - makecanvas:
                 - 1:
                     - common-meta and subplots()
                     - uncommon metadata in legend
@@ -2951,10 +2952,22 @@ class myinkc(hopper):
                     - one figure per outline
                 - gallery:
                     - one figure (spind) for all outlines
-            gradientplot
+            - gradientplot
                 - for each hist, select color along spectrum of cm.turbo
-            monocolor
+            - monocolor
                 - choose all black for outlines
+            - badgedata
+                - shieldbadge kwargs
+                - set to None to disable
+            - linestyle_dict (dict)
+                - msr: linestyle
+            - show_bins (bool)
+                - overlay bins as vlines
+            - legend (bool or "force")
+                - show legend (bool: respect 10 threshold)
+            - kwargs
+                - passthrough to plot()
+
             """
         
         # # init vars
@@ -3135,6 +3148,9 @@ class myinkc(hopper):
             self.plot(x, y, zorder=10, **pkwargs)
             self.log.crumb(f"plotted {hist} {metadata}")
 
+
+
+                    
             # plot bin grid
             if show_bins:
                 # plot vertical lines at bin edges
@@ -3147,7 +3163,18 @@ class myinkc(hopper):
             if k==len(outlines)-1:
                 # add shieldbadge,
                 #   after all plotting done (incl. vlines)
-                if not makecanvas=="gallery":
+
+                # # legend or log metadata # #
+                
+                if (l<10 and legend) or legend=="force":
+                    self.legend()
+                else:
+                    self.log.error("legend disabled by default, use legend=\"force\" to override")
+                    #if (not monoculture_lines and n>10) or (monoculture_lines and n>5):
+                    for k, (hist, bins, metadata) in enumerate(outlines):
+                        self.log.info(f"{k}: {metadata}")
+                        
+                if (badgedata != None) and (not makecanvas=="gallery"):
                     # defaults
                     bdefaults = dict(anchor="topleft")
                     # start with bdefaults and overwrite with badgedata if given
@@ -3192,13 +3219,7 @@ class myinkc(hopper):
             #self.get_fig().subplots_adjust(hspace=0.0, wspace=0.0)
             self.gs.update(hspace=0.0, wspace=0.0)
             
-        # print metadata, or make legend
-        #if (not monoculture_lines and n>10) or (monoculture_lines and n>5):
-        if l>10:
-            for k, (hist, bins, metadata) in enumerate(outlines):
-                self.log.info(f"{k}: {metadata}")
-        elif legend:
-            self.legend()
+
 
 
 # https://stackoverflow.com/questions/17212722/matplotlib-imshow-how-to-animate
