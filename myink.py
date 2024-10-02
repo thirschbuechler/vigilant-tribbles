@@ -2933,7 +2933,7 @@ class myinkc(hopper):
     def plot_outlines(self, outlines=None,
                         gradientplot=False, monocolor=False, # colorfullness
                         makecanvas=True,
-                        legend=True, badgedata={}, show_bins=False, dontlabel=[], # annotations
+                        legend=True, badgedata={}, show_bins=False, dontlabel=[], onlylabel=[], # annotations
                         renormalize=True, do_offset=True, # data manipulation
                         linestyle_dict={}, **kwargs): # plot() options
         """ hist plotter
@@ -2968,7 +2968,9 @@ class myinkc(hopper):
             - kwargs
                 - passthrough to plot()
             - dontlabel (list)
-                - remove metadata keys from label
+                - remove certain metadata keys from label
+            - onlylabel (list)
+                - exclusively use these metadata keys for label
 
             """
         
@@ -3113,16 +3115,24 @@ class myinkc(hopper):
                 metadata.pop("offset_dB", None)
 
             # prep 
-            commonkeys_dontlabel = list(common_meta.keys())
+            commonkeys = list(common_meta.keys())
+            keys = list(metadata.keys())
 
-            # add to dontlabel ..
-            dontlabel.extend(commonkeys_dontlabel)
-            # .. and remove duplicates
-            dontlabel = list(set(dontlabel))
+            # # onlylabel vs dontlabel operation
+            # build a dict from metadata (noncommon) using onlylabel keys
+            if onlylabel:
+                metadata = {key:metadata[key] for key in onlylabel}
+            
+            # regular operation
+            else:
+                # add to dontlabel ..
+                dontlabel.extend(commonkeys)
+                # .. and remove duplicates
+                dontlabel = list(set(dontlabel))
 
-            # do the popping
-            for key in dontlabel:
-                metadata.pop(key, "")
+                # do the popping
+                for key in dontlabel:
+                    metadata.pop(key, "")
 
             # generate label for this hist instance from metadata
             label = metadata_to_str(metadata)
