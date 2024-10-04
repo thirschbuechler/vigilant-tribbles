@@ -676,9 +676,9 @@ class myinkc(hopper):
     
     def killlegend(self,ax=None):
         ax = self.get_ax(ax)
-        oh_my = ax.get_legend()
-        if oh_my:
-            oh_my.remove()
+        leg = ax.get_legend()
+        if leg:
+            leg.remove()
 
 
     def yticklabels(self, stuff, offset=0, **kwargs):
@@ -706,17 +706,63 @@ class myinkc(hopper):
         return ax.legend(**kwargs)
 
 
-    def modlegend(self, mylegendtext=None, addtext=None, title=None, rmsubstr=None, ax=None, *args, **kwargs):#, *args, **kwargs for ax.legend only
-        """ OLD - h,l = get_legend_handles_labels() is kinda better
-            legend handler and creator 
-            - create out of self.mylegend if no mylegendtext passed 
-            - use mylegendtext (if passed and same len)
-            - remove shit with rmsubstr
-            - DOES NOT WORK FOR plot, as it does not save mylegendtext
+    def renewlegend(self, **kwargs):
+        """ fetch current legend settings,
+                and radapt according to kwargs
+            
+            some parameters and defaults here:
+            - fontsize=10
+            - loc='best'
+            - bbox_to_anchor
+            - borderaxespad
+            """
+        
+        # get current ax
+        ax = self.get_ax()
+
+        # get current legend settings
+        leg = ax.get_legend()
+
+        legkwargs = {}
+        if leg is not None:
+            # both in one, but does not work for manually inserted stuff
+            #h,l = ax.get_legend_handles_labels()
+
+            # legend lines
+            legkwargs["handles"] = leg.legendHandles
+            # text strings
+            legkwargs["labels"] = [t.get_text() for t in leg.get_texts()]
+                        
+            # guess a font size
+            legkwargs["fontsize"] = 10
+            
+            # loc
+            legkwargs["loc"] = 'best'
+
+            # remove oldlegend
+            leg.remove()
+            
+            # update with new settings
+            legkwargs.update(kwargs)
+            
+            # place new legend
+            ax.legend(**legkwargs)
+        else:
+            self.log.error("no legend to renew")
+
+
+    def modlegend(self, mylegendtext=None, addtext=None, title=None, # at least one required
+                        rmsubstr=None, ax=None,
+                            *args, **kwargs):#, *args, **kwargs for ax.legend
+        """ 
+            legend modder
+            - messy, old
+            - renewlegend() is for changing kwargs of an existing one
             """
         # addtext is a list of same len as legend    
         ax = self.get_ax(ax)
         
+        # scenario: build empty from text
         if mylegendtext!=None: 
             if len(mylegendtext)>0:
                 
@@ -737,47 +783,46 @@ class myinkc(hopper):
                             transform=ax.transAxes) # transform means koord sys of graph, not data
                     # todo: maybe more options from https://matplotlib.org/3.1.1/tutorials/text/text_intro.html
         
+        # scenario: addtext
         elif type(addtext)!=type(None):#check type to avoid elementwise
             ll=list(ax.get_legend().get_texts()) # fetch what is there
             texts = [item._text for item in ll ]
-            mylegendtext=texts
-            #print(texts)
+
             texts = [ texti+str(addi) for texti,addi in zip(texts,addtext)]
             #    note: only goes as far as lowest itemcount, see
             #   [(xi+xu) for xi,xu in zip(np.ones(2), np.zeros(5))]
             ax.legend(texts)
             
+        # scenario: title given too
+        #https://stackoverflow.com/questions/16826711/is-it-possible-to-add-a-string-as-a-legend-item-in-matplotlib
         if title!=None:
-            #print(title)
-            from matplotlib.patches import Rectangle 
-            #https://stackoverflow.com/questions/16826711/is-it-possible-to-add-a-string-as-a-legend-item-in-matplotlib
             
             ll=list(ax.get_legend().get_texts()) # fetch what is there
             texts = [item._text for item in ll ]
-            mylegendtext=texts
             
             extra = patches.Rectangle((0, 0), 1, 1, fc="w", fill=False, edgecolor='none', linewidth=0) # dummy rect
-            
-            mytext=mylegendtext
-            
+                        
             ## todo: outsource it into  "turn into list" function
-            if type(mytext)==list:
+            if type(texts)==list:
                 pass # we're good
-            elif type(mytext)==type(np.ones(1)):#numpy ndarray          
-                mytext=list(mytext)
-            elif type(mytext)==str:
-                mytext=[mytext]
+            elif type(texts)==type(np.ones(1)):#numpy ndarray          
+                texts=list(texts)
+            elif type(texts)==str:
+                texts=[texts]
             else:
-                mytext=[str(mytext)]#assume int, float, ..
+                texts=[str(texts)]#assume int, float, ..
             
             if rmsubstr!=None:
-                mytext=ms.removestringparts(rmsubstr,mytext)
-
-            mytext.insert(0,title) # insert as first ele into list
-            legendlines=ax.get_lines()[:] # decompose simple_list object, or sth.
-            legendlines.insert(0,extra) # insert into regular list
+                texts=ms.removestringparts(rmsubstr,texts)
             
-            ax.legend(legendlines, mytext)   
+            # insert as first ele into list
+            texts.insert(0,title)
+            # decompose simple_list object, or sth.
+            legendlines=ax.get_lines()[:]
+            # insert into regular list
+            legendlines.insert(0,extra) 
+            
+            ax.legend(legendlines, texts)   
     
 
     def comradekernel(self, **kwargs):
@@ -1715,24 +1760,17 @@ class myinkc(hopper):
                     #   division over 72: pt to inch
                     #   scaled arbitrarily
 
+                    # ydatalen == xdatalen probably, but..
+                    max_xlabellen = kwargs_fig.pop("max_xlabellen", 15)
+                    max_ylabellen = kwargs_fig.pop("max_ylabellen", 15)
+                
                     autolabellen = False # HACK, was inadvertenly disabled so leave
                     if autolabellen:
-                        # ydatalen == xdatalen probably, but..
-                        max_xlabellen = kwargs_fig.pop("max_xlabellen", 0)
-                        max_ylabellen = kwargs_fig.pop("max_ylabellen", 0)
-                        # some legacy guess
-                        if (not max_xlabellen) or (not max_ylabellen):
-                            max_xlabellen = 15
                         max_chars = max(max_xlabellen, max_ylabellen)
-                    
                     else:
                         max_chars = 15
-                    
-                        kwargs_fig.pop("max_xlabellen", None)
-                    
-                        kwargs_fig.pop("max_ylabellen", None)
-                    # HACK end
 
+                    # remember old pixelscale
                     pixelscale_old = pixelscale
 
                     # # lookuptable instead
