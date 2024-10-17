@@ -3031,8 +3031,8 @@ class myinkc(hopper):
                 raise Exception(f"plot_outlines got no outlines and doesn't have \"bins\" attribute either")
 
 
-        if kwargs:
-            raise Exception(f"plot_outlines got unexpected kwargs: {kwargs}")
+        #if kwargs:
+        #    raise Exception(f"plot_outlines got unexpected kwargs: {kwargs}")
 
         # keys to delete for plotting
         meta_del_list = ["filling", "setkeys"]
@@ -3195,7 +3195,7 @@ class myinkc(hopper):
                 #txt.append("histogram, normalized outlines") # below
 
             # kwargs
-            pkwargs = dict(label=label, linestyle=linestyle, color=g.cycle(k))
+            pkwargs = dict(kwargs, label=label, linestyle=linestyle, color=g.cycle(k))
             if makecanvas=="n":
                 self.subplots()
             elif makecanvas=="gallery":
