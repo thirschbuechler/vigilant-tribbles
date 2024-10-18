@@ -3122,8 +3122,6 @@ class myinkc(hopper):
             # # find out if some keys in metadatadict are same for all series
             # find keys staying the same
             common_meta = ms.dictlist_intersection(metadatas)
-            #  remove, as linestyle tells them apart anyway
-            #common_meta.pop("msr") 
             common_meta = common_meta.copy() # avoid runtimeerror when removing stuff because subinstances didnt get duplicated?
         else:
             self.log.info("ignoring common_meta, as makecanvas==False")
@@ -3134,14 +3132,15 @@ class myinkc(hopper):
 
             # fetch linestyle if msr
             if "msr" in metadata:
-                #raise Exception(msr_style_dict[metadata["msr"]])
                 linestyle = msr_style_dict[metadata["msr"]].get("linestyle", "solid")
+                
                 if not (monocolor or gradientplot):
                     color = msr_style_dict[metadata["msr"]].get("color", "grey")
                 else:
+                    # monocolor or gradientplot
                     color = g.cycle(k)
                 
-                # remove as linestyle tells them apart anyway
+                # rm msr-meta entries, as linestyles ID them
                 metadata.pop("msr")
                 if "msr" in common_meta:
                     common_meta.pop("msr","")
@@ -3214,25 +3213,6 @@ class myinkc(hopper):
             self.log.crumb(f"plotted {hist} {metadata}")
             #
                     
-            self.xlabel("RSSI [dBm]")
-            self.ylabel("scaled histograms")
-            if monocolor:
-                # make a custom legend with an entry per linestyle and a black line with that style
-                
-                lines = []
-                labels = []
-                for key in msr_style_dict.keys():
-                    linestyle = msr_style_dict[key].get("linestyle", "solid")
-                    color = msr_style_dict[key].get("color", g.cycle(k)) # only if no color given it can use gradient/monocolor!
-                    # make a fake mpl line without plotting, to put into legend
-                    line = mpl.lines.Line2D([], [], label=key, color=color, linestyle=linestyle)
-                    lines.append(line)
-                    labels.append(key)
-                
-                # howto reference: self.renewlegend()
-                self.legend(**dict(lkwargs, labels=labels, handles=lines))
-
-
             # plot bin grid
             if show_bins:
                 # plot vertical lines at bin edges
@@ -3242,31 +3222,53 @@ class myinkc(hopper):
                 self.log.crumb(f"{k=},{bins}")
                 self.log.crumb(f"{k=},{x=}")
 
-            if k==len(outlines)-1:
-                # add shieldbadge,
-                #   after all plotting done (incl. vlines)
-
-                # # legend or log metadata # #
-                # non-mono legend with metadata
-                if (l<10 and legend) or legend=="force":
-                    self.legend(lkwargs)
-                else:
-                    self.log.error("legend disabled by default, use legend=\"force\" to override")
-                    #if (not monocol_note and n>10) or (monocol_note and n>5):
-                    for k, (hist, bins, metadata) in enumerate(outlines):
-                        self.log.info(f"{k}: {metadata}")
-                        
-                if (badgedata != None) and (not makecanvas=="gallery"):
-                    # defaults
-                    bdefaults = dict(anchor="topleft")
-                    # start with bdefaults and overwrite with badgedata if given
-                    badgedata = dict(bdefaults, **badgedata)
-                    # add shieldbadge
-                    badgedata = dict(badgedata, mylist=gcodes)
-                    self.add_shieldbadge(**badgedata)
-
 
         # # finalize graph # #
+        # add shieldbadge,
+        #   after all plotting done (incl. vlines)
+
+        # # legend or log metadata # #
+
+        self.xlabel("RSSI [dBm]")
+        self.ylabel("scaled histograms")
+        # make a custom legend with an entry per linestyle and a black line with that style
+        
+        lines = []
+        labels = []
+        for key in msr_style_dict.keys():
+            linestyle = msr_style_dict[key].get("linestyle", "solid")
+            if not (monocolor or gradientplot):
+                color = msr_style_dict[key].get("color", g.cycle(k)) # only if no color given it can use gradient/monocolor!
+            else:
+                color = "black"
+            # make a fake mpl line without plotting, to put into legend
+            line = mpl.lines.Line2D([], [], label=key, color=color, linestyle=linestyle)
+            lines.append(line)
+            labels.append(key)
+        
+
+        if monocolor:
+            lkwargs.update(dict(labels=labels, handles=lines))
+            #reference: self.renewlegend()
+            
+        # non-mono legend with metadata
+        if (l<10 and legend) or legend=="force":
+            self.legend(**lkwargs)
+        else:
+            self.log.error("legend disabled by default, use legend=\"force\" to override")
+            #if (not monocol_note and n>10) or (monocol_note and n>5):
+            for k, (hist, bins, metadata) in enumerate(outlines):
+                self.log.info(f"{k}: {metadata}")
+                
+        if (badgedata != None) and (not makecanvas=="gallery"):
+            # defaults
+            bdefaults = dict(anchor="topleft")
+            # start with bdefaults and overwrite with badgedata if given
+            badgedata = dict(bdefaults, **badgedata)
+            # add shieldbadge
+            badgedata = dict(badgedata, mylist=gcodes)
+            self.add_shieldbadge(**badgedata)
+            
         # make title txt
         txt = []
         if renormalize:
