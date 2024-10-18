@@ -2971,9 +2971,9 @@ class myinkc(hopper):
     def plot_outlines(self, outlines=None,
                         gradientplot=False, monocolor=False, # colorfullness
                         makecanvas=True,
-                        legend=True, badgedata={}, show_bins=False, dontlabel=[], onlylabel=[], # annotations
+                        legend=True, badgedata={}, show_bins=False, dontlabel=[], onlylabel=[], lkwargs={}, # annotations
                         renormalize=True, do_offset=True, # data manipulation
-                        linestyle_dict={}, **kwargs): # plot() options
+                        msr_style_dict={}, **kwargs): # plot() options
         """ hist plotter
             - outlines = (hist, bins, metadata)
             
@@ -2997,8 +2997,8 @@ class myinkc(hopper):
             - badgedata
                 - shieldbadge kwargs
                 - set to None to disable
-            - linestyle_dict (dict)
-                - msr: linestyle
+            - style_dict (dict)
+                - msr: dict(color, linestyle)
             - show_bins (bool)
                 - overlay bins as vlines
             - legend (bool or "force")
@@ -3129,22 +3129,28 @@ class myinkc(hopper):
             self.log.info("ignoring common_meta, as makecanvas==False")
             
         # plot
-        monoculture_lines = False
+        monocol_note = False
         for k, (hist, bins, metadata) in enumerate(outlines):
 
             # fetch linestyle if msr
             if "msr" in metadata:
-                linestyle = linestyle_dict[metadata["msr"]]
+                #raise Exception(msr_style_dict[metadata["msr"]])
+                linestyle = msr_style_dict[metadata["msr"]].get("linestyle", "solid")
+                if not (monocolor or gradientplot):
+                    color = msr_style_dict[metadata["msr"]].get("color", "grey")
+                else:
+                    color = g.cycle(k)
                 
                 # remove as linestyle tells them apart anyway
                 metadata.pop("msr")
                 if "msr" in common_meta:
                     common_meta.pop("msr","")
-                    monoculture_lines = False
+                    monocol_note = False
                 else:
-                    monoculture_lines = True
+                    monocol_note = True
             else:
                 linestyle = None
+                color = g.cycle(k)
 
             # # build label # #
             # remove offset from dontlabel if not applied
@@ -3195,7 +3201,7 @@ class myinkc(hopper):
                 #txt.append("histogram, normalized outlines") # below
 
             # kwargs
-            pkwargs = dict(kwargs, label=label, linestyle=linestyle, color=g.cycle(k))
+            pkwargs = dict(kwargs, label=label, linestyle=linestyle, color=color)
             if makecanvas=="n":
                 self.subplots()
             elif makecanvas=="gallery":
@@ -3208,6 +3214,25 @@ class myinkc(hopper):
             self.log.crumb(f"plotted {hist} {metadata}")
             #
                     
+            self.xlabel("RSSI [dBm]")
+            self.ylabel("scaled histograms")
+            if monocolor:
+                # make a custom legend with an entry per linestyle and a black line with that style
+                
+                lines = []
+                labels = []
+                for key in msr_style_dict.keys():
+                    linestyle = msr_style_dict[key].get("linestyle", "solid")
+                    color = msr_style_dict[key].get("color", g.cycle(k)) # only if no color given it can use gradient/monocolor!
+                    # make a fake mpl line without plotting, to put into legend
+                    line = mpl.lines.Line2D([], [], label=key, color=color, linestyle=linestyle)
+                    lines.append(line)
+                    labels.append(key)
+                
+                # howto reference: self.renewlegend()
+                self.legend(**dict(lkwargs, labels=labels, handles=lines))
+
+
             # plot bin grid
             if show_bins:
                 # plot vertical lines at bin edges
@@ -3222,12 +3247,12 @@ class myinkc(hopper):
                 #   after all plotting done (incl. vlines)
 
                 # # legend or log metadata # #
-                
+                # non-mono legend with metadata
                 if (l<10 and legend) or legend=="force":
-                    self.legend()
+                    self.legend(lkwargs)
                 else:
                     self.log.error("legend disabled by default, use legend=\"force\" to override")
-                    #if (not monoculture_lines and n>10) or (monoculture_lines and n>5):
+                    #if (not monocol_note and n>10) or (monocol_note and n>5):
                     for k, (hist, bins, metadata) in enumerate(outlines):
                         self.log.info(f"{k}: {metadata}")
                         
@@ -3249,8 +3274,8 @@ class myinkc(hopper):
         else:
             txt.append("histogram")
         txt.append(f"common meta: {metadata_to_str(common_meta, maxlen=50, blocktext=True)}")
-        if not monoculture_lines:
-            txt.append(f"linestyles {metadata_to_str(linestyle_dict, maxlen=50, blocktext=True)}")
+        if not monocol_note:
+            txt.append(f"linestyles {metadata_to_str(msr_style_dict, maxlen=50, blocktext=True)}")
         
         # join
         txt = "\n".join(txt)
