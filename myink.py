@@ -2135,7 +2135,7 @@ class myinkc(hopper):
                 self.scatter(x, means-stds, marker="v", label="_", **annotargs) # triag down, label hidden
 
             # numbers
-            if stats.len < 5:
+            if (stats.len < 5) or ("force" in annot):
                 # https://stackoverflow.com/questions/58066009/how-to-display-numeric-mean-and-std-values-next-to-a-box-plot-in-a-series-of-box
                 for i, (line, mean, cstd, clen) in enumerate(zip(bp['medians'], means, stds, stats.lens)):
                     # some loop var suffixed c for current to not overwrite builtin len, std
@@ -2145,6 +2145,7 @@ class myinkc(hopper):
                     # ensure string
                     annot = str(annot)
 
+                    text = []
                     # case-switch
                     if "nerd" in annot:
                         if "smallonly" in annot:
@@ -2152,18 +2153,39 @@ class myinkc(hopper):
                         else:
                             smallonly=False
 
-                        text = f"µ={self.enginerd(mean,places=2,smallonly=smallonly)}"
-                        text += f"\nσ={self.enginerd(cstd,places=2,smallonly=smallonly)}"
+                        text.append(f"µ={self.enginerd(mean,places=2,smallonly=smallonly)}")
+                        text.append(f"\nσ={self.enginerd(cstd,places=2,smallonly=smallonly)}")
 
                     else:
-                        text = f"μ={mean:.2f}"
-                        text += f"\n σ={cstd:.2f}"
+                        text.append(f"μ={mean:.2f}")
+                        text.append(f"\n σ={cstd:.2f}")
                     
                     if "samples" in annot:
-                        text += f"\n(n={self.enginerd(clen, places=0)})"
+                        text.append(f"\n(n={self.enginerd(clen, places=0)})")
+                        
+                    if "rot90" in annot:
+                        rot = 90
+                    elif "rot45" in annot:
+                        rot = 45
+                    else:
+                        rot = 0
+
+                    if "yinv" in annot:
+                        y = 1-y
+
+                    if "pop0" in annot: # remove µ when meanoffset
+                        text.pop(0)
+
+                    # (ha="left" default anyway, drawn right) right of vertical bar
+                    if "hac" in annot:
+                        ha = "center"
+                    else:
+                        ha = "left"
+                    
+                    text = "\n".join(text)
 
                     # add text, tiny clearance for x-coord to right
-                    annotation = ax.annotate(text, xy=(x*1.05, y)) # (ha="left" default anyway, drawn right) right of vertical bar
+                    annotation = ax.annotate(text, xy=(x*1.05, y), rotation=rot, ha=ha) 
 
                     # # "boxplot auto-border mod" - move right border if needed
                     # draw the figure to update the renderer
