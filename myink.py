@@ -2135,7 +2135,7 @@ class myinkc(hopper):
                 self.scatter(x, means-stds, marker="v", label="_", **annotargs) # triag down, label hidden
 
             # numbers
-            if (stats.len < 5) or ("force" in annot):
+            if (stats.len < 5) or ("force" in str(annot)):
                 # https://stackoverflow.com/questions/58066009/how-to-display-numeric-mean-and-std-values-next-to-a-box-plot-in-a-series-of-box
                 for i, (line, mean, cstd, clen) in enumerate(zip(bp['medians'], means, stds, stats.lens)):
                     # some loop var suffixed c for current to not overwrite builtin len, std
