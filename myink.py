@@ -1372,7 +1372,7 @@ class myinkc(hopper):
             return self.get_ax().text(*args, **kwargs)
 
 
-    def add_shieldbadge(self, mylist, front=True, dbg=False, extend_outside=False,
+    def add_shieldbadge(self, mylist, disable=False, front=True, dbg=False, extend_outside=False,
                         dscale=None, wscale=1, fixedscale=None, targetat4pt = 3/4, targetat10pt=1, linescale=None, # scaling factors
                         anchor="topright", anchorlegacy=True, # placement
                         exclude=[]):
@@ -1402,6 +1402,9 @@ class myinkc(hopper):
 
             DO NOT CHANGE XLIMS, YLIMS, or use AUTOSCALE etc. afterwards!
         """
+
+        if disable:
+            return None
         
         if hasattr(self,"gcode_masseur"):
             mylist = self.gcode_masseur(mylist)
@@ -3480,14 +3483,17 @@ class myinkc(hopper):
 
 def metadata_to_str(metadata={}, blocktext=False, maxlen=40):
     for key in metadata.keys():
-        if (metadata[key]):
+        try:
+            if (metadata[key]):
 
-            if key=="avl":
-                metadata[key] = f"avl %: {(metadata[key]*100):.2f}"
-            
-            elif isinstance(metadata[key], float):
-                # np.char.isnumeric only works on strings
-                metadata[key] = ms.enginerd(metadata[key], sep=" ")
+                if key=="avl" and isinstance(metadata[key], float):
+                    metadata[key] = f"avl %: {(metadata[key]*100):.2f}"
+                
+                elif isinstance(metadata[key], float):
+                    # np.char.isnumeric only works on strings
+                    metadata[key] = ms.enginerd(metadata[key], sep=" ")
+        except Exception as e:
+            raise Exception(f"metadata_to_str {key=}, {metadata[key]=}, {e}")
 
     if blocktext:
         return ms.dict_to_blocktext(metadata, maxlinelen=maxlen)
