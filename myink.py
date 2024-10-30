@@ -2183,12 +2183,23 @@ class myinkc(hopper):
                     if "hac" in annot:
                         ha = "center"
                     else:
+                        # same as mpl default
                         ha = "left"
+
+                    if "vac" in annot:
+                        va = "center"
+                    elif "vab" in annot:
+                        va = "bottom"
+                    elif "vat" in annot:
+                        va = "top"
+                    else:
+                        # same as mpl default
+                        va = "baseline"
                     
                     text = "\n".join(text)
 
                     # add text, tiny clearance for x-coord to right
-                    annotation = ax.annotate(text, xy=(x*1.05, y), rotation=rot, ha=ha) 
+                    annotation = ax.annotate(text, xy=(x*1.05, y), rotation=rot, ha=ha, va=va) 
 
                     # # "boxplot auto-border mod" - move right border if needed
                     # draw the figure to update the renderer
