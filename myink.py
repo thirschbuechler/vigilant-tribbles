@@ -2035,7 +2035,7 @@ class myinkc(hopper):
 
     def boxplot(self, data=[], xlabels="",ylabel="", title="",
                 annot=True, mc = "green", mediancol = 'orange', meanline=False, markerkwargs={}, # annotation related args
-                availability=False, nan_bad=True,
+                availability=False, nan_bad=True, legkwargs={},
                 badgedata={},
                 **kwargs):
         """
@@ -2309,12 +2309,12 @@ class myinkc(hopper):
             h.insert(-1, markerline)
 
         # predefine legend kwargs
-        legkwargs = dict(loc="upper left", facecolor='white', framealpha=0.5)
+        locallegkwargs = dict(loc="upper left", facecolor='white', framealpha=0.5)
         
         # location dependent on datalen
 
         if stats.len == 1:
-            legkwargs.update(loc="upper left")
+            locallegkwargs.update(loc="upper left")
 
             if badgedata:
                 badgedata["anchor"] = "topright"
@@ -2327,22 +2327,24 @@ class myinkc(hopper):
             loc = "center"
             
             # legend
-            legkwargs.update(dict(bbox_to_anchor=(0.5, 0.25), loc=loc))
+            locallegkwargs.update(dict(bbox_to_anchor=(0.5, 0.25), loc=loc))
 
             # badge
             if badgedata:
                 badgedata["anchor"] = loc+"top"
         
         elif stats.len > 2:
-            legkwargs.update(dict(loc="lower center"))
+            locallegkwargs.update(dict(loc="lower center"))
 
             if badgedata:
                 badgedata["anchor"] = "botright"
         else:
             raise Exception(f"boxplot - {stats.len=} not useful, {type(data)=}\n{data=}")
 
+        locallegkwargs.update(legkwargs)
+
         # put
-        self.legend(handles=h,labels=l, **legkwargs)   
+        self.legend(handles=h,labels=l, **locallegkwargs)   
 
         self.title(title)
         self.autoscale_fig()
