@@ -2157,14 +2157,14 @@ class myinkc(hopper):
                             smallonly=False
 
                         text.append(f"µ={self.enginerd(mean,places=2,smallonly=smallonly)}")
-                        text.append(f"\nσ={self.enginerd(cstd,places=2,smallonly=smallonly)}")
+                        text.append(f"σ={self.enginerd(cstd,places=2,smallonly=smallonly)}")
 
                     else:
                         text.append(f"μ={mean:.2f}")
-                        text.append(f"\n σ={cstd:.2f}")
+                        text.append(f"σ={cstd:.2f}")
                     
                     if "samples" in annot:
-                        text.append(f"\n(n={self.enginerd(clen, places=0)})")
+                        text.append(f"(n={self.enginerd(clen, places=0)})")
                         
                     if "rot90" in annot:
                         rot = 90
