@@ -1367,8 +1367,15 @@ class myinkc(hopper):
         """
         
         if coord=="canvas":
+            # pos wrapper
+            pos = kwargs.pop("position", None)
+            if pos:
+                x,y = pos
+                kwargs["x"] = x
+                kwargs["y"] = y
             return plt.text(*args, **kwargs)
         else:
+            # pos is a native arg
             return self.get_ax().text(*args, **kwargs)
 
 
