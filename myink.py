@@ -3283,7 +3283,8 @@ class myinkc(hopper):
         for key in msr_style_dict.keys():
             linestyle = msr_style_dict[key].get("linestyle", "solid")
             if not (monocolor or gradientplot):
-                color = msr_style_dict[key].get("color", g.cycle(k)) # only if no color given it can use gradient/monocolor!
+                for k in range(0,l):
+                    color = msr_style_dict[key].get("color", g.cycle(k)) # only if no color given it can use gradient/monocolor!
             else:
                 color = "black"
             # make a fake mpl line without plotting, to put into legend
