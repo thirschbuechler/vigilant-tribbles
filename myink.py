@@ -33,6 +33,8 @@ from matplotlib.transforms import Bbox
 import matplotlib.patches as patches
 from matplotlib.path import Path
 from matplotlib.lines import Line2D
+from matplotlib.colors import Normalize # colormap on bar-plot
+from matplotlib.cm import ScalarMappable # colormap on bar-plot
 #from matplotlib.patches import Arc, Circle
 
 try:
@@ -1912,6 +1914,28 @@ class myinkc(hopper):
             kwargs["s"]=s
 
         return self.get_ax().scatter(*args,**kwargs)
+
+
+    def bar(self, *args, **kwargs):
+        """ wrap mpl to accept c-axis just like imshow,imshowpro for heatmaps/waterfalls
+            
+            - c: color-axis
+            - cmap: colormap
+        """
+        c = kwargs.pop("c", None)
+        cmap = kwargs.pop("cmap", "turbo_r")
+        
+        if ml.my_any(c):
+            norm = Normalize(vmin = min(c), vmax=max(c))
+            scalar_map = ScalarMappable(norm=norm, cmap=cmap)
+            colors = scalar_map.to_rgba(c)
+            # pipe in colors
+            kwargs["color"] = colors
+            # add the map for self.colorbar() to fish out downstream
+            self.imims.append(scalar_map)
+
+        # bar-call
+        self.get_ax().bar(*args, **kwargs)  
 
 
     def errorbar(self,*args,**kwargs):
