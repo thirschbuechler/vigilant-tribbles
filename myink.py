@@ -1942,6 +1942,31 @@ class myinkc(hopper):
         """ forward to mpl errorbar"""
         return self.get_ax().errorbar(*args,**kwargs)
 
+
+    def wheel(self, matrix, **kwargs):
+        # make a radial plot of a matrix,
+        # where the matrix is a 2D array of values,
+        # and the values represent the colors
+
+        # figure and axis
+        fig, ax = plt.subplots(subplot_kw={'projection': 'polar'})
+
+        # angles
+        angles = np.linspace(0, 2 * np.pi, matrix.shape[1], endpoint=False) # endpoint to not make last one overlap w first one
+
+        # radii
+        radii = np.arange(matrix.shape[0])
+
+        # create a meshgrid of angles and radii
+        angles, radii = np.meshgrid(angles, radii)
+
+        # plot the matrix
+        c = ax.pcolormesh(angles, radii, matrix, cmap='turbo_r')
+
+        # add a colorbar
+        fig.colorbar(c, ax=ax)
+
+
     def stem(self, *args, hidestems=False, hidedots=False, markersize = -1, markercolor="", **kwargs):
         """ stem, options to hide lines etc. """
 
@@ -4462,6 +4487,17 @@ def gridspec_shieldbadge_test():
     plt.show()
 
 
+def wheeltest():
+    # create a matrix of random values
+    matrix = np.random.rand(9, 5) # radial and angular axes
+
+    pe = myinkc()
+    pe.wheel(matrix)
+
+    # display the plot
+    pe.show()
+
+
 #-#-# module test #-#-#
 if testing:#call if selected, after defined, explanation see above
     #tester() # better - call myink_demos.ipynb
@@ -4503,11 +4539,12 @@ if testing:#call if selected, after defined, explanation see above
     #shield_textlen_test(shapes=["hex"], lens=[3], dbg=True)
     
     # note: major issue was front=True with reset_coordsys
-    spind_shieldbadge_test() # both pe
-    gridspec_patch_test() # both manual
-    gridspec_shieldbadge_test() # man gridspec w pe patch
-    spind_path_test()# spind w manual baddge
+    #spind_shieldbadge_test() # both pe
+    #gridspec_patch_test() # both manual
+    #gridspec_shieldbadge_test() # man gridspec w pe patch
+    #spind_path_test()# spind w manual baddge
     
+    wheeltest()
 
     pass
 
