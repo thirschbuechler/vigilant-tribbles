@@ -1943,10 +1943,16 @@ class myinkc(hopper):
         return self.get_ax().errorbar(*args,**kwargs)
 
 
-    def wheel(self, matrix, **kwargs):
-        # make a radial plot of a matrix,
-        # where the matrix is a 2D array of values,
-        # and the values represent the colors
+    def wheel(self, matrix, theta_dir="CCW", rotation=0, **kwargs):
+        """
+        make a radial plot of a matrix,
+        where the matrix is a 2D array of values,
+        and the values represent the colors
+
+        - matrix: 2D array
+        - rotation: rotate the plot by this angle (deg, from 3'clock as default 0°)
+        - thetha_dir: CCW (default) / CW
+        """
 
         # figure and axis
         fig, ax = plt.subplots(subplot_kw={'projection': 'polar'})
@@ -1962,6 +1968,16 @@ class myinkc(hopper):
 
         # plot the matrix
         c = ax.pcolormesh(angles, radii, matrix, cmap='turbo_r')
+
+        if theta_dir == "CCW":
+            ax.set_theta_direction(1)
+        elif theta_dir == "CW":
+            ax.set_theta_direction(-1)
+        else:
+            raise Exception(f"wheel: unknown {theta_dir=}")
+
+        # rotate labels
+        ax.set_theta_offset(rotation* 2*np.pi/360)
 
         # add a colorbar
         fig.colorbar(c, ax=ax)
