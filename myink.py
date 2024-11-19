@@ -1943,7 +1943,7 @@ class myinkc(hopper):
         return self.get_ax().errorbar(*args,**kwargs)
 
 
-    def wheel(self, matrix, theta_dir="CCW", rotation=0, cb_label="cb_label", **kwargs):
+    def wheel(self, matrix, theta_dir="CCW", rotation=0, cb_label="cb_label", ncols=1, **kwargs):
         """
         make a radial plot of a matrix,
         where the matrix is a 2D array of values,
@@ -1952,10 +1952,17 @@ class myinkc(hopper):
         - matrix: 2D array
         - rotation: rotate the plot by this angle (deg, from 3'clock as default 0°)
         - thetha_dir: CCW (default) / CW
+        - ncols: 2 for waterfall doubleplot w cb_bot
+        - (kwargs: go to waterfall, if ncols=2)
         """
 
         # figure and axis
-        fig, ax = plt.subplots(subplot_kw={'projection': 'polar'})
+        if ncols == 2:
+            fig, (ax1, ax2) = plt.subplots(ncols=2)
+            ax1 = plt.subplot(121, projection='polar')
+            ax = ax1
+        else:
+            fig, ax = plt.subplots(subplot_kw={'projection': 'polar'})
 
         # angles
         angles = np.linspace(0, 2 * np.pi, matrix.shape[1], endpoint=False) # endpoint to not make last one overlap w first one
@@ -1969,6 +1976,9 @@ class myinkc(hopper):
         # plot the matrix
         c = ax.pcolormesh(angles, radii, matrix, cmap='turbo_r')
 
+        # save the colorbar handle
+        self.imims.append(c)
+
         if theta_dir == "CCW":
             ax.set_theta_direction(1)
         elif theta_dir == "CW":
@@ -1979,15 +1989,29 @@ class myinkc(hopper):
         # rotate labels
         ax.set_theta_offset(rotation* 2*np.pi/360)
 
-        # # add the colorbar
-        # adjust the subplot to add space for the colorbar
-        fig.subplots_adjust(right=0.55)
+        if ncols !=2:
+            # # add the colorbar
+            # adjust the subplot to add space for the colorbar
+            fig.subplots_adjust(right=0.55)
 
-        # add axis
-        cbar_ax = fig.add_axes([0.65, 0.15, 0.03, 0.7])  # [left, bottom, width, height]
+            # add axis
+            cbar_ax = fig.add_axes([0.65, 0.15, 0.03, 0.7])  # [left, bottom, width, height]
 
-        # colorbar
-        self.colorbar(cmap="turbo_r", cax=cbar_ax, label=cb_label)
+            # colorbar
+            self.colorbar(cmap="turbo_r", cax=cbar_ax, label=cb_label)
+        elif ncols == 2:
+            self.ax = ax2
+            self.axs = [ax1,ax2]
+            self.waterfall(matrix.T, **kwargs)
+
+            # commoncb: bot
+            self.cb_remove()
+
+            # add new one
+            # horizontalalignment='right' - nicer for large figure
+            self.colorbar(label=cb_label, location="bottom", horizontalalignment="center", ax = self.axs)# attach to axs aka all_axes not just one sub-ax
+            # set imshow common colorrange, empty imim array
+            self.common_cb_lims(matrix)
 
 
 
