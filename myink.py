@@ -1943,7 +1943,7 @@ class myinkc(hopper):
         return self.get_ax().errorbar(*args,**kwargs)
 
 
-    def wheel(self, matrix, theta_dir="CCW", rotation=0, **kwargs):
+    def wheel(self, matrix, theta_dir="CCW", rotation=0, cb_label="cb_label", **kwargs):
         """
         make a radial plot of a matrix,
         where the matrix is a 2D array of values,
@@ -1979,8 +1979,16 @@ class myinkc(hopper):
         # rotate labels
         ax.set_theta_offset(rotation* 2*np.pi/360)
 
-        # add a colorbar
-        fig.colorbar(c, ax=ax)
+        # # add the colorbar
+        # adjust the subplot to add space for the colorbar
+        fig.subplots_adjust(right=0.55)
+
+        # add axis
+        cbar_ax = fig.add_axes([0.65, 0.15, 0.03, 0.7])  # [left, bottom, width, height]
+
+        # colorbar
+        self.colorbar(cmap="turbo_r", cax=cbar_ax, label=cb_label)
+
 
 
     def stem(self, *args, hidestems=False, hidedots=False, markersize = -1, markercolor="", **kwargs):
