@@ -206,6 +206,20 @@ class myinkc(hopper):
             self.tikz_enable()
 
 
+    def usetex(self,val=True):
+        self.tex = val
+        self.rcparams_update({"text.usetex":val})
+
+    def get_sep(self):
+        # define which separator to use
+        if self.tex:
+            sep = r"$\thinspace$"
+        else:
+            sep="\N{THIN SPACE}"
+        
+        return sep
+
+
     def mycanvassize(self, **kwargs):
         """ if one of the keys (e.g. medfig) is set (e.g. medfig=True) in kwargs:
             - get kwargs
