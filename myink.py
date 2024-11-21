@@ -1389,6 +1389,8 @@ class myinkc(hopper):
                 x,y = pos
                 kwargs["x"] = x
                 kwargs["y"] = y
+                kwargs["s"] = args[0]
+                args = []
             return plt.text(*args, **kwargs)
         else:
             # pos is a native arg
