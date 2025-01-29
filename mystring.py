@@ -371,16 +371,16 @@ def myunit(value, unit='', sep="\N{THIN SPACE}"):
     return(f"{value}{sep}{unit}")
 
 
-def enginerd(value, unit='', places=2, smallonly=False, sep="\N{THIN SPACE}", text=True, tex=False, **kwargs): #u2009 thinspace not nice in tex, also "G" in graph and Hz in label == unprofessional -_-
-        """ return engineer-nerd formatted string for a given float
+def enginerd(value=None, unit='', places=2, smallonly=False, sep="\N{THIN SPACE}", tex=False, **kwargs): #u2009 thinspace not nice in tex, also "G" in graph and Hz in label == unprofessional -_-
+        """ return engineer-nerd formatter / formatted string for a given value
             
             optional:
+            - value: interpret a value and return text, instead of formatter (default = None)
             - places : how many decimals (default = 2)
-            - unit (str t append)
+            - unit (str to append after order of mag)
             - sep: separator (str, default Unicode-thin-space, non-ascii!)
-            - smallonly: only format if format-string with selected places does not appear as zero (default = False) - "read coffee percipitate if that's the only thing"
-            - text: return as text (default = True) or as formatter (False)
-            - tex overrides sep to be compatible
+            - smallonly: only format if format-string with selected places does not appear as zero (default = False) -- "read coffee percipitate if that's the only thing"
+            - tex (bool): overrides sep to be compatible
             - kwargs: additional kwargs for formatter
 
             # https://matplotlib.org/3.1.0/gallery/text_labels_and_annotations/engineering_formatter.html
@@ -403,8 +403,11 @@ def enginerd(value, unit='', places=2, smallonly=False, sep="\N{THIN SPACE}", te
             >>> enginerd(0.1, sep=" ", smallonly=True)
             '0.10'
 
+            >>> enginerd(300, sep=" ", unit="Hz", places=0, smallonly=True)
+            '300 Hz'
+            
             # nan-handler
-            >>> enginerd(np.nan, "Hz", places=0, smallonly=True)
+            >>> enginerd(np.nan, unit="Hz", places=0, smallonly=True)
             'nan'
 
         """
@@ -415,14 +418,18 @@ def enginerd(value, unit='', places=2, smallonly=False, sep="\N{THIN SPACE}", te
             sep = "" # no separator if no unit
         elif tex:
             sep = r"$\thinspace$"
-
-        try:
-            if np.isnan(value):
-                return "nan"
-            else:
+        else:
+            # pass to engformatter
+            kwargs["unit"] = unit
+        
+        if value:
+            try:
+                if np.isnan(value):
+                    return "nan"
+                else:
+                    pass
+            except:
                 pass
-        except:
-            pass
 
         # "smallonly" might remove go-signal
         if smallonly:
@@ -445,16 +452,16 @@ def enginerd(value, unit='', places=2, smallonly=False, sep="\N{THIN SPACE}", te
         
         # regular operation block
         if go:
-
-            if text==True:
-                return(EngFormatter(places=places, sep=sep, **kwargs).format_eng(value)+unit)
+            if value:
+                return(EngFormatter(places=places, sep=sep, **kwargs).format_eng(value))
             else:
                 if not tex:
                     return(EngFormatter(places=places, sep=sep, **kwargs))
                 else:
-                    return(ScalarFormatter(**kwargs)) # eg puts 10E9 on right
+                    kwargs.pop("unit", None) # remove unit, as it's not compatible with scalarformatter
+                    return(ScalarFormatter(**kwargs)+unit) # eg puts 10E9 on right
         else:
-            return verybasicstr
+            return verybasicstr+sep+unit
 
 
 ###################### testing #############################

@@ -679,13 +679,13 @@ class myinkc(hopper):
             #  an empty fig on importing, even without an obj instance
             raise exception("Specify axis for enginerd format!")
         
-        axissub.set_major_formatter(self.enginerd(text=False, value=None, **kwargs))
+        axissub.set_major_formatter(self.enginerd(**kwargs))
 
-    def enginerd_xaxis(self, ax=None, unit='Hz', **kwargs):
+    def enginerd_xaxis(self, ax=None, unit='', **kwargs):
         ax = self.get_ax(ax)
         self.enginerd_axis(ax.xaxis, unit=unit, **kwargs)
 
-    def enginerd_yaxis(self, ax=None, unit='Hz', **kwargs):
+    def enginerd_yaxis(self, ax=None, unit='', **kwargs):
         ax = self.get_ax(ax)
         self.enginerd_axis(ax.yaxis, unit=unit, **kwargs)        
 
@@ -4551,6 +4551,21 @@ def gridspec_shieldbadge_test():
     plt.show()
 
 
+def engineerd_test():
+    pe = myinkc()
+    
+    pe.subplots()
+    
+    x = np.linspace(0,0.05,1001)
+    #x = np.linspace(0,10,1001)
+    pe.plot(x,x)
+
+    pe.enginerd_xaxis(unit="s")
+    print(pe.get_ax().have_units())
+
+    plt.show()
+
+
 def wheeltest():
     # create a matrix of random values
     matrix = np.random.rand(9, 5) # radial and angular axes
@@ -4608,7 +4623,9 @@ if testing:#call if selected, after defined, explanation see above
     #gridspec_shieldbadge_test() # man gridspec w pe patch
     #spind_path_test()# spind w manual baddge
     
-    wheeltest()
+    #wheeltest()
+    engineerd_test()
+
 
     pass
 
