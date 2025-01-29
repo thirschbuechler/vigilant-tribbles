@@ -1143,10 +1143,10 @@ class myinkc(hopper):
         
         
     def rotate_xticks(self, rotation, long=0, ha="right", autoscale=1,to_int=0):
-        """ rotate ticks. also fix visual offset if long
+        """ rotate xticks. also fix visual offset if long
             - rotation (degrees)
             - ha: horizontal alignment
-            - long (bool): further reformatting (Hack)
+            - long (bool): further reformatting (legacy Hack)
                 - autoscale: re-scale axis
                 - to_int: cast auto-fetched xlabels to int?
                     (alternative: use enginerd_xaxis)
@@ -1194,6 +1194,42 @@ class myinkc(hopper):
             ax.set_xticklabels(xticks,fontdict=fontdict)#Warning mandatory Axes.set_xticks beforehand!. 
                                                             #Otherwise, the labels may end up in unexpected positions. (mpl >3.3.0, web-doc 3.4.1)
             
+
+    def rotate_yticks(self, rotation=0, **kwargs):
+        """ rotate yticks
+            - rotation (degrees)
+            - ha: horizontal alignment
+            - ..
+        """
+        ax=self.get_ax()
+        ax.set_yticklabels(ax.get_yticklabels(), rotation=rotation, **kwargs)
+
+
+    def sudo_rotate_yticks(self, angle=0, overrides={}):
+        """ manually make labels instead of using ax.set_yticklabels
+            
+            works also on polar plots
+        
+            https://stackoverflow.com/questions/46719340/how-to-rotate-tick-labels-in-polar-matplotlib-plot
+        
+        """
+        ax = self.get_ax()
+
+        angles = [angle for _ in ax.get_yticklabels()]
+
+        # manual text labels
+        for i, (label, angle) in enumerate(zip(ax.get_yticklabels(), angles)):
+            x,y = label.get_position()
+            txt = label.get_text()
+
+            if i in overrides.keys():
+                txt = overrides.get(i)
+
+            lab = ax.text(x,y, txt, transform=label.get_transform(),
+                        ha=label.get_ha(), va=label.get_va())
+            lab.set_rotation(angle)
+            #labels.append(lab)
+        ax.set_yticklabels([]) # delete old ones
 
 
     def subplots_adjust(self, *args, **kwargs):
