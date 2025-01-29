@@ -190,7 +190,11 @@ class myinkc(hopper):
         self.close_after_savefig = 0
         self.figs_dir = "figs_out" # outputdir - lies in current path!! e.g. modified by hopper(), portal() or thereof
         
-        self.imims=[] # remember imageshows for rescaling - common_cb_lims
+        # remember imageshows etc. for rescaling - common_cb_lims
+        self.imims=[] 
+        self.imims_old=[]
+        self.data_old=[]
+        
         self.export=False # can be used for differences in labelling etc.
 
         self.printimg=True # shall images be printed
