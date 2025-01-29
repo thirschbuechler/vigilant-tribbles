@@ -1145,22 +1145,23 @@ class myinkc(hopper):
     def rotate_xticks(self, rotation, long=0, ha="right", autoscale=1,to_int=0):
         """ rotate ticks. also fix visual offset if long
             - rotation (degrees)
-            - long (bool): further reformatting?
-                - ha: horizontal alignment
+            - ha: horizontal alignment
+            - long (bool): further reformatting (Hack)
                 - autoscale: re-scale axis
                 - to_int: cast auto-fetched xlabels to int?
                     (alternative: use enginerd_xaxis)
 
         """
         ax=self.get_ax()
-    
-        # first, rotate 
-        #"empty" but sets rotation (_str of this obj returns "Text(0, 0, '')")
-        for tick in ax.get_xticklabels():
-            tick.set_rotation(rotation)
         
-        # then check if longer
-        if long:#longer ones might appear shifted to right - compensate!
+        if not long:
+            ax.set_xticklabels(ax.get_xticklabels(), rotation=rotation, ha=ha)
+        
+        else: # legacy hack
+            for tick in ax.get_xticklabels():
+                tick.set_rotation(rotation)
+                # set ha
+                tick.set_ha(ha)
             
             xticks=ax.get_xticks()
             if to_int:
@@ -4562,6 +4563,9 @@ def engineerd_test():
 
     pe.enginerd_xaxis(unit="s")
     print(pe.get_ax().have_units())
+    
+    #pe.rotate_xticks(45, ha="center")
+    pe.rotate_xticks(45, long=0)
 
     plt.show()
 
