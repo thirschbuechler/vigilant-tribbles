@@ -3543,13 +3543,20 @@ class myinkc(hopper):
             imim.colorbar.remove()
 
 
-    def common_cb_lims(self, data, nan_allowed=True):
+    def common_cb_lims(self, data=None, nan_allowed=True, recover=False):
         """ 
             - finds common min/max of data
             - iterates over self.imim
             - sets common colorbar limits
             - resets self.imim
         """
+        # recover and data imims from other graphs?
+        if recover:
+            data = self.recover_imims()
+        
+        if not len(data):
+            raise Exception(f"no data given to common_cb_lims, {recover=}")
+
         # squash data, in case of different shapes
         #   works always if np.matrix instances are inside data
         #   (not necessarily with np.array tough, e.g. 1D case)
@@ -3572,7 +3579,31 @@ class myinkc(hopper):
             imim.set_clim(mymin,mymax)
             #print(imim)
             #self.get_fig().colorbar(imim,ax=self.get_ax())
-        self.imims=[]#del imshow refs after rescaling
+
+        # remember for a possible recover_imims
+        self.imims_old.append(self.imims)
+        self.data_old.append(data)
+
+        # flush to indicate rescaling happened
+        self.imims=[]
+
+
+    def recover_imims(self):
+        """ restore imims from self.imims_old, for commoncb across multiple figures, etc.
+            """
+        if hasattr(self,"imims_old"):
+            self.imims = ml.autoroadkill(self.imims_old)
+            return self.data_old
+        else:
+            self.log.error("no imims_old to restore")
+
+
+    def recover_imims_init(self):
+        """ init imims_old and data_old
+                for recover_imims()
+        """
+        self.imims_old = []
+        self.data_old = []
 
 
     def reset_coordsys(self):
