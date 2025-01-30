@@ -384,8 +384,7 @@ def enginerd(value=None, unit='', places=2, smallonly=False, sep="\N{THIN SPACE}
             - kwargs: additional kwargs for formatter
 
             # https://matplotlib.org/3.1.0/gallery/text_labels_and_annotations/engineering_formatter.html
-            
-            name is pun on engineer-nerd
+
 
             ## doctest examples
             # cannot test unit-param well, because \t in \thinspace get's interpreted by doctest as \t only -_-
@@ -406,9 +405,13 @@ def enginerd(value=None, unit='', places=2, smallonly=False, sep="\N{THIN SPACE}
             >>> enginerd(300, sep=" ", unit="Hz", places=0, smallonly=True)
             '300 Hz'
             
-            # nan-handler
+            # nan-handler tests
             >>> enginerd(np.nan, unit="Hz", places=0, smallonly=True)
-            'nan'
+            Traceback (most recent call last):
+            Exception: value=nan is nan, why passed to enginerd?
+            >>> enginerd("asdf hello")
+            Traceback (most recent call last):
+            Exception: value='asdf hello' is nan, why passed to enginerd?
 
         """
         go = True
@@ -423,9 +426,17 @@ def enginerd(value=None, unit='', places=2, smallonly=False, sep="\N{THIN SPACE}
             kwargs["unit"] = unit
         
         try:
-            val_present = not np.isnan(value)
+            # handle default
+            if value == None:
+                value_given = False
+            # handle nan
+            else:
+                value_given = (not np.isnan(value))
+                if not value_given:
+                    raise Exception(f"{value=} is nan, why passed to enginerd?")
         except:
-            val_present = 0
+            #return("nan")
+            raise Exception(f"{value=} is nan, why passed to enginerd?")
 
         # "smallonly" might remove go-signal
         if smallonly:
@@ -448,7 +459,7 @@ def enginerd(value=None, unit='', places=2, smallonly=False, sep="\N{THIN SPACE}
         
         # regular operation block
         if go:
-            if val_present:
+            if value_given:
                 return(EngFormatter(places=places, sep=sep, **kwargs).format_eng(value))
             else:
                 if not tex:
