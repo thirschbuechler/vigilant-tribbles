@@ -171,6 +171,17 @@ def auto_ceil(x):
     16000
     >>> auto_ceil(153)
     160
+    >>> auto_ceil(0.3)
+    0
+
+    # comparison to standard stuff
+    >>> np.ceil(0.3)
+    1.0
+    >>> np.around(0.3)
+    0.0
+    >>> np.around(15555)
+    15555
+
     """
     r =  int (np.log10(x)) - 1
     if r>0:
