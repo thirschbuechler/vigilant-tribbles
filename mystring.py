@@ -422,14 +422,10 @@ def enginerd(value=None, unit='', places=2, smallonly=False, sep="\N{THIN SPACE}
             # pass to engformatter
             kwargs["unit"] = unit
         
-        if value:
-            try:
-                if np.isnan(value):
-                    return "nan"
-                else:
-                    pass
-            except:
-                pass
+        try:
+            val_present = not np.isnan(value)
+        except:
+            val_present = 0
 
         # "smallonly" might remove go-signal
         if smallonly:
@@ -452,7 +448,7 @@ def enginerd(value=None, unit='', places=2, smallonly=False, sep="\N{THIN SPACE}
         
         # regular operation block
         if go:
-            if value:
+            if val_present:
                 return(EngFormatter(places=places, sep=sep, **kwargs).format_eng(value))
             else:
                 if not tex:

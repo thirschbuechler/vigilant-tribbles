@@ -944,6 +944,9 @@ def my_any(thing):
     >>> my_any(np.array([[], []]))
     False
 
+    # value 0
+    >>> my_any(0)
+    False
 
 
     # # full # #
