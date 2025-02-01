@@ -361,6 +361,39 @@ def str_split_via_indices(s="",split_points=[]):
     # stackoverflow magic
     return([s[i: j] for i, j in zip(split_points, split_points[1:])])
 
+# hack
+method_map = {"PTI":"PT", "SAZ":"SA", "VNA":"NA"}
+def metadata_to_str(metadata={}, blocktext=False, maxlen=40):
+    """
+    >>> metadata_to_str({"msr":"VNA", "avl":0.5, "ch_list":[1,2,3]})
+    'msr: NA, avl: avl %: 50.00, ch_list: [1, 2, 3]'
+    
+    
+    """
+    for key in metadata.keys():
+        try:
+            if (metadata[key]):
+
+                if key=="avl" and isinstance(metadata[key], float):
+                    metadata[key] = f"avl %: {(metadata[key]*100):.2f}"
+
+                if key == "msr":
+                    # eg metadata[key] == "VNA"
+                    # map PTI to PT, SAZ to SA, VNA to NA
+                    
+                    metadata[key] = method_map.get(metadata[key], metadata[key])
+                
+                elif isinstance(metadata[key], float):
+                    # np.char.isnumeric only works on strings
+                    metadata[key] = enginerd(metadata[key], sep=" ")
+        except Exception as e:
+            raise Exception(f"metadata_to_str {key=}, {metadata[key]=}, {e}")
+
+    if blocktext:
+        return dict_to_blocktext(metadata, maxlinelen=maxlen)
+    else:
+        return dict_to_str(metadata)
+    
 
 def myunit(value, unit='', sep="\N{THIN SPACE}"):
     """ return formatted string for a given float

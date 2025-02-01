@@ -3170,7 +3170,7 @@ class myinkc(hopper):
     def plot_outlines(self, outlines=None,
                         gradientplot=False, monocolor=False, # colorfullness
                         makecanvas=True,
-                        legend=True, badgedata={}, show_bins=False, dontlabel=[], onlylabel=[], lkwargs={}, # annotations
+                        legend=True, badgedata={}, show_bins=False, dontlabel=[], onlylabel=[], lkwargs={}, xlabel="RSSI [dBm]", # annotations
                         renormalize=True, do_offset=True, # data manipulation
                         msr_style_dict={}, **kwargs): # plot() options
         """ hist plotter
@@ -3377,7 +3377,7 @@ class myinkc(hopper):
                     metadata.pop(key, "")
 
             # generate label for this hist instance from metadata
-            label = metadata_to_str(metadata)
+            label = ms.metadata_to_str(metadata)
                 
             #label = f"${label}$" /u2009 issue
 
@@ -3390,9 +3390,12 @@ class myinkc(hopper):
             y = hist
 
             # offset / normalize
-            if ("offset_dB" in metadata) and do_offset:
-                x+=metadata["offset_dB"]*np.ones(np.shape(x))
-                bins+=metadata["offset_dB"] # for show_bins
+            if do_offset:
+                # get from meta OR common_meta (can't be both anyways)
+                offset_dB = metadata.get("offset_dB", common_meta.get("offset_dB", 0))
+                x += offset_dB * np.ones(np.shape(x))
+                bins += offset_dB # for show_bins
+            
             #
             if renormalize:
                 y=y/ml.nanmax(y)
@@ -3428,9 +3431,10 @@ class myinkc(hopper):
 
         # # legend or log metadata # #
 
-        self.xlabel("RSSI [dBm]")
+        self.xlabel(xlabel)
         self.ylabel("scaled histograms")
         # make a custom legend with an entry per linestyle and a black line with that style
+        
         
         lines = []
         labels = []
@@ -3444,8 +3448,15 @@ class myinkc(hopper):
             # make a fake mpl line without plotting, to put into legend
             line = mpl.lines.Line2D([], [], label=key, color=color, linestyle=linestyle)
             lines.append(line)
+            #if key in ms.method_map:
+            #    labels.append(ms.method_map[key])
+            #if substring in key contains any values of the methodmap this substring shall be replaced using method_map
+            for substring, replacement in ms.method_map.items():
+                if substring in key:
+                    key = key.replace(substring, replacement)
+            
             labels.append(key)
-        
+            
 
         if monocolor:
             lkwargs.update(dict(labels=labels, handles=lines))
@@ -3475,9 +3486,9 @@ class myinkc(hopper):
             txt.append("histogram, normalized outlines")
         else:
             txt.append("histogram")
-        txt.append(f"common meta: {metadata_to_str(common_meta, maxlen=50, blocktext=True)}")
+        txt.append(f"common meta: {ms.metadata_to_str(common_meta, maxlen=50, blocktext=True)}")
         if not monocol_note:
-            txt.append(f"linestyles {metadata_to_str(msr_style_dict, maxlen=50, blocktext=True)}")
+            txt.append(f"linestyles {ms.metadata_to_str(msr_style_dict, maxlen=50, blocktext=True)}")
         
         # join
         txt = "\n".join(txt)
@@ -3686,25 +3697,6 @@ class myinkc(hopper):
     #</myinkc> - if an indent level is wrong fcts afterwards not defined!
 
 
-
-def metadata_to_str(metadata={}, blocktext=False, maxlen=40):
-    for key in metadata.keys():
-        try:
-            if (metadata[key]):
-
-                if key=="avl" and isinstance(metadata[key], float):
-                    metadata[key] = f"avl %: {(metadata[key]*100):.2f}"
-                
-                elif isinstance(metadata[key], float):
-                    # np.char.isnumeric only works on strings
-                    metadata[key] = ms.enginerd(metadata[key], sep=" ")
-        except Exception as e:
-            raise Exception(f"metadata_to_str {key=}, {metadata[key]=}, {e}")
-
-    if blocktext:
-        return ms.dict_to_blocktext(metadata, maxlinelen=maxlen)
-    else:
-        return ms.dict_to_str(metadata)
     
 # # # # # # # # # # # # # # # # # # # # # # tester # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 #region tester
