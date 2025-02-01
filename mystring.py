@@ -404,14 +404,15 @@ def myunit(value, unit='', sep="\N{THIN SPACE}"):
     return(f"{value}{sep}{unit}")
 
 
-def enginerd(value=None, unit='', places=2, smallonly=False, sep="\N{THIN SPACE}", tex=False, **kwargs): #u2009 thinspace not nice in tex, also "G" in graph and Hz in label == unprofessional -_-
+def enginerd(value=None, nanok=False, smallonly=False, # str output only
+            unit='', places=2, sep="\N{THIN SPACE}", tex=False, **kwargs): # general
         """ return engineer-nerd formatter / formatted string for a given value
             
             optional:
             - value: interpret a value and return text, instead of formatter (default = None)
             - places : how many decimals (default = 2)
             - unit (str to append after order of mag)
-            - sep: separator (str, default Unicode-thin-space, non-ascii!)
+            - sep: separator (str, default Unicode-thin-space u2009, non-ascii, non-tex compatible)
             - smallonly: only format if format-string with selected places does not appear as zero (default = False) -- "read coffee percipitate if that's the only thing"
             - tex (bool): overrides sep to be compatible
             - kwargs: additional kwargs for formatter
@@ -466,10 +467,16 @@ def enginerd(value=None, unit='', places=2, smallonly=False, sep="\N{THIN SPACE}
             else:
                 value_given = (not np.isnan(value))
                 if not value_given:
-                    raise Exception(f"{value=} is nan, why passed to enginerd?")
+                    if nanok:
+                        return("nan")
+                    else:
+                        raise Exception(f"{value=} is nan, why passed to enginerd?")
+                
         except:
-            #return("nan")
-            raise Exception(f"{value=} is nan, why passed to enginerd?")
+            if nanok:
+                return("nan")
+            else:
+                raise Exception(f"{value=} is nan, why passed to enginerd?")
 
         # "smallonly" might remove go-signal
         if smallonly:
