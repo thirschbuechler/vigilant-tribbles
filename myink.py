@@ -2224,15 +2224,16 @@ class myinkc(hopper):
         self.autoscale_fig()
 
 
-    def boxplot(self, data=[], xlabels="",ylabel="", title="",
-                annot=True, mc = "green", mediancol = 'orange', meanline=False, markerkwargs={}, # annotation related args
-                availability=False, nan_bad=True, legkwargs={},
-                badgedata={},
+    def boxplot(self, data=[], xlabels=None, ylabel="", title="", # data and basic labels
+                legkwargs={}, badgedata={}, # legends
+                xscale=1, xoff=1, xlims=None, # positioning of boxplot and legends
+                reduceright = False, rightlegends=False, # Sets for rightlegends params
+                annot=True, mc = "green", mediancol = 'orange', meanline=False, markerkwargs={}, # further annotation
                 **kwargs):
         """
         boxplot
 
-        copied from stickplot, adapted
+        
         - data: input array/list
         - xlabels: data labels
         - ylabel
@@ -2240,12 +2241,7 @@ class myinkc(hopper):
             - mean always, meanonly removes mean+-stdev
             - mc: markercolors for mean, std edges upper+lower
             - markerkwargs: call hvmarkers
-        
-        availability related:
-        - availability: add availability [%] into xlabel?
-        - nan_bad: NANs are bad?
-            - True: missing datapoints (DEFAULT)
-            - False: empty matrix elements (less to count, e.g. padding in some position_matrix)
+        - xscale: smaller value means boxes are closer together
 
         # Troubleshooting #
         - data = ml.singledim_mod(data)
@@ -2253,6 +2249,7 @@ class myinkc(hopper):
             - ax.boxplot() dies otherwise sometimes
             - applied all the time, might result in a numpy-nanmean-nonzero error however
 
+            (copied from stickplot, adapted)
         """
         
         
@@ -2284,12 +2281,46 @@ class myinkc(hopper):
         # stats.len # more reliable than len(data) for ragged etd
         # stats.lens # list of samples per column
 
-        # consider boxplots are plotted at x-offset of +1 for some reason, maybe to avoid ugly plot at 0
-        xoff = 1
-        x=np.arange(stats.len) + xoff
 
         # input conditioning
         data = data.T
+        mlen = len(means) # not len(data) to not get hung up on ragged arrays; boxstats deals w that
+
+        if type(xlabels)!=type(None):
+            if len(xlabels):
+                if len(xlabels) != mlen:
+                    raise Exception(f"boxplot: {len(xlabels)=} != {len(means)=}, with {np.size(data)=},\n{xlabels=}")
+            else:
+                xlabels = None
+
+
+        if rightlegends:
+            self.log.warning(f"boxplot: {rightlegends=} overwrites badge and legend loc, and sets reduceright")
+            #badgedata["anchor"] = "stickbothugright"
+            #badgedata["anchor"] = "botunstickright"
+            badgedata["anchor"] = "centerright"
+            badgedata["anchorlegacy"] = True
+            legkwargs["loc"] = "upper right"
+            reduceright = True
+            kwargs["widths"] = 0.04
+
+        # todo: hand over a dict with xoff, xscale xlims_fct instead of hardcoding here
+        if reduceright:
+            self.log.warning(f"boxplot: {reduceright=} overwrites xoff, xscale, xlims")
+            # required preconditions
+            xoff = 0
+            #xscale = 0.25
+            xscale = 0.1
+            # reduce space on left
+            #xlims = np.array([-0.1, mlen/3 -0.2 ])
+            xlims = np.array([-0.1, mlen/3 -0.4 ])
+            
+        
+        # x-axis
+        x = np.arange(stats.len) + xoff
+        x = x.astype(float)
+        x *= xscale
+
 
         # plotprep
         flierprops = dict(marker=',', markerfacecolor='black', markersize=12, linestyle='none')
@@ -2298,9 +2329,18 @@ class myinkc(hopper):
         # # plotting # #        
         # flierprops == outlier-marker type
         #   - ","==pixel-marker
-
-        bp = ax.boxplot(data, flierprops=flierprops, **kwargs)
+        try:
+            # passing empty or None xlabels fucks it up, so do it later
+            bp = ax.boxplot(data, flierprops=flierprops, positions=x, **kwargs)
+        except Exception as e:
+            self.log.error(f"boxplot - {e=}")
+            self.log.error(f"boxplot - {data=}")
+            self.log.error(f"boxplot - {x=}")
+            self.log.error(f"boxplot - {xlabels=}")
+            self.log.error(f"boxplot - {kwargs=}")
+            raise Exception(f"mpl boxplot call failed")
         
+
         # annotate with mean, median
         if annot:
 
@@ -2329,7 +2369,7 @@ class myinkc(hopper):
                 self.scatter(x, means-stds, marker="v", label="_", **annotargs) # triag down, label hidden
 
             # numbers
-            if (stats.len < 5) or ("force" in str(annot)):
+            if "text" in str(annot) and ((stats.len < 5) or ("force" in str(annot))):
                 # https://stackoverflow.com/questions/58066009/how-to-display-numeric-mean-and-std-values-next-to-a-box-plot-in-a-series-of-box
                 for i, (line, mean, cstd, clen) in enumerate(zip(bp['medians'], means, stds, stats.lens)):
                     # some loop var suffixed c for current to not overwrite builtin len, std
@@ -2435,14 +2475,6 @@ class myinkc(hopper):
 
                     #self.log.error(f"boxplot - {bbox_text_fig.x0=} {bbox_text_fig.x1=}")
 
-        """
-        if availability:
-            if not xlabels:
-                xlabels=np.zeros(len(data.T))
-            for i, datacolumn in enumerate(data.T):
-                avail_pc = ml.availability_frac(data=datacolumn, nan_bad=nan_bad)*100
-                xlabels[i] = f"{xlabels[i]}\n({avail_pc:.1f}%)"
-        """
 
         if meanline:
             # fetch
@@ -2461,17 +2493,8 @@ class myinkc(hopper):
 
         # # xy_labelling
         ax.set_ylabel(ylabel)
-        if np.any(np.array(xlabels, dtype=object)): # a.any() warning fix, for evaluating bool(list([1,2,3])) or bool(list([0,0,0])), bool(list([[],[],[]])) etc.
-            xlabels = list(xlabels)
-            xlabels.insert(0,0)#insert dummy at begin        
-        ax.set_xticks(np.arange(len(xlabels)))
-        
-        if stats.len > 2:
-            ax.set_xticklabels(xlabels, ha="right")
-            self.rotate_xticks(45, autoscale=0)
-        else:
-            # align the ticks centered below the data series
-            ax.set_xticklabels(xlabels, ha="center")
+        if ml.my_any(xlabels):
+            self.sudo_xlabels(xlabels, x)
 
         ax.locator_params(axis='x', nbins=10)#, tight=True)
         ax.minorticks_on()
@@ -2500,37 +2523,8 @@ class myinkc(hopper):
             h.insert(-1, markerline)
 
         # predefine legend kwargs
-        locallegkwargs = dict(loc="upper left", facecolor='white', framealpha=0.5)
+        locallegkwargs = dict(loc="upper right", facecolor='white', framealpha=0.5)
         
-        # location dependent on datalen
-
-        if stats.len == 1:
-            locallegkwargs.update(loc="upper left")
-
-            if badgedata:
-                badgedata["anchor"] = "topright"
-
-        elif stats.len == 2 : # as len(data) can have a empty dimension at beginning or sth
-            #if len(data) !=2:
-            #    self.log.warning(f"boxplot - evaded for badge creation: {len(data)=} but {stats.len=}")
-            
-            # legend + badge
-            loc = "center"
-            
-            # legend
-            locallegkwargs.update(dict(bbox_to_anchor=(0.5, 0.25), loc=loc))
-
-            # badge
-            if badgedata:
-                badgedata["anchor"] = loc+"top"
-        
-        elif stats.len > 2:
-            locallegkwargs.update(dict(loc="lower center"))
-
-            if badgedata:
-                badgedata["anchor"] = "botright"
-        else:
-            raise Exception(f"boxplot - {stats.len=} not useful, {type(data)=}\n{data=}")
 
         locallegkwargs.update(legkwargs)
 
@@ -2540,7 +2534,10 @@ class myinkc(hopper):
         self.title(title)
         self.autoscale_fig()
         
-        if badgedata:
+        if type(xlims) != type(None):
+            ax.set_xlim(xlims)
+        
+        if badgedata.get("mylist", False):
             fixedscale_upstream = badgedata.pop("fixedscale", None)
             fixedscale_override = 0.9
             badgedata["fixedscale"] = fixedscale_override 
@@ -2554,6 +2551,8 @@ class myinkc(hopper):
                     self.log.info(etxt)
     
             self.add_shieldbadge(**badgedata)
+
+
 
 
     def stickplot_summary(self, data=[], xlabels=None, ylabel=None, title=None):
@@ -4316,13 +4315,134 @@ def statistics_visu():
 
 
 def boxplottest():
+    y = np.array([1,1,1,1,1,1,1,5,2,2,2,-10, -3, -3, -3])
+
+    pe = myinkc()
+    
+    data = [y, -y, y*2, -y*2, y*3, -y*3, y*4, -y*4]
+    xlabels = ["y", "-y", "2y", "-2y", "3y", "-3y", "4y", "-4y"]
+    xscale = 0.25
+
+    for mlen in [2,3,4, 5, 6, 7, 8]:
+        # delete everything up to mlen
+        ddata = data[:mlen]
+        dxlabels = xlabels[:mlen]
+        print(f"{len(ddata)=}, {len(dxlabels)=}")
+
+        pe.subplots()
+        pe.boxplot(ddata, xlabels=dxlabels, annot=True, xscale=xscale, #xlims=np.array([-1,1])*xscale,
+                    xoff=0,
+                    #widths=0.3,  # enlargen boxplot boxes (default: 0.2)
+                    widths=0.09,
+                    #patch_artist=True, fill
+                    #widths=1/xsc,
+                    legkwargs={"loc":"upper right"},
+                    badgedata={"mylist":["M30","M0"], "anchor":"stickhugbotright", "anchorlegacy":True})
+        #pe.get_ax().set_aspect(xscale)
+        
+        # backtrack to get off shieldbadge-ax
+        #pe.ax_backtrack()
+        pe.ax=pe.axs[0]
+
+        ax = pe.get_ax()
+        xlim = np.array(ax.get_xlim())
+        xlimnew = None
+        # with XOFF=1 and length == 2
+        #ax.set_xlim((xlim)*0.5+1*xscale) # ok for 0.25 xscale  
+        #ax.set_xlim((xlim))         # ok for 1 xscale
+
+        # reduce space on left
+        xlimnew = np.array([-0.1, mlen/3 -0.2 ])
+
+        ax.set_xlim(xlimnew)
+
+        print(f"{xscale=}, {xlim=} before mod")
+        print(f"xlim rations before mod: {xlim[0]/xlim[1]}")
+
+        pe.title(f"{mlen=}")
+        
+    pe.show()
+
+def boxplottest_right():
+    y = np.array([1,1,1,1,1,1,1,5,2,2,2,-10, -3, -3, -3])
+
+    pe = myinkc()
+    
+    data = [y, -y, y*2, -y*2, y*3, -y*3, y*4, -y*4]
+    xlabels = ["y", "-y", "2y", "-2y", "3y", "-3y", "4y", "-4y"]
+    xscale = 0.25
+
+    for mlen in [2]:
+        # delete everything up to mlen
+        ddata = data[:mlen]
+        dxlabels = xlabels[:mlen]
+        print(f"{len(ddata)=}, {len(dxlabels)=}")
+
+        pe.subplots()
+        pe.boxplot(ddata, xlabels=dxlabels, annot=True, xscale=xscale, #xlims=np.array([-1,1])*xscale,
+                    xoff=0,
+                    #widths=0.3,  # enlargen boxplot boxes (default: 0.2)
+                    widths=0.09,
+                    #patch_artist=True, fill
+                    #widths=1/xsc,
+                    legkwargs={"loc":"upper right"},
+                    badgedata={"mylist":["M30","M0"], "anchor":"stickhugbotright", "anchorlegacy":True})
+        
+
+        pe.title(f"{mlen=}")
+        
+    pe.show()
+
+
+def boxplottest0():
     y = [1,1,1,1,1,1,1,5,2,2,2,-10, -3, -3, -3]
 
     pe = myinkc()
+    
+    data = [y, -np.array(y)]
+    xlabels = ["y", "-y"]
 
-    pe.subplots()
-    pe.boxplot([y,-np.array(y)], xlabels=["y", "-y"])
+    for xscale in [1,0.75,0.5,0.25]:
+        pe.subplots()
+        pe.boxplot(data, xlabels=xlabels, annot=True, xscale=xscale, #xlims=np.array([-1,1])*xscale,
+                    xoff=1,
+                    #widths=0.3,  # enlargen boxplot boxes (default: 0.2)
+                    widths=0.09,
+                    #patch_artist=True, fill
+                    #widths=1/xsc,
+                    legkwargs={"loc":"upper right"},
+                    badgedata={"mylist":["M30","M0"], "anchor":"stickhugbotright", "anchorlegacy":True})
+        #pe.get_ax().set_aspect(xscale)
+        
+        # backtrack to get off shieldbadge-ax
+        #pe.ax_backtrack()
+        pe.ax=pe.axs[0]
 
+        ax = pe.get_ax()
+        xlim = np.array(ax.get_xlim())
+        xlimnew = None
+        # with XOFF=1
+        ax.set_xlim((xlim)*0.5+1*xscale) # ok for 0.25 xscale 
+        #ax.set_xlim((xlim))         # ok for 1 xscale
+
+        print(f"{xscale=}, {xlim=} before mod")
+        print(f"xlim rations before mod: {xlim[0]/xlim[1]}")
+        #ax.set_xlim(xscale*(2*xlim+1))      
+        #print(f"after: {xscale*(2*xlim+1)}")
+
+        #parts = 3
+        #left = -0.1
+        #xlimnew = np.array([left/parts,1-left/parts])*np.sum(xlim)
+        #xlimnew = [xlim[0], xscale*np.exp(xlim[1])]
+
+        # AFTER SETTING XOFF==0 its EASIER!
+        #left = 0.8
+        #right = 1+1-left
+        #xlimnew = np.array([left,right])*0.5*sum(abs(xlim))
+        #xlimnew= [0,xlim[1]]
+        #ax.set_xlim(xlimnew)
+        pe.title(f"{xscale=}")
+        
     pe.show()
 
 
@@ -4359,8 +4479,6 @@ def corr_mx_tester(ns=[3], **kwargs):
         pe.plot_corr_mx(mx=mx,xlabels=narr, ylabels=narr, clims=clims, optlabel="", aspect="square", cb_label="1E", **kwargs)
 
         pe.show()
-
-
 
 
 def get_maximum_gui_plot_figsize():
@@ -4708,7 +4826,7 @@ if testing:#call if selected, after defined, explanation see above
     #calibrate_corr_mx_label() # old; new: cal_plot_corr_mx.py
     #corr_mx_tester()
 
-    #boxplottest()
+    boxplottest()
 
     #shield_textlen_test()
     #shield_textlen_test(rowsubplot=1)
@@ -4721,7 +4839,7 @@ if testing:#call if selected, after defined, explanation see above
     #spind_path_test()# spind w manual baddge
     
     #wheeltest()
-    engineerd_test()
+    #engineerd_test()
 
 
     pass
