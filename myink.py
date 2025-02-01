@@ -1440,7 +1440,7 @@ class myinkc(hopper):
 
     def add_shieldbadge(self, mylist, disable=False, front=True, dbg=False, extend_outside=False,
                         dscale=None, wscale=1, fixedscale=None, targetat4pt = 3/4, targetat10pt=1, linescale=None, # scaling factors
-                        anchor="topright", anchorlegacy=True, # placement
+                        anchor="botleft", anchorlegacy=True, # placement
                         exclude=[]):
         """ add a shield-badge-like shaped textbox in upper right corner, call after plot AND xlabels etc. done
         
@@ -1582,6 +1582,36 @@ class myinkc(hopper):
                 text_y = 0.85 - n/2
             elif "bot" in anchor:
                 text_y = 0.15 + n/2
+
+            # narrow a bit
+            if "hug" in anchor:
+                # x
+                if "left" in anchor:
+                    text_x -= 0.095
+                elif "right" in anchor:
+                    text_x += 0.095
+            
+            if "stick" in anchor:
+                # y
+                if "top" in anchor:
+                    text_y += 0.02
+                elif "bot" in anchor:
+                    text_y -= 0.02
+
+            # unhug and unstick: do the opposite, after undo (that's why x2)
+            if "unhug" in anchor:
+                # x
+                if "left" in anchor:
+                    text_x += 0.095*2
+                elif "right" in anchor:
+                    text_x -= 0.095*2
+
+            if "unstick" in anchor:
+                # y
+                if "top" in anchor:
+                    text_y -= 0.02*2
+                elif "bot" in anchor:
+                    text_y += 0.02*2
 
         elif type(anchor) ==list:
             # or screw the text, load fig coordinates directly from anchor var
