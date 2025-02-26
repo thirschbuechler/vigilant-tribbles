@@ -31,7 +31,7 @@ except:
         from vigilant_tribbles import detect_rectangle_pixel as drp
 
     except:
-        print("failed to import module directly or via submodule -  mind adding them with underscores not operators (minuses aka dashes, etc.)")
+        print(f"failed to import module directly or via submodule in {__file__} -  mind adding them with underscores not operators (minuses aka dashes, etc.)")
 
 
 def graph_examiner(datalens=[], pixelscales=[], labellen=[], human=True, **kwargs):

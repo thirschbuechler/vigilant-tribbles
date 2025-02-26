@@ -12,7 +12,7 @@ except:
     try:
         from vigilant_tribbles.myink import myinkc
     except:
-        print("failed to import module directly or via submodule -  mind adding them with underscores not operators (minuses aka dashes, etc.)")
+        print(f"failed to import module directly or via submodule in {__file__} -  mind adding them with underscores not operators (minuses aka dashes, etc.)")
 
 
 def is_odd(num):

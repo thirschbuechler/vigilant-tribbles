@@ -19,7 +19,6 @@ Created on Mon May 18 21:26:53 2020
 import colored_traceback.always # colorize terminal output and errors in terminal and vscode terminal
 from logging import exception
 import re
-import os
 import numpy as np
 #import pandas as pd
 
@@ -37,24 +36,21 @@ from matplotlib.colors import Normalize # colormap on bar-plot
 from matplotlib.cm import ScalarMappable # colormap on bar-plot
 #from matplotlib.patches import Arc, Circle
 
-try:
-    import mystring as ms
-    import mailuefterl as ml
-    import cal_plot_corr_mx as cplm
-    from portal import hopper
-except:
-    try:
-        import vigilant_tribbles.mystring as ms
-        from vigilant_tribbles.portal import hopper
-        import vigilant_tribbles.mailuefterl as ml
-        import vigilant_tribbles.cal_plot_corr_mx as cplm
+import sys, os
 
-    except:
-        print("failed to import module directly or via submodule -  mind adding them with underscores not operators (minuses aka dashes, etc.)")
+# import modules if in parent directory via path tmp
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+import vigilant_tribbles.mystring as ms
+from vigilant_tribbles.portal import hopper
+import vigilant_tribbles.mailuefterl as ml
+#import vigilant_tribbles.cal_plot_corr_mx as cplm # avoid circular import, execute there, as it also uses myunk
+
+# undo path tmp import
+sys.path.pop(len(sys.path)-1)
+
 
 modulepath = (os.path.dirname(os.path.abspath(__file__)))
-
-
 
 from PIL import Image
 

@@ -9,29 +9,22 @@ auto-calibrate to px size and drop a csv file
 Created 02.01.24
 @author: thirschbuechler
 """
-import os
 import numpy as np
 import pandas as pd
+import sys, os
 
 
+# import modules if in parent directory via path tmp
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-try:
-    import myink as mi
-    import mailuefterl as ml
-    import mystring as ms
-    import ch_mx_lineartime as chx
-    import detect_rectangle_pixel as drp
+from vigilant_tribbles import myink as mi
+from vigilant_tribbles import mailuefterl as ml
+from vigilant_tribbles import mystring as ms
+from vigilant_tribbles import ch_mx_lineartime as chx
+from vigilant_tribbles import detect_rectangle_pixel as drp
 
-except:
-    try:
-        from vigilant_tribbles import myink as mi
-        from vigilant_tribbles import mailuefterl as ml
-        from vigilant_tribbles import mystring as ms
-        from vigilant_tribbles import ch_mx_lineartime as chx
-        from vigilant_tribbles import detect_rectangle_pixel as drp
-
-    except:
-        print("failed to import module directly or via submodule -  mind adding them with underscores not operators (minuses aka dashes, etc.)")
+# undo path tmp import
+sys.path.pop(len(sys.path)-1)
 
 
 # define calfile and make sure its loaded from scriptfolder

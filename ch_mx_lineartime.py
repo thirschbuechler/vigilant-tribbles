@@ -1,20 +1,17 @@
 import pandas as pd
 import numpy as np
-
-import numpy as np
-try:
-    from myink import myinkc
-    import reshaper as rs
-    import mailuefterl as ml
-except:
-    try:
-        from vigilant_tribbles.myink import myinkc
-        import vigilant_tribbles.reshaper as rs
-        import vigilant_tribbles.mailuefterl as ml
-    except:
-        print("failed to import module directly or via submodule -  mind adding them with underscores not operators (minuses aka dashes, etc.)")
+import sys, os
 
 
+# import modules if in parent directory via path tmp
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+from vigilant_tribbles.myink import myinkc
+import vigilant_tribbles.reshaper as rs
+import vigilant_tribbles.mailuefterl as ml
+
+# undo path tmp import
+sys.path.pop(len(sys.path)-1)
 from scipy.sparse import lil_matrix, bsr_array # needs scipy 1.8.0!!
 
 
