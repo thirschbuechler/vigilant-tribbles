@@ -6,7 +6,7 @@ import sys, os
 # import modules if in parent directory via path tmp
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from vigilant_tribbles.myink import myinkc
+#from vigilant_tribbles.myink import myinkc # only use in main to avoid circular import
 import vigilant_tribbles.reshaper as rs
 import vigilant_tribbles.mailuefterl as ml
 
@@ -153,6 +153,7 @@ if __name__ == '__main__': # test if called as executable, not as library
             sup = ("wf: {}-nan_padding {} equal-spaced datapoints onto end, {:.1f}%".format(mode, d, d/n * 100))
 
         # plot #
+        from vigilant_tribbles.myink import myinkc
         pe = myinkc()
         pe.subplots(ncols=3)
         ikwargs_common =dict(aspect="auto")

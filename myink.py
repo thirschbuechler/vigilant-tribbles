@@ -44,7 +44,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import vigilant_tribbles.mystring as ms
 from vigilant_tribbles.portal import hopper
 import vigilant_tribbles.mailuefterl as ml
-#import vigilant_tribbles.cal_plot_corr_mx as cplm # avoid circular import, execute there, as it also uses myunk
+import vigilant_tribbles.cal_plot_corr_mx as cplm # avoid circular import, execute cal there, but can use importer
 
 # undo path tmp import
 sys.path.pop(len(sys.path)-1)

@@ -17,7 +17,7 @@ import sys, os
 # import modules if in parent directory via path tmp
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from vigilant_tribbles import myink as mi
+#F
 from vigilant_tribbles import mailuefterl as ml
 from vigilant_tribbles import mystring as ms
 from vigilant_tribbles import ch_mx_lineartime as chx
@@ -109,6 +109,7 @@ def calibrate(want_width_px, labellens, datalens, px_arr):
             - at least two edges required for bintreesearch (pixelscales points)
             - can be array which is parsed from left to right for a valid starting point in case of an Exception"""
 
+    from vigilant_tribbles import myink as mi
     # plot element
     pe = mi.myinkc()
 
