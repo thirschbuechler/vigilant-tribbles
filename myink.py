@@ -3503,7 +3503,8 @@ class myinkc(hopper):
             badgedata = dict(bdefaults, **badgedata)
             # add shieldbadge
             badgedata = dict(badgedata, mylist=gcodes)
-            self.add_shieldbadge(**badgedata)
+            if len(gcodes):
+                self.add_shieldbadge(**badgedata)
             
         # make title txt
         txt = []
