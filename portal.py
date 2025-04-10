@@ -294,7 +294,7 @@ class hopper(portal):
             if "suffixes" in value:
                 for suffix in value["suffixes"]:
                     suffixes_defs[suffix] = key
-            elif "prefixes" in value:
+            if "prefixes" in value:
                 for prefix in value["prefixes"]:
                     prefixes_defs[prefix] = key
 
@@ -315,12 +315,13 @@ class hopper(portal):
                 # file.tar.gz --> "file.tar" and ["tar", "gz"]
                 base = pathlib.PurePath(element).stem
                 suffixes = pathlib.PurePath(element).suffixes
+                suffixes = [suffix[1:] for suffix in suffixes] # remove leading dot
                 
                 # classify #
                 # can be matched multiple times per loop
                 loop_matched = False
                 for suffix in suffixes:
-                    if suffix in suffixes_defs:
+                    if suffix in suffixes_defs.keys():
                         myprint(f"suffix {suffix} found in {element}")
                         getattr(self, suffixes_defs[suffix]).append(element)
                         loop_matched = True
