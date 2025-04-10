@@ -18,12 +18,23 @@ Created on Mon May 18 21:06:39 2020
 import sys, os
 from pathvalidate import sanitize_filepath
 
-
 # import modules if in parent directory via path tmp
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from vigilant_tribbles import Fruit
-from vigilant_tribbles import mystring as ms
+try:
+    if __name__ == '__main__':
+        from Fruit import Fruit
+        import mystring as ms
+    else: # submodule
+        print(__name__) # vigilant_tribbles.portal
+        from .Fruit import Fruit
+        from . import mystring as ms
+except ImportError:
+    #print("failed to import module directly or via submodule ")
+    #print(" -> mind not having operators in file or dir-name ( \"-\" etc.); \"_\" is ok") 
+    #print(" -> check if you are in the right folder")
+    #print(" -> check if modules contain errors")
+    sys.exit(1)
 
 # undo path tmp import
 sys.path.pop(len(sys.path)-1)
@@ -46,7 +57,7 @@ def dummy(*args, **kwargs):
 
 # here: child of Fruit.Fruit for data collection purposes,
 # class portal(object) etc. will work as well
-class portal(Fruit.Fruit):
+class portal(Fruit):
     """ - enter a subfolder
         - cleanup afterwards
         - no hopping
@@ -378,8 +389,8 @@ def testreader():
 
 def portaltests():
     print("hello") 
-
-    os.chdir("vigilant_tribbles") # for some reason if called as main but script seated as submodule in another git, the path is the root-project and not submodule
+    if __name__ != '__main__':
+        os.chdir("vigilant_tribbles")
     with portal("testfolder", myprint=print) as p1:
         print("hello2")
         print(p1.getpath())

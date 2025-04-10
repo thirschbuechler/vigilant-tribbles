@@ -36,7 +36,13 @@ import logging
 # import modules if in parent directory via path tmp
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from vigilant_tribbles.mailuefterl import bin_to_xaxis
+try:
+    if __name__ in ['__main__', 'Fruit']:
+        from mailuefterl import bin_to_xaxis
+    else:
+        from .mailuefterl import bin_to_xaxis
+except ImportError:
+    sys.exit(1)
 
 # undo path tmp import
 sys.path.pop(len(sys.path)-1)
