@@ -319,7 +319,7 @@ class hopper(portal):
 
         self.fcounter = fcounter
         self.dcounter = len(self.dirs)
-        myprint(f"classified {fcounter-len(otherfiles)}/{fcounter} files and {len(self.dirs)} directories in {location}")
+        myprint(f"classified {fcounter}/{fcounter+len(otherfiles)} files and {len(self.dirs)} directories in {location}")
 
 
     def get_bins(self, folder, fext=""):
