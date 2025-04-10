@@ -55,6 +55,17 @@ def integritycheck():
 def dummy(*args, **kwargs):
     pass
 
+
+classifiers_def = {"images": {"suffixes": ["png", "jpg", "jpeg"]},
+                #"layouts": {"suffixes": ["pmd"]},
+                "touchstone": {"suffixes": ["s2p", "s1p"]},
+                "csv": {"suffixes": ["csv"]},
+                "errterms": {"prefixes": ["errterms_"]},
+                "pti_files": {"suffixes": ["isd", "csv"]},
+                "txts": {"suffixes": ["txt"]},
+                "pyfiles": {"suffixes": ["py", "ipynb"]},
+                }
+
 # here: child of Fruit.Fruit for data collection purposes,
 # class portal(object) etc. will work as well
 class portal(Fruit):
@@ -63,7 +74,7 @@ class portal(Fruit):
         - no hopping
         """
 
-    def __init__(self, folder="", myprint=dummy, **kwargs):
+    def __init__(self, folder="", classifiers=classifiers_def, myprint=dummy, **kwargs):
         #self.myprint = myprint # legacy - ignore
         self.__enterdir=self.getpath() # needed for cleanup!
         #self.cd(self.__enterdir) # for some reason, a cd of a sub-loop with a portal would fail (it assumes start from scriptdir) - nope was different rooted obj i think
@@ -74,6 +85,8 @@ class portal(Fruit):
 
         super().__init__(**kwargs) # (*args, **kwargs) # superclass inits
         self.myprint = self.log.info # made in __init__ of Fruit class
+
+        self.classifiers = classifiers
 
 
     # https://stackoverflow.com/questions/1481488/what-is-the-del-method-and-how-do-i-call-it
@@ -268,48 +281,55 @@ class hopper(portal):
         fcounter = 0
         otherfiles = []
         
-        self.images=[]
-        self.layouts=[] # pyweave pmd layout files - old
-        self.touchstone=[]
-        self.csv=[]
-        self.pti_files=[]
+
+        # create lists, build reverse lookups 
+        suffixes_defs = {}
+        prefixes_defs = {}
+        for key, value in self.classifiers.items():
+            # create empty list
+            setattr(self, key, [])
+
+            # create reverse lookup
+            if "suffixes" in value:
+                for suffix in value["suffixes"]:
+                    suffixes_defs[suffix] = key
+            elif "prefixes" in value:
+                for prefix in value["prefixes"]:
+                    prefixes_defs[prefix] = key
+
+
+        # manually create subdir list
         self.dirs=[]
-        self.txts=[]
-        self.pyfiles=[]
-        self.errterms=[]
         
         # files and directories
         elements = os.listdir(location)
         if not elements and emptyerror:
             raise Exception(f"No files or folders here - empty directory {location}!")
             
-        # classify
+        # loop over listdir output
         for element in elements:    
             if os.path.isfile(element):
-                # assume it's an useful file
-                fcounter +=1
 
-                if element.endswith(".png") or element.endswith(".jpg"):
-                    self.images.append(element)
-                elif element.endswith(".pmd"):
-                    self.layouts.append(element)
-                elif element.endswith(".s2p") or element.endswith(".s1p"):
-                    self.touchstone.append(element)
-                elif element.startswith("errterms_"):
-                    self.errterms.append(element)
-                elif element.endswith(".isd"):
-                    self.pti_files.append(element)
-                elif element.endswith(".csv"):
-                    self.pti_files.append(element)
-                    self.csv.append(element)
-                elif element.endswith(".txt"):
-                    self.txts.append(element)
-                elif element.endswith(".py") or element.endswith(".ipynb"):
-                    self.pyfiles.append(element)
+                # split filename into base and extension
+                filename = os.path.basename(element)
+                if "." in filename:
+                    base, extension = filename.split(".")
+                else:
+                    base = filename
+                    extension = ""
+
+                # classify
+                if extension in suffixes_defs:
+                    myprint(f"suffix {extension} found in {element}")
+                    getattr(self, suffixes_defs[extension]).append(element)
+                    fcounter +=1
+                elif base in prefixes_defs:
+                    myprint(f"prefix {base} found in {element}")
+                    getattr(self, prefixes_defs[base]).append(element)
+                    fcounter +=1
                 else:
                     otherfiles.append(element)
-                    # does not count as useful, remove from counter
-                    fcounter -=1
+                    
                     
             elif os.path.isdir(element):
                 self.dirs.append(element)
@@ -406,6 +426,7 @@ def hoppertests():
     a = hopper()
     a.cd("myfigures")
     a.listfiles(myprint=print)
+    print("these images:")
     print(a.images)
 
     # testing legacy mystring include
