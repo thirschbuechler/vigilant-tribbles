@@ -17,6 +17,7 @@ Created on Mon May 18 21:06:39 2020
 """
 import sys, os
 from pathvalidate import sanitize_filepath
+import pathlib
 
 # import modules if in parent directory via path tmp
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -278,7 +279,7 @@ class hopper(portal):
         """ list files and classify them """
         #https://stackoverflow.com/questions/18262293/how-to-open-every-file-in-a-folder
         location = self.getpath()
-        fcounter = 0
+        matched_files = 0
         otherfiles = []
         
 
@@ -310,36 +311,47 @@ class hopper(portal):
         for element in elements:    
             if os.path.isfile(element):
 
-                # split filename into base and extension
-                filename = os.path.basename(element)
-                if "." in filename:
-                    base, extension = filename.split(".")
-                else:
-                    base = filename
-                    extension = ""
-
-                # classify
-                if extension in suffixes_defs:
-                    myprint(f"suffix {extension} found in {element}")
-                    getattr(self, suffixes_defs[extension]).append(element)
-                    fcounter +=1
-                elif base in prefixes_defs:
+                # pathlib for filename analysis #
+                # file.tar.gz --> "file.tar" and ["tar", "gz"]
+                base = pathlib.PurePath(element).stem
+                suffixes = pathlib.PurePath(element).suffixes
+                
+                # classify #
+                # can be matched multiple times per loop
+                loop_matched = False
+                for suffix in suffixes:
+                    if suffix in suffixes_defs:
+                        myprint(f"suffix {suffix} found in {element}")
+                        getattr(self, suffixes_defs[suffix]).append(element)
+                        loop_matched = True
+                
+                if base in prefixes_defs:
                     myprint(f"prefix {base} found in {element}")
                     getattr(self, prefixes_defs[base]).append(element)
-                    fcounter +=1
+                    loop_matched = True
+
+                if loop_matched:
+                    matched_files += 1
                 else:
                     otherfiles.append(element)
                     
-                    
             elif os.path.isdir(element):
                 self.dirs.append(element)
+
+            # treat as dir
+            elif os.path.islink(element):
+                # check if its valid
+                if os.path.exists(element):
+                    # treat as dir
+                    self.dirs.append(element)
+                #self.dirs.append(element)
             
             else:
                 raise Exception(f"unknown (impossible?) file/dir type {element=} in {location}!")
 
-        self.fcounter = fcounter
+        self.fcounter = matched_files
         self.dcounter = len(self.dirs)
-        myprint(f"classified {fcounter}/{fcounter+len(otherfiles)} files and {len(self.dirs)} directories in {location}")
+        myprint(f"classified {matched_files}/{matched_files+len(otherfiles)} files and {len(self.dirs)} directories in {location}")
 
 
     def get_bins(self, folder, fext=""):
