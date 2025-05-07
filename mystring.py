@@ -438,6 +438,9 @@ def enginerd(value=None, nanok=False, smallonly=False, # str output only
 
             >>> enginerd(300, sep=" ", unit="Hz", places=0, smallonly=True)
             '300 Hz'
+
+            >>> enginerd(29E-3, sep=" ", unit="m", places=0, smallonly=False)
+            '29 mm'
             
             # nan-handler tests
             >>> enginerd(np.nan, unit="Hz", places=0, smallonly=True)
@@ -500,7 +503,8 @@ def enginerd(value=None, nanok=False, smallonly=False, # str output only
         # regular operation block
         if go:
             if value_given:
-                return(EngFormatter(places=places, sep=sep, **kwargs).format_eng(value))
+                ef = EngFormatter(places=places, sep=sep, **kwargs)
+                return ef(value) # use __call__ implicitly instead of format_eng to also get unit
             else:
                 if not tex:
                     return(EngFormatter(places=places, sep=sep, **kwargs))
