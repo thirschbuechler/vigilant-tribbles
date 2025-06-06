@@ -2222,9 +2222,10 @@ class myinkc(hopper):
 
     def boxplot(self, data=[], xlabels=None, ylabel="", title="", # data and basic labels
                 legkwargs={}, badgedata={}, # legends
-                xscale=1, xoff=1, xlims=None, # positioning of boxplot and legends
+                xscale=1, xoff=1, xlims=None, xlrot=0, # positioning of boxplot and legends
                 reduceright = False, rightlegends=False, # Sets for rightlegends params
                 annot=True, mc = "green", mediancol = 'orange', meanline=False, markerkwargs={}, # further annotation
+                flierprops = dict(marker=',', markerfacecolor='black', markersize=12, linestyle='none'), # outlier marker
                 **kwargs):
         """
         boxplot
@@ -2237,6 +2238,7 @@ class myinkc(hopper):
             - mean always, meanonly removes mean+-stdev
             - mc: markercolors for mean, std edges upper+lower
             - markerkwargs: call hvmarkers
+        - flierprops: outlier marker properties (default: pixel-marker dict)
         - xscale: smaller value means boxes are closer together
 
         # Troubleshooting #
@@ -2319,7 +2321,9 @@ class myinkc(hopper):
 
 
         # plotprep
-        flierprops = dict(marker=',', markerfacecolor='black', markersize=12, linestyle='none')
+        if flierprops in [None, {}, ""]:
+            # turn it off
+            flierprops = dict(marker='', markerfacecolor='black', markersize=12, linestyle='none')
         ax = self.get_ax()
 
         # # plotting # #        
@@ -2491,9 +2495,10 @@ class myinkc(hopper):
         ax.set_ylabel(ylabel)
         if ml.my_any(xlabels):
             self.sudo_xlabels(xlabels, x)
+            self.rotate_xticks(xlrot)
 
         ax.locator_params(axis='x', nbins=10)#, tight=True)
-        ax.minorticks_on()
+        #ax.minorticks_on()
         
         # # legend customization
         # init default, mod later
