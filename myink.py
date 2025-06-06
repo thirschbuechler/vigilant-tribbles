@@ -2238,7 +2238,9 @@ class myinkc(hopper):
             - mean always, meanonly removes mean+-stdev
             - mc: markercolors for mean, std edges upper+lower
             - markerkwargs: call hvmarkers
-        - flierprops: outlier marker properties (default: pixel-marker dict)
+        - flierprops: outlier marker properties
+            - default: pixel-marker dict
+            - invisible on printouts!
         - xscale: smaller value means boxes are closer together
 
         # Troubleshooting #
@@ -2324,6 +2326,8 @@ class myinkc(hopper):
         if flierprops in [None, {}, ""]:
             # turn it off
             flierprops = dict(marker='', markerfacecolor='black', markersize=12, linestyle='none')
+        else:
+            flierprops = kwargs.pop("flierprops", flierprops)
         ax = self.get_ax()
 
         # # plotting # #        
