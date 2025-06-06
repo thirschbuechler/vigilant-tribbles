@@ -1465,7 +1465,7 @@ class myinkc(hopper):
             DO NOT CHANGE XLIMS, YLIMS, or use AUTOSCALE etc. afterwards!
         """
 
-        if disable:
+        if True:
             return None
         
         if hasattr(self,"gcode_masseur"):
