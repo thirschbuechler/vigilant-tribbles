@@ -157,25 +157,24 @@ def dictlist_intersection(mydictlist):
     find common key-value pairs in a list of dictionaries
     (as "dict1 & dict2" doesn't work)
     
-    doesn't like if more than 1 sub-dict has a list!
-
-    dccsillag: https://stackoverflow.com/questions/18554012/intersecting-two-dictionaries
+    Handles lists in dictionary values by comparing their contents.
 
     >>> dictlist_intersection([{"a":3, "b":4, "d":0},{"a":1, "c":4, "d":0},{"d":0, "a":4, "x":0}])
     {'d': 0}
     >>> dictlist_intersection([{"a":3, "b":4, "nestedlist":[1,2,3,"aa"]},{"a":1, "c":4, "d":0},{"d":0, "a":4, "x":0}])
     {}
 
-    # same-valued nestedlists screw up
+    # Same-valued nestedlists now work properly
     >>> dictlist_intersection([{"a":3, "b":4, "nestedlist":[1,2,3,"aa"]},{"a":1, "c":4, "nestedlist":[1,2,3,"aa"]}])
-    Traceback (most recent call last):
-    ...
-    Exception: ['dictlist_intersection', "list nestedlist:[1, 2, 3, 'aa']", "list nestedlist:[1, 2, 3, 'aa']"]
+    {'nestedlist': [1, 2, 3, 'aa']}
 
-    # differing don't
+    # Differing lists still return empty dict for that key
     >>> dictlist_intersection([{"a":3, "b":4, "nestedlist":[1,2,3,"aa"]},{"a":1, "c":4, "nestedlist":[1,2,3,"bb"]}])
     {}
 
+    # Works with multiple lists
+    >>> dictlist_intersection([{"sparams":["S21"], "ch_list":[]}, {"sparams":["S21"], "ch_list":[]}])
+    {'sparams': ['S21'], 'ch_list': []}
     """
     if not (type(mydictlist[0]) == dict):
         raise Exception("not a dict as list element")
@@ -185,26 +184,21 @@ def dictlist_intersection(mydictlist):
             # initialize
             commons = item
         else:
-            # intersect with last one
-            try:
-                commons = dict(commons.items() & item.items()) # dict.items() produces keys+values
-            
-            # only on error, loop and show issue, don't loop on runtime all the time
-            except TypeError as e:
-                t = []
-                t.append(f"dictlist_intersection")
-
-                for check_dict in [commons, item]: # traverse last loop(s) and currentloops dicts
-                    if hasattr(check_dict,"items"):
-                        for key,val in check_dict.items(): 
-                            if type(val)==list:
-                                t.append(f"list {key}:{val}")
-                # re-raise  
-                if not t:
-                    t = e
-                raise Exception(t) from None # to suppress "during handling of Exeption, .."
-            
+            # Manual intersection to handle lists properly
+            new_commons = {}
+            for key, value in commons.items():
+                if key in item:
+                    # For lists, compare contents
+                    if isinstance(value, list) and isinstance(item[key], list):
+                        if value == item[key]:  # Compare list contents
+                            new_commons[key] = value
+                    # For regular values, compare directly
+                    elif value == item[key]:
+                        new_commons[key] = value
+            commons = new_commons
+    
     return commons
+
 
 
 def dict_a_fully_in_b(dict_a={}, dict_b={}):
