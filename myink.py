@@ -2812,7 +2812,8 @@ class myinkc(hopper):
 
 
     def persistence_core(self, xaxes=None, mxs=None, # data
-                        pos_avg=True, pos_med=False, weighted=False, # plot options
+                        pos_avg=True, pos_med=False,# plot options
+                        weighted=False, persistence=np.nan, # alpha options
                         title="", labels=[], markers=[], # annotations
                     colors=np.array([["bisque", "sandybrown", "darkorange", "red"], ["lavender", "cornflowerblue", "blue", "purple"]]).T,
                     **subpkwargs):
@@ -2863,7 +2864,11 @@ class myinkc(hopper):
                 if alpha > 1:
                     raise Exception(f"{weighted=} results in {alpha=} > 1, which is invalid")
             else:
-                alpha = 1
+                alpha = 1 # no transparency
+            
+            if persistence != np.nan:
+                alpha = persistence
+
             for pos, color in zip(magDBs, colors):
                 self.plot(x_axis, pos, color=color, alpha=alpha)
             
