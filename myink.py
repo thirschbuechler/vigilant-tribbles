@@ -298,8 +298,8 @@ class myinkc(hopper):
             self.close()
                     
 
-    def saveallfigs(self, fns=[]):
-        """ wrap save_lastgraph for a list of fns (filenames)"""
+    def saveallfigs(self, fns=[], prefix=""):
+        """ wrap save_lastgraph for a list of fns (filenames), and an optional common prefix"""
         figs = list(map(plt.figure, plt.get_fignums()))
         if not figs:
             raise Exception("no figs retrieved to save, there are none!")
@@ -309,7 +309,7 @@ class myinkc(hopper):
             if len(fns) == len(figs):
                 for fig, fn in zip(figs, fns):
                     plt.figure(fig)
-                    self.save_lastgraph(fn)
+                    self.save_lastgraph(prefix+fn)
             else:
                 raise Exception(f"figure savenames:{len(fns)} != available figures:{len(figs)}")
         
