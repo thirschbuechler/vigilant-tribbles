@@ -689,7 +689,43 @@ class myinkc(hopper):
         ax = self.get_ax(ax)
         self.enginerd_axis(ax.yaxis, unit=unit, **kwargs)        
 
-    
+    def enginerd_xaxis_splitoff_unit(self, target="(", order=None):
+        """ after using enginerd_xaxis,
+            maybe you want the order (eg. G for Giga)
+            to be in the label instead,
+            after a certain target character
+        """
+        # get all xticklabels
+        ax = self.get_ax()
+        labels = ax.get_xticklabels()
+        # split off any unit from the labels
+        
+        newlabels = []
+        for label in labels:
+            parts = label.get_text().split(order)
+            newlabels.append(parts[0])
+
+        # set the new xticklabels
+        ax.set_xticklabels(newlabels)
+
+        # get the xlabel
+        xlabel = ax.get_xlabel()
+        
+        # parse for target
+        if target in xlabel:
+            # find the position
+            pos = xlabel.index(target)
+            # insert the units afterwards
+            new_xlabel = xlabel[:pos+1] + order + xlabel[pos+1:]
+            ax.set_xlabel(new_xlabel)
+        else:
+            # if target not found or given, set as prefix
+            new_xlabel = order + xlabel
+            ax.set_xlabel(new_xlabel)
+
+        return new_xlabel
+
+
     def killlegend(self,ax=None):
         ax = self.get_ax(ax)
         leg = ax.get_legend()
